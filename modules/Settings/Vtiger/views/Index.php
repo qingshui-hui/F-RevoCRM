@@ -133,7 +133,7 @@ class Settings_Vtiger_Index_View extends Vtiger_Basic_View {
 		$moduleName = $request->getModule();
 
 		$jsFileNames = array(
-			'modules.Vtiger.resources.Vtiger',
+			// 'modules.Vtiger.resources.Vtiger',
 			'modules.Settings.Vtiger.resources.Vtiger',
 			'modules.Settings.Vtiger.resources.Edit',
 			"modules.Settings.$moduleName.resources.$moduleName",

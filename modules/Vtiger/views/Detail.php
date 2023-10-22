@@ -293,7 +293,7 @@ class Vtiger_Detail_View extends Vtiger_Index_View {
 			"libraries.jquery.ckeditor.ckeditor",
 			"libraries.jquery.ckeditor.adapters.jquery",
 			"modules.Emails.resources.MassEdit",
-			"modules.Vtiger.resources.CkEditor",
+			// "modules.Vtiger.resources.CkEditor",
 			"~/libraries/jquery/twitter-text-js/twitter-text.js",
 			"libraries.jquery.multiplefileupload.jquery_MultiFile",
 			'~/libraries/jquery/bootstrapswitch/js/bootstrap-switch.min.js',
