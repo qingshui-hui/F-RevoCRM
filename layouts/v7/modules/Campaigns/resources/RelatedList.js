@@ -367,7 +367,7 @@ class Campaigns_RelatedList_Js extends Vtiger_RelatedList_Js {
     }
 
     constructor(parentId, parentModule, selectedRelatedTabElement, relatedModuleName) {
-        super.constructor(parentId, parentModule, selectedRelatedTabElement, relatedModuleName);
+        super(parentId, parentModule, selectedRelatedTabElement, relatedModuleName);
         this.registerEvents();
     }
 };

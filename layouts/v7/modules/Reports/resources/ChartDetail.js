@@ -232,9 +232,9 @@ class Report_Piechart_Js extends Vtiger_Pie_Widget_Js {
 
     constructor(parent) {
         if (parent) {
-            super.constructor(parent);
+            super(parent);
         } else {
-            super.constructor(jQuery('#reportContentsDiv'));
+            super(jQuery('#reportContentsDiv'));
         }
     }
 
@@ -316,9 +316,9 @@ class Report_Verticalbarchart_Js extends Vtiger_Barchat_Widget_Js {
 
     constructor(parent) {
         if (parent) {
-            super.constructor(parent);
+            super(parent);
         } else {
-            super.constructor(jQuery('#reportContentsDiv'));
+            super(jQuery('#reportContentsDiv'));
         }
     }
 

@@ -20,6 +20,7 @@ class Settings_Vtiger_TermsAndConditionsEdit_Js extends Vtiger_Class_Js {
     }
 
     constructor() {
+        super();
         this.addComponents();
     }
 

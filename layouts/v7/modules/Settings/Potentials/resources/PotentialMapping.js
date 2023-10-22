@@ -255,12 +255,13 @@ class Settings_PotentialMapping_Js {
 
 class Settings_Potentials_MappingDetail_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
-//        if(jQuery('.sticky-wrap').length == 0){
-//            stickyheader.controller();
-//            var container = jQuery('#detailView');
-//            container.find('.sticky-thead').addClass('listview-table');
-//        }
+        //        if(jQuery('.sticky-wrap').length == 0){
+        //            stickyheader.controller();
+        //            var container = jQuery('#detailView');
+        //            container.find('.sticky-thead').addClass('listview-table');
+        //        }
         if(window.hasOwnProperty('Vtiger_List_Js')) {
             var listInstance = new Vtiger_List_Js();
             setTimeout(function(){

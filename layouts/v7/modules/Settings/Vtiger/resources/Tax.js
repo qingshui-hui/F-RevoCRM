@@ -25,6 +25,7 @@ class Settings_Vtiger_TaxIndex_Js extends Vtiger_Class_Js {
     }
 
     constructor() {
+        super();
         this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
     }
 

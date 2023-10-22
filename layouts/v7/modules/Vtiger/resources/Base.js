@@ -11,6 +11,7 @@ class Vtiger_Base_Js extends Vtiger_Class_Js {
     addComponents() {}
 
     constructor() {
+        super();
         this.addComponents();
     }
 

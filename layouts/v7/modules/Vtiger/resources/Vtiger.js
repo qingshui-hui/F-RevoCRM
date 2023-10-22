@@ -305,6 +305,7 @@ class Vtiger_Index_Js extends Vtiger_Class_Js {
     autoFillElement = false;
 
     constructor() {
+        super();
         this.addComponents();
     }
 

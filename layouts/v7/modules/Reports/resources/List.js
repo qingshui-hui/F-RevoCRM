@@ -132,6 +132,7 @@ class Reports_List_Js extends Vtiger_List_Js {
     }
 
     constructor() {
+        super();
         this.addComponents();
     }
 

@@ -184,7 +184,7 @@ class Inventory_Edit_Js extends Vtiger_Edit_Js {
     lineItemDetectingClass = 'lineItemRow';
 
     constructor() {
-       super.constructor();
+       super();
        this.initializeVariables();
     }
 

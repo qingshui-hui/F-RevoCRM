@@ -74,8 +74,9 @@ class Settings_PickListDependency_Js extends Vtiger_Class_Js {
 
     //constructor
     constructor() {
-            this.addComponents();
-            Settings_PickListDependency_Js.pickListDependencyInstance = this;
+        super();
+        this.addComponents();
+        Settings_PickListDependency_Js.pickListDependencyInstance = this;
     }
 
     addComponents() {

@@ -283,6 +283,7 @@ class Vtiger_List_Js extends Vtiger_Class_Js {
     _moduleName = false;
 
     constructor() {
+        super();
         this.addComponents();
     }
 

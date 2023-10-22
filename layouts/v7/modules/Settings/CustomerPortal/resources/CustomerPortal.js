@@ -14,6 +14,7 @@ class Settings_Customer_Portal_Js extends Vtiger_Class_Js {
     rowClass = 'portalModuleRow';
 
     constructor() {
+        super();
         this.addComponents();
     }
 

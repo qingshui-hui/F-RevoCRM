@@ -12,6 +12,7 @@ class Reports_Edit_Js extends Vtiger_Edit_Js {
     reportsContainer = false;
 
     constructor() {
+        super();
         this.addComponents();
         var statusToProceed = this.proceedRegisterEvents();
         if(!statusToProceed){

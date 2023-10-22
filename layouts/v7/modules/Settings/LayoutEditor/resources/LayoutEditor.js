@@ -2322,6 +2322,7 @@ class Settings_LayoutEditor_Js extends Vtiger_Class_Js {
 
 class Settings_LayoutEditor_Index_Js extends Settings_LayoutEditor_Js {
     constructor() {
+        super();
         this.addComponents();
     }
 

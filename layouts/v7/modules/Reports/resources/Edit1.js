@@ -12,6 +12,7 @@ class Reports_Edit1_Js extends Reports_Edit_Js {
     secondaryModulesContainer = false;
 
     constructor() {
+        super();
         this.initialize();
     }
 

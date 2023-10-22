@@ -34,10 +34,11 @@ class Vtiger_Widget_Js extends Vtiger_Class_Js {
     plotContainer = false;
 
     constructor(container) {
+        super(container);
         this.setContainer(jQuery(container));
         this.registerWidgetPostLoadEvent(container);
         this.registerWidgetPostRefreshEvent(container);
-        this.registerWidgetPostResizeEvent(container); 
+        this.registerWidgetPostResizeEvent(container);
     }
 
     getContainer() {

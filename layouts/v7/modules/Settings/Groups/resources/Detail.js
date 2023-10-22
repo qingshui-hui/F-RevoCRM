@@ -9,7 +9,8 @@
 
 class Settings_Groups_Detail_Js extends Vtiger_Class_Js {
     constructor() {
-       this.addComponents();
+        super();
+        this.addComponents();
     }
 
     addComponents() {

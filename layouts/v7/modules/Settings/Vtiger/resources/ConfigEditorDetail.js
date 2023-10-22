@@ -9,6 +9,7 @@
 
 class Settings_Vtiger_ConfigEditorDetail_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
     }
 

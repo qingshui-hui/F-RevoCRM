@@ -11,6 +11,7 @@ class Reports_Edit3_Js extends Reports_Edit_Js {
     advanceFilterInstance = false;
 
     constructor() {
+        super();
         this.initialize();
     }
 

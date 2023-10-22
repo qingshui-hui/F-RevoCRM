@@ -11,6 +11,7 @@ class Settings_Sharing_Access_Js extends Vtiger_Class_Js {
     contentsContainer = false;
 
     constructor() {
+        super();
         this.setContentTable('.sharingAccessDetails').setContentContainer('#sharingAccessContainer');
     }
 
@@ -334,7 +335,7 @@ class Settings_Sharing_Access_Js extends Vtiger_Class_Js {
 
 class Settings_SharingAccess_Index_Js extends Settings_Sharing_Access_Js {
     constructor() {
-        super.constructor();
+        super();
         this.addComponents();
     }
 

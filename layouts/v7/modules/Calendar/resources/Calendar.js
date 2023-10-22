@@ -93,6 +93,7 @@ class Calendar_Calendar_Js extends Vtiger_Class_Js {
     }
 
     constructor() {
+        super();
         this.addComponents();
     }
 

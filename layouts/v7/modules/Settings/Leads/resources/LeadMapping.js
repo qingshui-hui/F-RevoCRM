@@ -271,13 +271,14 @@ class Settings_LeadMapping_Js {
 
 class Settings_Leads_MappingDetail_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
-//        if(jQuery('.sticky-wrap').length == 0){
-//            stickyheader.controller();
-//            var container = jQuery('#detailView');
-//            container.find('.sticky-thead').addClass('listview-table');
-//            app.helper.dynamicListViewHorizontalScroll();
-//        }
+        //        if(jQuery('.sticky-wrap').length == 0){
+        //            stickyheader.controller();
+        //            var container = jQuery('#detailView');
+        //            container.find('.sticky-thead').addClass('listview-table');
+        //            app.helper.dynamicListViewHorizontalScroll();
+        //        }
         if(window.hasOwnProperty('Vtiger_List_Js')) {
             var listInstance = new Vtiger_List_Js();
             setTimeout(function(){

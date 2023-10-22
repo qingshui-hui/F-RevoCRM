@@ -8,7 +8,7 @@
  *************************************************************************************/
 class Settings_LanguageConverter_List_Js extends Settings_LanguageConverter_Js {
     constructor() {
-            super.constructor();
+            super();
         this.addComponents();
     }
 

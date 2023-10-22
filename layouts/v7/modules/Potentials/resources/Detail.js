@@ -54,7 +54,7 @@ class Potentials_Detail_Js extends Vtiger_Detail_Js {
 
     //constructor
     constructor() {
-        super.constructor();
+        super();
         Potentials_Detail_Js.detailCurrentInstance = this;
     }
 

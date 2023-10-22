@@ -9,6 +9,7 @@
 
 class Google_Index_Js extends Vtiger_ExtensionCommon_Js {
     constructor() {
+        super();
         this.addComponents();
     }
 

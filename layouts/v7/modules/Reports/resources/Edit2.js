@@ -16,6 +16,7 @@ class Reports_Edit2_Js extends Reports_Edit_Js {
     selectedFields = false;
 
     constructor() {
+        super();
         this.initialize();
     }
 

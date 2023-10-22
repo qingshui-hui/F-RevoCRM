@@ -59,6 +59,7 @@ class Settings_LanguageConverter_Js extends Vtiger_Class_Js {
 
     //constructor
     constructor() {
+        super();
         Settings_LanguageConverter_Js.currentInstance = this;
     }
 

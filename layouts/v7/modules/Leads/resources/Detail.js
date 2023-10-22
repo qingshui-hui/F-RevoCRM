@@ -53,7 +53,7 @@ class Leads_Detail_Js extends Vtiger_Detail_Js {
 
     //constructor
     constructor() {
-        super.constructor();
+        super();
         Leads_Detail_Js.detailCurrentInstance = this;
    }
 

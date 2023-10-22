@@ -205,6 +205,7 @@ class Vtiger_DashBoard_Js extends Vtiger_Class_Js {
     instancesCache = {};
 
     constructor() {
+        super();
         Vtiger_DashBoard_Js.currentInstance = this;
         this.addComponents();
     }
@@ -588,8 +589,9 @@ class Vtiger_DashBoard_Js extends Vtiger_Class_Js {
                     var chartClass = window["Report_"+chartClassName + "_Js"];
                     class Vtiger_ChartReportWidget_Widget_Js extends chartClass {
                         constructor() {
-                                super.registerWidgetFullScreenView(modalWidgetContainer);
-                            }
+                            super();
+                            super.registerWidgetFullScreenView(modalWidgetContainer);
+                        }
                     };
                 }
                 var widgetInstance = Vtiger_Widget_Js.getInstance(modalWidgetContainer, widgetName);

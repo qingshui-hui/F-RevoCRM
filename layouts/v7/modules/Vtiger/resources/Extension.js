@@ -23,6 +23,7 @@ class Vtiger_Extension_Js extends Vtiger_Class_Js {
     }
 
     constructor() {
+        super();
         this.addComponents();
     }
 

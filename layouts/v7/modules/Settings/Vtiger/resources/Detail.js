@@ -11,7 +11,8 @@ class Settings_Vtiger_Detail_Js extends Vtiger_Class_Js {
     detailViewForm = false;
 
     constructor() {
-       this.addComponents();
+        super();
+        this.addComponents();
     }
 
     addComponents() {

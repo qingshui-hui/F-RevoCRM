@@ -438,6 +438,7 @@ var Settings_Profiles_Js = {
 
 class Settings_Profiles_Detail_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
         Settings_Profiles_Js.registerEvents();
     }
@@ -449,6 +450,7 @@ class Settings_Profiles_Detail_Js extends Vtiger_Class_Js {
 
 class Settings_Profiles_Edit_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
         Settings_Profiles_Js.registerEvents();
     }

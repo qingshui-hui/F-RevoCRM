@@ -381,8 +381,9 @@ var Settings_Roles_Js = {
 
 class Settings_Roles_Index_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
-                Settings_Roles_Js.registerEvents();
+        Settings_Roles_Js.registerEvents();
     }
 
     addComponents() {
@@ -392,8 +393,9 @@ class Settings_Roles_Index_Js extends Vtiger_Class_Js {
 
 class Settings_Roles_Edit_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
-                Settings_Roles_Js.registerEvents();
+        Settings_Roles_Js.registerEvents();
     }
 
     addComponents() {

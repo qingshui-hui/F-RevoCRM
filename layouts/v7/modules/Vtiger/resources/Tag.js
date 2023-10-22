@@ -17,6 +17,7 @@ class Vtiger_Tag_Js extends Vtiger_Class_Js {
     editTagContainerCached = false;
 
     constructor() {
+        super();
         this.editTagContainerCached = jQuery('.editTagContainer');
     }
 

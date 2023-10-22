@@ -18,7 +18,8 @@ class Settings_Vtiger_CustomRecordNumbering_Js extends Vtiger_Class_Js {
     }
 
     constructor() {
-       this.addComponents();
+        super();
+        this.addComponents();
     }
 
     addComponents() {

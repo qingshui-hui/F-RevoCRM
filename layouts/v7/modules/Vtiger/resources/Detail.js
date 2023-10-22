@@ -343,6 +343,7 @@ class Vtiger_Detail_Js extends Vtiger_Class_Js {
     };
 
     constructor() {
+        super();
         this.addComponents();
     }
 

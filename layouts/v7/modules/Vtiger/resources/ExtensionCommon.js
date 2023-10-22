@@ -9,6 +9,7 @@
 
 class Vtiger_ExtensionCommon_Js extends Vtiger_Class_Js {
     constructor() {
+        super();
         this.addComponents();
     }
 

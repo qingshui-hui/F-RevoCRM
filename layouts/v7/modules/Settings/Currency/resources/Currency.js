@@ -54,6 +54,7 @@ class Settings_Currency_Js extends Vtiger_Class_Js {
 
     //constructor
     constructor() {
+        super();
         Settings_Currency_Js.currencyInstance = this;
     }
 
