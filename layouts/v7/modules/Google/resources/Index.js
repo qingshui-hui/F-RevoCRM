@@ -7,17 +7,16 @@
  * All Rights Reserved.
  *************************************************************************************/  
 
-Vtiger_ExtensionCommon_Js("Google_Index_Js", {}, {
-
-    init : function() {
+class Google_Index_Js extends Vtiger_ExtensionCommon_Js {
+    constructor() {
         this.addComponents();
-    },
-    
-    addComponents : function() {
+    }
+
+    addComponents() {
         this.addComponent('Google_Settings_Js');
-    },
-    
-    registerSyncNowButton : function(container) {
+    }
+
+    registerSyncNowButton(container) {
         container.on('click', '.syncNow', function(e) {
             var params = {
                 module : 'Google',
@@ -26,36 +25,36 @@ Vtiger_ExtensionCommon_Js("Google_Index_Js", {}, {
             app.helper.showProgress();
             app.request.post({data: params}).then(function(error, data){
                 app.helper.hideProgress();
-				
-				var hasMoreVtigerRecords = false;
-				var hasMoreGoogleRecords = false;
-				
+                
+                var hasMoreVtigerRecords = false;
+                var hasMoreGoogleRecords = false;
+                
                 jQuery.each(data, function(module, syncInfo){
-					hasMoreVtigerRecords = false;
-					hasMoreGoogleRecords = false;
-					
-					if(syncInfo['google'].more === true) {
-						hasMoreGoogleRecords = true;
-						app.helper.showAlertNotification({message : app.vtranslate('JS_MORE_GOOGLE')});
-					}
+                    hasMoreVtigerRecords = false;
+                    hasMoreGoogleRecords = false;
+                    
+                    if(syncInfo['google'].more === true) {
+                        hasMoreGoogleRecords = true;
+                        app.helper.showAlertNotification({message : app.vtranslate('JS_MORE_GOOGLE')});
+                    }
 
-					if(syncInfo['vtiger'].more === true) {
-						hasMoreVtigerRecords = true;
-						app.helper.showAlertNotification({message : app.vtranslate('JS_MORE_VTIGER')});
-					}
-					
-				});
-				
-				if(hasMoreVtigerRecords || hasMoreGoogleRecords) {
-					setTimeout(3000);
-				}
-				
-				window.location.reload();
+                    if(syncInfo['vtiger'].more === true) {
+                        hasMoreVtigerRecords = true;
+                        app.helper.showAlertNotification({message : app.vtranslate('JS_MORE_VTIGER')});
+                    }
+                    
+                });
+                
+                if(hasMoreVtigerRecords || hasMoreGoogleRecords) {
+                    setTimeout(3000);
+                }
+                
+                window.location.reload();
             });
         });
-    },
-    
-    registerSettingsMenuClickEvent : function(container) {
+    }
+
+    registerSettingsMenuClickEvent(container) {
         container.on('click', '.settingsPage', function(e) {
             var element = jQuery(e.currentTarget);
             var url = element.data('url');
@@ -75,12 +74,12 @@ Vtiger_ExtensionCommon_Js("Google_Index_Js", {}, {
                 }
             });
         });
-    },
-    
-    registerEvents : function() {
-        this._super();
+    }
+
+    registerEvents() {
+        super.registerEvents();
         var container = this.getListContainer();
         this.registerSyncNowButton(container);
         app.event.trigger(Google_Settings_Js.postSettingsLoad, container);
     }
-});
+};

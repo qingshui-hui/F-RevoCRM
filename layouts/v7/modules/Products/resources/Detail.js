@@ -8,8 +8,8 @@
  *************************************************************************************/
 
 
-PriceBooks_Detail_Js("Products_Detail_Js", {
-    triggerEditQuantity: function(url) {
+class Products_Detail_Js extends PriceBooks_Detail_Js {
+    static triggerEditQuantity(url) {
         app.request.get({url: url}).then(
                 function(err, data) {
                     app.helper.showModal(data, {cb: function() {
@@ -18,15 +18,14 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
                         }
                     });
                 });
-    },
-}, {
+    }
 
     /**
      * function to register event for editing the list price in related list
      */
 
 
-    registerEventForUpdateQuantity: function() {
+    registerEventForUpdateQuantity() {
         var self = this;
         var updateQuantityForm = jQuery('#quantityUpdate');
         updateQuantityForm.vtValidate({
@@ -42,9 +41,9 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
                 relation.done(self.loadRelatedList());         
             }
         });
-    },
-    
-    registerEventForChangeTotalCost: function() {
+    }
+
+    registerEventForChangeTotalCost() {
         var detailContentsHolder = this.getContentHolder();
         var thisInstance = this;
         detailContentsHolder.on('click', '#updatePrice', function(e) {
@@ -86,11 +85,12 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
                 app.helper.showVerticalScroll(jQuery('.productBundlePopover .popover-content'));
             });
         });
-    },
+    }
+
     /**
      * Function to register event for select button click on pricebooks in Products related list
      */
-    registerEventForSelectOptionToShowBundleInInventory: function() {
+    registerEventForSelectOptionToShowBundleInInventory() {
         var thisInstance = this;
         var detailContentsHolder = this.getContentHolder();
 
@@ -132,26 +132,30 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
                 );
             }
         });
-    },
-    loadRelatedList: function(){
+    }
+
+    loadRelatedList() {
         var relatedController = this.getRelatedController();
         var self = this;
         relatedController.loadRelatedList().then(function(){
             relatedController.triggerRelationAdditionalActions();
         });
-    },
-    registerPopover: function() {
+    }
+
+    registerPopover() {
         if (jQuery('.totalCostCalculationInfo').length !== 0) {
             jQuery('.totalCostCalculationInfo').popover({html: true, container: 'body', placement: 'top'}).data('bs.popover').tip().addClass('productBundlePopover');
         }
-    },
-    registerBasicEvents: function(){
-        this._super();
-    },
+    }
+
+    registerBasicEvents() {
+        super.registerBasicEvents();
+    }
+
     /**
      * Function to register events
      */
-    registerEvents: function() {
+    registerEvents() {
         var self = this;
         app.event.on("post.RecordList.click", function(event, data) {
             var responseData = JSON.parse(data);
@@ -159,7 +163,7 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
             var relatedController = self.getRelatedController();
             relatedController.addRelations(responseData).then(self.loadRelatedList());
         });
-        this._super();
+        super.registerEvents();
         this.registerEventForSelectOptionToShowBundleInInventory();
         this.registerEventForChangeTotalCost();
         app.event.on("post.relatedListLoad.click", function() {
@@ -169,4 +173,4 @@ PriceBooks_Detail_Js("Products_Detail_Js", {
             self.registerPopover();
         });
             }
-        });
+};

@@ -7,9 +7,8 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-jQuery.Class('Vtiger.Class',{},{
-    
-    addComponent : function(componentName) {
+class Vtiger_Class_Js {
+    addComponent(componentName) {
         if(window[componentName]){
             if(typeof this._components == "undefined") {
                 this._components = {};
@@ -17,23 +16,22 @@ jQuery.Class('Vtiger.Class',{},{
             this._components[componentName] = window[componentName];
         }
         
-    },
-    
-    addModuleSpecificComponent : function(view,module,parent){
-		var componentName = app.getModuleSpecificViewClass(view,module,parent);
-		this.addComponent(componentName);
-    },
-    
-    setParentInstance : function(instance){
+    }
+
+    addModuleSpecificComponent(view, module, parent) {
+        var componentName = app.getModuleSpecificViewClass(view,module,parent);
+        this.addComponent(componentName);
+    }
+
+    setParentInstance(instance) {
         this._parent = instance;
-    },
-    
-    getParentInstance : function() {
+    }
+
+    getParentInstance() {
         return this._parent;
-    },
-    
-    
-    intializeComponents : function() {
+    }
+
+    intializeComponents() {
         if(typeof this._componentInstances  == "undefined") {
             this._componentInstances = {};
         }
@@ -54,25 +52,25 @@ jQuery.Class('Vtiger.Class',{},{
             componentInstance.registerEvents();
             
         }
-    },
-    
-    getComponentInstance : function(componentName) {
-		if(typeof this._components != 'undefined' && typeof this._componentInstances != 'undefined'){
-			if(componentName in this._components){
-				if(componentName in this._componentInstances) {
-					return this._componentInstances[componentName];
-				}
-			}
-		}
+    }
+
+    getComponentInstance(componentName) {
+        if(typeof this._components != 'undefined' && typeof this._componentInstances != 'undefined'){
+            if(componentName in this._components){
+                if(componentName in this._componentInstances) {
+                    return this._componentInstances[componentName];
+                }
+            }
+        }
         return false;
-    },
-	
-	getModuleSpecificComponentInstance : function(view, module, parent) {
-		var componentName = app.getModuleSpecificViewClass(view,module,parent);
-		return this.getComponentInstance(componentName);
-	},
-    
-    registerEvents : function() {
+    }
+
+    getModuleSpecificComponentInstance(view, module, parent) {
+        var componentName = app.getModuleSpecificViewClass(view,module,parent);
+        return this.getComponentInstance(componentName);
+    }
+
+    registerEvents() {
         
     }
-});
+};

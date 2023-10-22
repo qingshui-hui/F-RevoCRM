@@ -7,23 +7,22 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Edit_Js("Faq_Edit_Js", {} ,{
+class Faq_Edit_Js extends Vtiger_Edit_Js {
+    /**
+     * Function to register event for ckeditor for description field
+     */
+    registerEventForCkEditor() {
+        var form = this.getForm();
+        var ckContentElement = form.find('[name="question"]');
+        this.addFieldCkEditor(ckContentElement);
+        var ckContentElement = form.find('[name="faq_answer"]');
+        this.addFieldCkEditor(ckContentElement);
+    }
 
-	/**
-	 * Function to register event for ckeditor for description field
-	 */
-	registerEventForCkEditor : function(){
-		var form = this.getForm();
-		var ckContentElement = form.find('[name="question"]');
-		this.addFieldCkEditor(ckContentElement);
-		var ckContentElement = form.find('[name="faq_answer"]');
-		this.addFieldCkEditor(ckContentElement);
-	},
-
-	registerEvents : function() {
+    registerEvents() {
         this.registerEventForCkEditor();
-        this._super();
-	}
-});
+        super.registerEvents();
+    }
+};
 
 

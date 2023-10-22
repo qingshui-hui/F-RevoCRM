@@ -7,42 +7,42 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Settings_Vtiger_Detail_Js",{},{
-	detailViewForm : false,
+class Settings_Vtiger_Detail_Js extends Vtiger_Class_Js {
+    detailViewForm = false;
 
-    init : function() {
+    constructor() {
        this.addComponents();
-    },
-   
-    addComponents : function (){
+    }
+
+    addComponents() {
       this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
-    },
+    }
 
-	/**
-	 * Function which will give the detail view form
-	 * @return : jQuery element
-	 */
-	getForm : function() {
-		if(this.detailViewForm === false) {
-			this.detailViewForm = jQuery('#detailView');
-		}
-		return this.detailViewForm;
-	},
+    /**
+     * Function which will give the detail view form
+     * @return : jQuery element
+     */
+    getForm() {
+        if(this.detailViewForm === false) {
+            this.detailViewForm = jQuery('#detailView');
+        }
+        return this.detailViewForm;
+    }
 
-	/**
-	 * Function to register form for validation
-	 */
-	registerFormForValidation : function(){
+    /**
+     * Function to register form for validation
+     */
+    registerFormForValidation() {
         var detailViewForm = this.getForm();
         if(detailViewForm.length > 0) {
             detailViewForm.vtValidate();
         }
-	},
+    }
 
-	/**
-	 * Function which will handle the registrations for the elements
-	 */
-	registerEvents : function() {
-		this.registerFormForValidation();
-	}
-});
+    /**
+     * Function which will handle the registrations for the elements
+     */
+    registerEvents() {
+        this.registerFormForValidation();
+    }
+};

@@ -7,23 +7,22 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-jQuery.Class("Vtiger_RecordSelectTracker_Js",{
-    getInstance : function(){
+class Vtiger_RecordSelectTracker_Js {
+    static getInstance() {
         var recordSelectTrackerObj = new Vtiger_RecordSelectTracker_Js;
         return recordSelectTrackerObj;
-    },
-},
-{    
-    selectedIds : [],
-    selectAllMode: false,
-    excludedIds : [],
-    cvId : '',
-    
-    setCvId : function (cvid){
+    }
+
+    selectedIds = [];
+    selectAllMode = false;
+    excludedIds = [];
+    cvId = '';
+
+    setCvId(cvid) {
        this.cvId = cvid;
-    },
-    
-    registerRowCheckListener : function(){
+    }
+
+    registerRowCheckListener() {
         var thisInstance = this;
         jQuery(document).on('Post.ListRow.Checked', 'tr.listViewEntries',function(e,args){ 
             if(thisInstance.selectAllMode){
@@ -45,9 +44,9 @@ jQuery.Class("Vtiger_RecordSelectTracker_Js",{
                 thisInstance.selectedIds.splice( $.inArray(args.id, thisInstance.selectedIds),1);
             }
         });
-    },
-    
-    registerListSelectAllListener: function(){
+    }
+
+    registerListSelectAllListener() {
         var thisInstance = this;
         jQuery(document).on('Post.ListSelectAll',function(e,args){
             thisInstance.selectedIds = [];
@@ -58,57 +57,57 @@ jQuery.Class("Vtiger_RecordSelectTracker_Js",{
             thisInstance.selectAllMode = args.mode;
             thisInstance.clearList();
         }); 
-    },
-    
-            getSelectedAndExcludedIds: function(jsonDecode) {
-                var selectedIds = this.getSelectedIds();
-                if (selectedIds == undefined || selectedIds == null || selectedIds.length == 0) {
-                    return false;
-                }
-                if (this.selectAllMode != true && jsonDecode) {
-                    selectedIds = JSON.stringify(selectedIds)
-                }
-                var params = {
-                    'selected_ids': selectedIds,
-                    'excluded_ids': this.getExcludedIds(jsonDecode),
-                    'viewname': this.getCvid()
-                }
-                return params;
-            },
-    
-    getSelectedIds : function(){
+    }
+
+    getSelectedAndExcludedIds(jsonDecode) {
+        var selectedIds = this.getSelectedIds();
+        if (selectedIds == undefined || selectedIds == null || selectedIds.length == 0) {
+            return false;
+        }
+        if (this.selectAllMode != true && jsonDecode) {
+            selectedIds = JSON.stringify(selectedIds)
+        }
+        var params = {
+            'selected_ids': selectedIds,
+            'excluded_ids': this.getExcludedIds(jsonDecode),
+            'viewname': this.getCvid()
+        }
+        return params;
+    }
+
+    getSelectedIds() {
         if (this.selectAllMode == true) {
             return  'all';
         }
         return this.selectedIds;
-    },
-    
-    getCvid : function(){
+    }
+
+    getCvid() {
         return this.cvId;
-    },
-    
-    getExcludedIds : function(jsonDecode){
+    }
+
+    getExcludedIds(jsonDecode) {
         if(jsonDecode){
             return JSON.stringify(this.excludedIds)
         }
         return this.excludedIds;
-    },
-    
-    getSelectAllMode: function(){
+    }
+
+    getSelectAllMode() {
         return this.selectAllMode;
-    },
-    
-    clearList : function(){
+    }
+
+    clearList() {
         this.selectedIds = []; 
         this.excludedIds = [];
         this.selectAllMode = false;
         this.cvId = '';
         
-    },
-    
-    registerEvents : function() {
+    }
+
+    registerEvents() {
         this.registerRowCheckListener();
         this.registerListSelectAllListener();
         
-    },
-});
+    }
+};

@@ -7,13 +7,13 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Detail_Js("Inventory_Detail_Js", {
-    triggerRecordPreview: function(recordId){
+class Inventory_Detail_Js extends Vtiger_Detail_Js {
+    static triggerRecordPreview(recordId) {
         var thisInstance = app.controller();
         thisInstance.showRecordPreview(recordId);
-    },
-    
-    sendEmailPDFClickHandler: function(url) {
+    }
+
+    static sendEmailPDFClickHandler(url) {
         var params = app.convertUrlToDataParams(url);
         
         app.helper.showProgress();
@@ -27,10 +27,9 @@ Vtiger_Detail_Js("Inventory_Detail_Js", {
                     app.helper.hideProgress();
                     app.helper.showModal(response,data);
                 });
-    },
-},
-{
-    showRecordPreview: function(recordId, templateId) {
+    }
+
+    showRecordPreview(recordId, templateId) {
         var thisInstance = this;
         var params = {};
         var moduleName = app.getModuleName();
@@ -57,26 +56,24 @@ Vtiger_Detail_Js("Inventory_Detail_Js", {
                 }
             });
         });
-    },
-     registerChangeTemplateEvent: function(container, recordId) {
-         var thisInstance = this;
-        var select = container.find('#fieldList');
-        select.on("change", function() {
-            var templateId = select.val();
-            thisInstance.showRecordPreview(recordId, templateId);
-        });
+    }
 
-    },
-    
-    
-    
-    registerEvents: function() {
-		var self = this;
-        this._super();
+    registerChangeTemplateEvent(container, recordId) {
+        var thisInstance = this;
+       var select = container.find('#fieldList');
+       select.on("change", function() {
+           var templateId = select.val();
+           thisInstance.showRecordPreview(recordId, templateId);
+       });
+
+   }
+
+    registerEvents() {
+        var self = this;
+        super.registerEvents();
         this.getDetailViewContainer().find('.inventoryLineItemDetails').popover({html: true});
-		app.event.on("post.relatedListLoad.click", function() {
-			self.getDetailViewContainer().find('.inventoryLineItemDetails').popover({html: true});
-		});
-    },
-
-});
+        app.event.on("post.relatedListLoad.click", function() {
+            self.getDetailViewContainer().find('.inventoryLineItemDetails').popover({html: true});
+        });
+    }
+};

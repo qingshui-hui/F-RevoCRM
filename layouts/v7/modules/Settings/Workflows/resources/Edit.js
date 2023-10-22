@@ -6,251 +6,249 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  *************************************************************************************/
-Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
-}, {
-    workFlowsContainer: false,
-    advanceFilterInstance: false,
-    ckEditorInstance: false,
-    fieldValueMap: false,
-    workFlowsActionContainer : false,
-   
-    /**
-     * Function to get the container which holds all the workflow elements
-     * @return jQuery object
-     */
-    getContainer: function () {
-       return this.workFlowsContainer;
-    },
-   
-    /**
-     * Function to get the container which holds all the workflow elements
-     * @return jQuery object
-     */
-    getActionContainer: function () {
-       return this.workFlowsActionContainer;
-    },
-   
-    /**
-     * Function to set the reports container
-     * @params : element - which represents the workflow container
-     * @return : current instance
-     */
-    setContainer: function (element) {
-       this.workFlowsContainer = element;
-       return this;
-    },
-   
-    /**
-    * Function to set the reports step1 container
-    * @params : element - which represents the reports step1 container
+class Settings_Workflows_Edit_Js extends Settings_Vtiger_Edit_Js {
+   workFlowsContainer = false;
+   advanceFilterInstance = false;
+   ckEditorInstance = false;
+   fieldValueMap = false;
+   workFlowsActionContainer = false;
+
+   /**
+    * Function to get the container which holds all the workflow elements
+    * @return jQuery object
+    */
+   getContainer() {
+      return this.workFlowsContainer;
+   }
+
+   /**
+    * Function to get the container which holds all the workflow elements
+    * @return jQuery object
+    */
+   getActionContainer() {
+      return this.workFlowsActionContainer;
+   }
+
+   /**
+    * Function to set the reports container
+    * @params : element - which represents the workflow container
     * @return : current instance
     */
-    setActionContainer : function(element) {
-            this.workFlowsActionContainer = element;
-            return this;
-    },
-    
-    calculateValues : function(){
-        //handled advanced filters saved values.
-        var enableFilterElement = jQuery('#enableAdvanceFilters');
-        if(enableFilterElement.length > 0 && enableFilterElement.is(':checked') == false) {
-                jQuery('#advanced_filter').val(jQuery('#olderConditions').val());
-        } else {
-                jQuery('[name="filtersavedinnew"]').val("6");
-                var advfilterlist = this.advanceFilterInstance.getValues();
-                // 担当」の場合、担当名からidに変換する
-                for(var i of Object.keys(advfilterlist)){
-                  for(var j of Object.keys(advfilterlist[i].columns)){
-                     if(advfilterlist[i].columns[j].columnname == 'assigned_user_id'){
-                        if(advfilterlist[i].columns[j].value){
-                           advfilterlist[i].columns[j].value = this.getAssignedUserId(advfilterlist[i].columns[j].value, '#advanceFilterContainer');
-                        }
-                     }
-                  }
-                }
-                jQuery('#advanced_filter').val(JSON.stringify(advfilterlist));
-        }
-    },
-    
-    checkExpressionValidation : function(form) {
-        var params = {
-            'module' : app.module(),
-            'parent' : app.getParentModuleName(),
-            'action' : 'ValidateExpression',
-            'mode' : 'ForWorkflowEdit'
-        };
-        var serializeForm = form.serializeFormData();
-        params = jQuery.extend(serializeForm, params);
-        
-        app.request.post({'data' : params}).then(function(error, data) {
-            if(error == null) {
-                form.get(0).submit();
-            } else {
-                jQuery(form).find('button.saveButton').removeAttr('disabled');
-                app.helper.showErrorNotification({'message' : app.vtranslate('LBL_EXPRESSION_INVALID')});
-            }
-        });
-    },
-    
-    /*
-     * Function to register the click event for next button
-     */
-    registerFormSubmitEvent : function() {
-        var self = this;
-        var form = jQuery('#workflow_edit');
-        var params = {
-            submitHandler: function(form) {
-                if(jQuery('[name="workflow_trigger"]').val() == '6' && jQuery('#schtypeid').val() == '3') {
-                    if(jQuery('#schdayofweek').val().length <= 0) {
-                        app.helper.showErrorNotification({'message':'Please Select atleast one value'});
-                        return false;
+   setContainer(element) {
+      this.workFlowsContainer = element;
+      return this;
+   }
+
+   /**
+   * Function to set the reports step1 container
+   * @params : element - which represents the reports step1 container
+   * @return : current instance
+   */
+   setActionContainer(element) {
+           this.workFlowsActionContainer = element;
+           return this;
+   }
+
+   calculateValues() {
+       //handled advanced filters saved values.
+       var enableFilterElement = jQuery('#enableAdvanceFilters');
+       if(enableFilterElement.length > 0 && enableFilterElement.is(':checked') == false) {
+               jQuery('#advanced_filter').val(jQuery('#olderConditions').val());
+       } else {
+               jQuery('[name="filtersavedinnew"]').val("6");
+               var advfilterlist = this.advanceFilterInstance.getValues();
+               // 担当」の場合、担当名からidに変換する
+               for(var i of Object.keys(advfilterlist)){
+                 for(var j of Object.keys(advfilterlist[i].columns)){
+                    if(advfilterlist[i].columns[j].columnname == 'assigned_user_id'){
+                       if(advfilterlist[i].columns[j].value){
+                          advfilterlist[i].columns[j].value = this.getAssignedUserId(advfilterlist[i].columns[j].value, '#advanceFilterContainer');
+                       }
                     }
-                }
-                var form = jQuery(form);
-                self.calculateValues();
-				window.onbeforeunload = null;
-                jQuery(form).find('button.saveButton').attr('disabled', 'disabled');
-                
-                self.checkExpressionValidation(form);
-                //form.get(0).submit();
-                return false;
-            }
-        };
-        form.vtValidate(params);
-    },
-	
-
-    getPopUp: function (container) {
-      var thisInstance = this;
-      if (typeof container == 'undefined') {
-         container = thisInstance.getContainer();
-      }
-      var isPopupShowing = false;
-      container.on('click', '.getPopupUi', function (e) {
-         // Added to prevent multiple clicks event
-         if(isPopupShowing) {
-             return false;
-         }
-         var fieldValueElement = jQuery(e.currentTarget);
-         var fieldValue = fieldValueElement.val();
-         var fieldUiHolder = fieldValueElement.closest('.fieldUiHolder');
-         var valueType = fieldUiHolder.find('[name="valuetype"]').val();
-         if (valueType == '' || valueType == 'null') {
-            valueType = 'rawtext';
-         }
-         var conditionsContainer = fieldValueElement.closest('.conditionsContainer');
-         var conditionRow = fieldValueElement.closest('.conditionRow');
-
-         var fieldinfo = fieldUiHolder.find('[name="valuetype"]').data('fieldinfo');
-         var listtype = fieldinfo.type;
-         var usePicklist = jQuery('#usePicklist');
-         usePicklist.empty();
-         if(listtype == 'multipicklist' || listtype == 'picklist'){
-            var picklistvalue = fieldinfo.picklistvalues;
-            usePicklist.attr('type', listtype)
-            usePicklist.parent().removeClass('hide');
-            usePicklist.append('<option></option>');
-            Object.keys(picklistvalue).forEach(function(key) {
-               var val = this[key];
-               var str = '<option value="' + key + '">'+ val +'</option>';
-               usePicklist.append(str);
-            }, picklistvalue);
-         }else if(listtype == 'owner'){
-            var picklistvalue = fieldinfo.picklistvalues;
-            usePicklist.attr('type', listtype)
-            usePicklist.parent().removeClass('hide');
-            usePicklist.append('<option></option>');
-            var str='';
-            for(var optGroup in picklistvalue){
-               str += '<optgroup label="'+ optGroup +'">';
-               var optionGroupValues = picklistvalue[optGroup];
-               for(var option in optionGroupValues){
-                  // valueは分かりやすさからIDではなくユーザー名とし、submit時にIDへ変換する
-                  str += '<option value="'+optionGroupValues[option]+'" ';
-                  str += '>'+optionGroupValues[option]+'</option>';
+                 }
                }
-               str += '</optgroup>'
-            }
-            usePicklist.append(str);
-         }else{
-            usePicklist.removeAttr('type');
-            usePicklist.parent().addClass('hide');
-         }
+               jQuery('#advanced_filter').val(JSON.stringify(advfilterlist));
+       }
+   }
 
-         var clonedPopupUi = conditionsContainer.find('.popupUi').clone(true, true).removeClass('hide').removeClass('popupUi').addClass('clonedPopupUi');
-         clonedPopupUi.find('select').addClass('select2');
-         clonedPopupUi.find('.fieldValue').val(fieldValue);
-         clonedPopupUi.find('.fieldValue').removeClass('hide');
-         if (fieldValueElement.hasClass('date')) {
-            clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
-            var dataFormat = fieldValueElement.data('date-format');
-            if (valueType == 'rawtext') {
-               var value = fieldValueElement.val();
-            } else {
-               value = '';
-            }
-            var clonedDateElement = '<input type="text" style="width: 30%;" class="dateField fieldValue inputElement" value="' + value + '" data-date-format="' + dataFormat + '" data-input="true" >'
-            clonedPopupUi.find('.fieldValueContainer div').prepend(clonedDateElement);
-         } else if (fieldValueElement.hasClass('time')) {
-            clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
-            if (valueType == 'rawtext') {
-               var value = fieldValueElement.val();
-            } else {
-               value = '';
-            }
-            var clonedTimeElement = '<input type="text" style="width: 30%;" class="timepicker-default fieldValue inputElement" value="' + value + '" data-input="true" >'
-            clonedPopupUi.find('.fieldValueContainer div').prepend(clonedTimeElement);
-         } else if (fieldValueElement.hasClass('boolean')) {
-            clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
-            if (valueType == 'rawtext') {
-               var value = fieldValueElement.val();
-            } else {
-               value = '';
-            }
-            var clonedBooleanElement = '<input type="checkbox" style="width: 30%;" class="fieldValue inputElement" value="' + value + '" data-input="true" >';
-            clonedPopupUi.find('.fieldValueContainer div').prepend(clonedBooleanElement);
+   checkExpressionValidation(form) {
+       var params = {
+           'module' : app.module(),
+           'parent' : app.getParentModuleName(),
+           'action' : 'ValidateExpression',
+           'mode' : 'ForWorkflowEdit'
+       };
+       var serializeForm = form.serializeFormData();
+       params = jQuery.extend(serializeForm, params);
+       
+       app.request.post({'data' : params}).then(function(error, data) {
+           if(error == null) {
+               form.get(0).submit();
+           } else {
+               jQuery(form).find('button.saveButton').removeAttr('disabled');
+               app.helper.showErrorNotification({'message' : app.vtranslate('LBL_EXPRESSION_INVALID')});
+           }
+       });
+   }
 
-            var fieldValue = clonedPopupUi.find('.fieldValueContainer input').val();
-            if (value == 'true:boolean' || value == '') {
-               clonedPopupUi.find('.fieldValueContainer input').attr('checked', 'checked');
-            } else {
-               clonedPopupUi.find('.fieldValueContainer input').removeAttr('checked');
-            }
-         }
-         var callBackFunction = function (data) {
-            isPopupShowing = false;
-            data.find('.clonedPopupUi').removeClass('hide');
-            var moduleNameElement = conditionRow.find('[name="modulename"]');
-            if (moduleNameElement.length > 0) {
-               var moduleName = moduleNameElement.val();
-               data.find('.useFieldElement').addClass('hide');
-               jQuery(data.find('[name="' + moduleName + '"]').get(0)).removeClass('hide');
-            }          
-            thisInstance.postShowModalAction(data, valueType);
-            thisInstance.registerChangeFieldEvent(data);
-            thisInstance.registerSelectOptionEvent(data);
-            thisInstance.registerPopUpSaveEvent(data, fieldUiHolder);
-            thisInstance.registerRemoveModalEvent(data);
-            data.find('.fieldValue').filter(':visible').trigger('focus');
-         }
-         conditionsContainer.find('.clonedPopUp').html(clonedPopupUi);
-         jQuery('.clonedPopupUi').on('shown', function () {
-            if (typeof callBackFunction == 'function') {
-               callBackFunction(jQuery('.clonedPopupUi', conditionsContainer));
-            }
-         });
-         isPopupShowing = true;
-         app.helper.showModal(jQuery('.clonedPopUp', conditionsContainer).find('.clonedPopupUi'), {cb: callBackFunction});
-      });
-   },
-   
-   registerRemoveModalEvent: function (data) {
+   /*
+    * Function to register the click event for next button
+    */
+   registerFormSubmitEvent() {
+       var self = this;
+       var form = jQuery('#workflow_edit');
+       var params = {
+           submitHandler: function(form) {
+               if(jQuery('[name="workflow_trigger"]').val() == '6' && jQuery('#schtypeid').val() == '3') {
+                   if(jQuery('#schdayofweek').val().length <= 0) {
+                       app.helper.showErrorNotification({'message':'Please Select atleast one value'});
+                       return false;
+                   }
+               }
+               var form = jQuery(form);
+               self.calculateValues();
+               window.onbeforeunload = null;
+               jQuery(form).find('button.saveButton').attr('disabled', 'disabled');
+               
+               self.checkExpressionValidation(form);
+               //form.get(0).submit();
+               return false;
+           }
+       };
+       form.vtValidate(params);
+   }
+
+   getPopUp(container) {
+     var thisInstance = this;
+     if (typeof container == 'undefined') {
+        container = thisInstance.getContainer();
+     }
+     var isPopupShowing = false;
+     container.on('click', '.getPopupUi', function (e) {
+        // Added to prevent multiple clicks event
+        if(isPopupShowing) {
+            return false;
+        }
+        var fieldValueElement = jQuery(e.currentTarget);
+        var fieldValue = fieldValueElement.val();
+        var fieldUiHolder = fieldValueElement.closest('.fieldUiHolder');
+        var valueType = fieldUiHolder.find('[name="valuetype"]').val();
+        if (valueType == '' || valueType == 'null') {
+           valueType = 'rawtext';
+        }
+        var conditionsContainer = fieldValueElement.closest('.conditionsContainer');
+        var conditionRow = fieldValueElement.closest('.conditionRow');
+
+        var fieldinfo = fieldUiHolder.find('[name="valuetype"]').data('fieldinfo');
+        var listtype = fieldinfo.type;
+        var usePicklist = jQuery('#usePicklist');
+        usePicklist.empty();
+        if(listtype == 'multipicklist' || listtype == 'picklist'){
+           var picklistvalue = fieldinfo.picklistvalues;
+           usePicklist.attr('type', listtype)
+           usePicklist.parent().removeClass('hide');
+           usePicklist.append('<option></option>');
+           Object.keys(picklistvalue).forEach(function(key) {
+              var val = this[key];
+              var str = '<option value="' + key + '">'+ val +'</option>';
+              usePicklist.append(str);
+           }, picklistvalue);
+        }else if(listtype == 'owner'){
+           var picklistvalue = fieldinfo.picklistvalues;
+           usePicklist.attr('type', listtype)
+           usePicklist.parent().removeClass('hide');
+           usePicklist.append('<option></option>');
+           var str='';
+           for(var optGroup in picklistvalue){
+              str += '<optgroup label="'+ optGroup +'">';
+              var optionGroupValues = picklistvalue[optGroup];
+              for(var option in optionGroupValues){
+                 // valueは分かりやすさからIDではなくユーザー名とし、submit時にIDへ変換する
+                 str += '<option value="'+optionGroupValues[option]+'" ';
+                 str += '>'+optionGroupValues[option]+'</option>';
+              }
+              str += '</optgroup>'
+           }
+           usePicklist.append(str);
+        }else{
+           usePicklist.removeAttr('type');
+           usePicklist.parent().addClass('hide');
+        }
+
+        var clonedPopupUi = conditionsContainer.find('.popupUi').clone(true, true).removeClass('hide').removeClass('popupUi').addClass('clonedPopupUi');
+        clonedPopupUi.find('select').addClass('select2');
+        clonedPopupUi.find('.fieldValue').val(fieldValue);
+        clonedPopupUi.find('.fieldValue').removeClass('hide');
+        if (fieldValueElement.hasClass('date')) {
+           clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
+           var dataFormat = fieldValueElement.data('date-format');
+           if (valueType == 'rawtext') {
+              var value = fieldValueElement.val();
+           } else {
+              value = '';
+           }
+           var clonedDateElement = '<input type="text" style="width: 30%;" class="dateField fieldValue inputElement" value="' + value + '" data-date-format="' + dataFormat + '" data-input="true" >'
+           clonedPopupUi.find('.fieldValueContainer div').prepend(clonedDateElement);
+        } else if (fieldValueElement.hasClass('time')) {
+           clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
+           if (valueType == 'rawtext') {
+              var value = fieldValueElement.val();
+           } else {
+              value = '';
+           }
+           var clonedTimeElement = '<input type="text" style="width: 30%;" class="timepicker-default fieldValue inputElement" value="' + value + '" data-input="true" >'
+           clonedPopupUi.find('.fieldValueContainer div').prepend(clonedTimeElement);
+        } else if (fieldValueElement.hasClass('boolean')) {
+           clonedPopupUi.find('.textType').find('option[value="rawtext"]').attr('data-ui', 'input');
+           if (valueType == 'rawtext') {
+              var value = fieldValueElement.val();
+           } else {
+              value = '';
+           }
+           var clonedBooleanElement = '<input type="checkbox" style="width: 30%;" class="fieldValue inputElement" value="' + value + '" data-input="true" >';
+           clonedPopupUi.find('.fieldValueContainer div').prepend(clonedBooleanElement);
+
+           var fieldValue = clonedPopupUi.find('.fieldValueContainer input').val();
+           if (value == 'true:boolean' || value == '') {
+              clonedPopupUi.find('.fieldValueContainer input').attr('checked', 'checked');
+           } else {
+              clonedPopupUi.find('.fieldValueContainer input').removeAttr('checked');
+           }
+        }
+        var callBackFunction = function (data) {
+           isPopupShowing = false;
+           data.find('.clonedPopupUi').removeClass('hide');
+           var moduleNameElement = conditionRow.find('[name="modulename"]');
+           if (moduleNameElement.length > 0) {
+              var moduleName = moduleNameElement.val();
+              data.find('.useFieldElement').addClass('hide');
+              jQuery(data.find('[name="' + moduleName + '"]').get(0)).removeClass('hide');
+           }          
+           thisInstance.postShowModalAction(data, valueType);
+           thisInstance.registerChangeFieldEvent(data);
+           thisInstance.registerSelectOptionEvent(data);
+           thisInstance.registerPopUpSaveEvent(data, fieldUiHolder);
+           thisInstance.registerRemoveModalEvent(data);
+           data.find('.fieldValue').filter(':visible').trigger('focus');
+        }
+        conditionsContainer.find('.clonedPopUp').html(clonedPopupUi);
+        jQuery('.clonedPopupUi').on('shown', function () {
+           if (typeof callBackFunction == 'function') {
+              callBackFunction(jQuery('.clonedPopupUi', conditionsContainer));
+           }
+        });
+        isPopupShowing = true;
+        app.helper.showModal(jQuery('.clonedPopUp', conditionsContainer).find('.clonedPopupUi'), {cb: callBackFunction});
+     });
+  }
+
+   registerRemoveModalEvent(data) {
       data.on('click', '.closeModal', function (e) {
          data.modal('hide');
       });
-   },
-   
-   registerPopUpSaveEvent: function (data, fieldUiHolder) {
+   }
+
+   registerPopUpSaveEvent(data, fieldUiHolder) {
       jQuery('[name="saveButton"]', data).on('click', function (e) {
          var valueType = jQuery('select.textType', data).val();
 
@@ -274,9 +272,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          fieldValueElement.val(fieldValue);
          data.modal('hide');
       });
-   },
-   
-   registerSelectOptionEvent: function (data) {
+   }
+
+   registerSelectOptionEvent(data) {
       jQuery('.useField,.useFunction,.usePicklist', data).on('change', function (e) {
          var currentElement = jQuery(e.currentTarget);
          var newValue = currentElement.val();
@@ -302,8 +300,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          data.find('.fieldValue').val(concatenatedValue);
          currentElement.val('').select2("val", '');
       });
-   },
-   registerChangeFieldEvent: function (data) {
+   }
+
+   registerChangeFieldEvent(data) {
       jQuery('.textType', data).on('change', function (e) {
          var valueType = jQuery(e.currentTarget).val();
          var useFieldContainer = jQuery('.useFieldContainer', data);
@@ -333,8 +332,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          jQuery('#' + valueType + '_help', data).removeClass('hide');
          data.find('.fieldValue').val('');
       });
-   },
-   postShowModalAction: function (data, valueType) {
+   }
+
+   postShowModalAction(data, valueType) {
       if (valueType == 'fieldname') {
          jQuery('.useFieldContainer', data).removeClass('hide');
          jQuery('.textType', data).val(valueType).trigger('change');
@@ -347,8 +347,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
       var uiType = jQuery('.textType', data).find('option:selected').data('ui');
       jQuery('.fieldValue', data).hide();
       jQuery('[data-' + uiType + ']', data).show();
-   },
-   registerEventForShowModuleFilterCondition: function () {
+   }
+
+   registerEventForShowModuleFilterCondition() {
       var thisInstance = this;
       jQuery('#module_name').on('change', function (e) {
          var currentElement = jQuery(e.currentTarget);
@@ -380,14 +381,14 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             thisInstance.registerTaskDeleteEvent();
             jQuery(".taskStatus").bootstrapSwitch();
             
-			app.helper.registerLeavePageWithoutSubmit(jQuery('#workflow_edit'));
+            app.helper.registerLeavePageWithoutSubmit(jQuery('#workflow_edit'));
          });
       });
       jQuery('#module_name').trigger('change');
-   },
-   
+   }
+
    //Workflow action related api's
-   registerEditTaskEvent: function () {
+   registerEditTaskEvent() {
       var thisInstance = this;
       var container = this.getActionContainer();
       container.on('click', '[data-url]', function (e) {
@@ -404,15 +405,15 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
                     setHeight:(viewPortHeight-jQuery('.app-fixed-navbar').height()-container.find('.modal-header').height())+'px'
                 };
                 app.helper.showVerticalScroll(container.find('.modal-body.editTaskBody'), params);
-				thisInstance.registerVTCreateTodoTaskEvents();
-				var taskType = jQuery('#taskType').val();
-				var functionName = 'register' + taskType + 'Events';
-				if (typeof thisInstance[functionName] != 'undefined') {
-				   thisInstance[functionName].apply(thisInstance);
-				}
-				thisInstance.registerSaveTaskSubmitEvent(taskType);
-				thisInstance.registerFillTaskFieldsEvent();
-				thisInstance.registerCheckSelectDateEvent();
+                thisInstance.registerVTCreateTodoTaskEvents();
+                var taskType = jQuery('#taskType').val();
+                var functionName = 'register' + taskType + 'Events';
+                if (typeof thisInstance[functionName] != 'undefined') {
+                   thisInstance[functionName].apply(thisInstance);
+                }
+                thisInstance.registerSaveTaskSubmitEvent(taskType);
+                thisInstance.registerFillTaskFieldsEvent();
+                thisInstance.registerCheckSelectDateEvent();
             });
          });
       });
@@ -464,8 +465,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
               tableDiv.find('.emptyRecordsDiv').removeClass('hide');
           }
       });
-   },
-   registerCheckSelectDateEvent: function () {
+   }
+
+   registerCheckSelectDateEvent() {
       jQuery('[name="check_select_date"]').on('change', function (e) {
          if (jQuery(e.currentTarget).is(':checked')) {
             jQuery('#checkSelectDateContainer').removeClass('hide').addClass('show');
@@ -473,18 +475,20 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             jQuery('#checkSelectDateContainer').removeClass('show').addClass('hide');
          }
       });
-   },
+   }
+
    /**
     * Function to add event on signature popover
     */
-   registerTooltipEventForSignatureField: function () {
+   registerTooltipEventForSignatureField() {
       jQuery("#signaturePopover").on('mouseover', function (e) {
          jQuery('#signaturePopover').popover({
             'html': true
          });
       });
-   },
-   registerSaveTaskSubmitEvent: function (taskType) {
+   }
+
+   registerSaveTaskSubmitEvent(taskType) {
       var thisInstance = this;
       var form = jQuery('#saveTask');
       var params = {
@@ -560,9 +564,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             ignore : ".ignore-validation"
       };
       form.vtValidate(params);
-   },
-   
-   getUniqueNumber : function() {
+   }
+
+   getUniqueNumber() {
         var date = new Date();
         var components = [
             date.getYear(),
@@ -577,18 +581,21 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
         var id = components.join("");
         
         return id;
-   },
-   
-   VTUpdateFieldsTaskCustomValidation: function () {
+   }
+
+   VTUpdateFieldsTaskCustomValidation() {
       return this.checkDuplicateFieldsSelected();
-   },
-   VTCreateEntityTaskCustomValidation: function () {
+   }
+
+   VTCreateEntityTaskCustomValidation() {
       return this.checkDuplicateFieldsSelected();
-   },
-   VTCreateEventTaskCustomValidation: function () {
+   }
+
+   VTCreateEventTaskCustomValidation() {
       return this.checkStartAndEndDate();
-   },
-   checkStartAndEndDate: function () {
+   }
+
+   checkStartAndEndDate() {
       var form = jQuery('#saveTask');
       var params = form.serializeFormData();
       var result = true;
@@ -607,8 +614,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       }
       return result;
-   },
-   checkDuplicateFieldsSelected: function () {
+   }
+
+   checkDuplicateFieldsSelected() {
       var selectedFieldNames = jQuery('#save_fieldvaluemapping').find('.conditionRow').find('[name="fieldname"]');
       var result = true;
       var failureMessage = app.vtranslate('JS_SAME_FIELDS_SELECTED_MORE_THAN_ONCE');
@@ -626,8 +634,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       });
       return result;
-   },
-   preSaveVTUpdateFieldsTask: function (tasktype) {
+   }
+
+   preSaveVTUpdateFieldsTask(tasktype) {
       var values = this.getValues(tasktype);
       for(var i of Object.keys(values)){
          if(values[i].fieldname == 'assigned_user_id'){
@@ -635,8 +644,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       }
       jQuery('[name="field_value_mapping"]').val(JSON.stringify(values));
-   },
-   preSaveVTCreateEntityTask: function (tasktype) {
+   }
+
+   preSaveVTCreateEntityTask(tasktype) {
       var values = this.getValues(tasktype);
       for(var i of Object.keys(values)){
          if(values[i].fieldname == 'assigned_user_id'){
@@ -644,33 +654,38 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       }
       jQuery('[name="field_value_mapping"]').val(JSON.stringify(values));
-   },
-   preSaveVTEmailTask: function (tasktype) {
+   }
+
+   preSaveVTEmailTask(tasktype) {
       var textAreaElement = jQuery('#content');
       //To keep the plain text value to the textarea which need to be
       //sent to server
       textAreaElement.val(CKEDITOR.instances['content'].getData());
-   },
+   }
+
    /**
     * Function to check if the field selected is empty field
     * @params : select element which represents the field
     * @return : boolean true/false
     */
-   isEmptyFieldSelected: function (fieldSelect) {
+   isEmptyFieldSelected(fieldSelect) {
       var selectedOption = fieldSelect.find('option:selected');
       //assumption that empty field will be having value none
       if (selectedOption.val() == 'none') {
          return true;
       }
       return false;
-   },
-   getVTCreateEntityTaskFieldList: function () {
+   }
+
+   getVTCreateEntityTaskFieldList() {
       return new Array('fieldname', 'value', 'valuetype', 'modulename');
-   },
-   getVTUpdateFieldsTaskFieldList: function () {
+   }
+
+   getVTUpdateFieldsTaskFieldList() {
       return new Array('fieldname', 'value', 'valuetype');
-   },
-   getValues: function (tasktype) {
+   }
+
+   getValues(tasktype) {
       var thisInstance = this;
       var conditionsContainer = jQuery('#save_fieldvaluemapping');
       var fieldListFunctionName = 'get' + tasktype + 'FieldList';
@@ -730,9 +745,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          values.push(rowValues);
       });
       return values;
-   },
-   
-   getTaskList: function () {
+   }
+
+   getTaskList() {
       var params = {
          module: app.getModuleName(),
          parent: app.getParentModuleName(),
@@ -745,9 +760,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          app.helper.hideProgress();
          jQuery(".taskStatus").bootstrapSwitch();
       });
-   },
+   }
 
-   getAssignedUserId: function (username, selector) {
+   getAssignedUserId(username, selector) {
       var users = this.getAssignedUsers(selector);
       values = username.split(' ');
       if(values.length == 1){
@@ -757,8 +772,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          values[1] = '';
       }
       return users[values[0]+' '+values[1]];
-   },
-   getAssignedUsers: function (selector) {
+   }
+
+   getAssignedUsers(selector) {
       var advanceFilterContainer = jQuery(selector);
       var fieldUiHolder = jQuery('input[name="assigned_user_id"]',advanceFilterContainer).closest('.fieldUiHolder');
       var fieldInfo = fieldUiHolder.find('[name="valuetype"]').data('fieldinfo');
@@ -773,18 +789,19 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       }
       return username;
-   },
-   
+   }
+
    /**
     * Function to get ckEditorInstance
     */
-   getckEditorInstance: function () {
+   getckEditorInstance() {
       if (this.ckEditorInstance == false) {
          this.ckEditorInstance = new Vtiger_CkEditor_Js();
       }
       return this.ckEditorInstance;
-   },
-   registerTaskStatusChangeEvent: function () {
+   }
+
+   registerTaskStatusChangeEvent() {
       var container = this.getActionContainer();
       container.on('change', '.taskStatus', function (e) {
          var currentStatusElement = jQuery(e.currentTarget);
@@ -803,8 +820,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          });
          e.stopImmediatePropagation();
       });
-   },
-   registerTaskDeleteEvent: function () {
+   }
+
+   registerTaskDeleteEvent() {
       var thisInstance = this;
       var container = this.getActionContainer();
       container.on('click', '.deleteTask', function (e) {
@@ -825,15 +843,17 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
                });
             });
       });
-   },
-   registerFillTaskFromEmailFieldEvent: function () {
+   }
+
+   registerFillTaskFromEmailFieldEvent() {
       jQuery('#saveTask').on('change', '#fromEmailOption', function (e) {
          var currentElement = jQuery(e.currentTarget);
          var inputElement = currentElement.closest('.row').find('.fields');
          inputElement.val(currentElement.val());
       })
-   },
-   registerFillTaskFieldsEvent: function () {
+   }
+
+   registerFillTaskFieldsEvent() {
       jQuery('#saveTask').on('change', '.task-fields', function (e) {
          var currentElement = jQuery(e.currentTarget);
          var inputElement = currentElement.closest('.row').find('.fields');
@@ -845,8 +865,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             inputElement.val(newValue);
          }
       });
-   },
-   registerFillMailContentEvent: function () {
+   }
+
+   registerFillMailContentEvent() {
       jQuery('#task-fieldnames,#task_timefields,#task-templates,#task-emailtemplates').change(function (e) {
          var textarea = CKEDITOR.instances.content;
          var value = jQuery(e.currentTarget).val();
@@ -857,8 +878,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             textArea.insertAtCaret(value);
          }
       });
-   },
-   registerVTEmailTaskEvents: function () {
+   }
+
+   registerVTEmailTaskEvents() {
       var textAreaElement = jQuery('#content');
       var ckEditorInstance = this.getckEditorInstance();
       ckEditorInstance.loadCkEditor(textAreaElement);
@@ -866,11 +888,13 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
       this.registerTooltipEventForSignatureField();
       this.registerFillTaskFromEmailFieldEvent();
       this.registerCcAndBccEvents();
-   },
-   registerVTCreateTodoTaskEvents: function () {
+   }
+
+   registerVTCreateTodoTaskEvents() {
       vtUtils.registerEventForTimeFields(jQuery('#saveTask'));
-   },
-   registerVTUpdateFieldsTaskEvents: function () {
+   }
+
+   registerVTUpdateFieldsTaskEvents() {
       var thisInstance = this;
       this.registerAddFieldEvent();
       this.registerDeleteConditionEvent();
@@ -884,27 +908,31 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          thisInstance.loadFieldSpecificUi(jQuery(field));
       });
       this.getPopUp(jQuery('#saveTask'));
-   },
-   registerVTPushNotificationTaskEvents: function () {
+   }
+
+   registerVTPushNotificationTaskEvents() {
       this.registerFillMailContentEvent();
-   },
-   registerAddFieldEvent: function () {
+   }
+
+   registerAddFieldEvent() {
       jQuery('#addFieldBtn').on('click', function (e) {
          var newAddFieldContainer = jQuery('.basicAddFieldContainer').clone(true, true).removeClass('basicAddFieldContainer hide').addClass('conditionRow');
          jQuery('select', newAddFieldContainer).addClass('select2');
          jQuery('#save_fieldvaluemapping').append(newAddFieldContainer);
          vtUtils.showSelect2ElementView(newAddFieldContainer.find('.select2'));
       });
-   },
-   registerDeleteConditionEvent: function () {
+   }
+
+   registerDeleteConditionEvent() {
       jQuery('#saveTask').on('click', '.deleteCondition', function (e) {
          jQuery(e.currentTarget).closest('.conditionRow').remove();
       })
-   },
+   }
+
    /**
     * Function which will register field change event
     */
-   registerFieldChange: function () {
+   registerFieldChange() {
       var thisInstance = this;
       jQuery('#saveTask').on('change', 'select[name="fieldname"]', function (e) {
          var selectedElement = jQuery(e.currentTarget);
@@ -924,19 +952,22 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             thisInstance.loadFieldSpecificUi(selectedElement);
          }
       });
-   },
-   getModuleName: function () {
+   }
+
+   getModuleName() {
       return app.getModuleName();
-   },
-   getFieldValueMapping: function () {
+   }
+
+   getFieldValueMapping() {
       var fieldValueMap = this.fieldValueMap;
       if (fieldValueMap != false) {
          return fieldValueMap;
       } else {
          return '';
       }
-   },
-   fieldValueReMapping: function () {
+   }
+
+   fieldValueReMapping() {
       var object = JSON.parse(jQuery('#fieldValueMapping').val());
       var fieldValueReMap = {};
 
@@ -949,8 +980,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          fieldValueReMap[array.fieldname] = values
       });
       this.fieldValueMap = fieldValueReMap;
-   },
-   loadFieldSpecificUi: function (fieldSelect) {
+   }
+
+   loadFieldSpecificUi(fieldSelect) {
       var selectedOption = fieldSelect.find('option:selected');
       var row = fieldSelect.closest('div.conditionRow');
       var fieldUiHolder = row.find('.fieldUiHolder');
@@ -960,9 +992,9 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
       var taskType = jQuery('#taskType').val();
       if (taskType == "VTUpdateFieldsTask") {
          fieldValueMappingKey = fieldInfo.workflow_columnname;
-		 if (fieldValueMappingKey === undefined || fieldValueMappingKey === null){
-			fieldValueMappingKey = selectedOption.val();
-		 }
+         if (fieldValueMappingKey === undefined || fieldValueMappingKey === null){
+            fieldValueMappingKey = selectedOption.val();
+         }
       }
       if (fieldValueMapping != '' && typeof fieldValueMapping[fieldValueMappingKey] != 'undefined') {
          fieldInfo.value = fieldValueMapping[fieldValueMappingKey]['value'];
@@ -1029,28 +1061,32 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          }
       }
       return this;
-   },
+   }
+
    /**
     * Functiont to get the field specific ui for the selected field
     * @prarms : fieldSelectElement - select element which will represents field list
     * @return : jquery object which represents the ui for the field
     */
-   getFieldSpecificUi: function (fieldSelectElement) {
+   getFieldSpecificUi(fieldSelectElement) {
       var fieldModel = this.fieldModelInstance;
       return  jQuery(fieldModel.getUiTypeSpecificHtml())
-   },
-   registerVTCreateEventTaskEvents: function () {
+   }
+
+   registerVTCreateEventTaskEvents() {
       vtUtils.registerEventForTimeFields(jQuery('#saveTask'));
       this.registerRecurrenceFieldCheckBox();
       this.repeatMonthOptionsChangeHandling();
       this.registerRecurringTypeChangeEvent();
       this.registerRepeatMonthActions();
-   },
-   registerVTCreateEntityTaskEvents: function () {
+   }
+
+   registerVTCreateEntityTaskEvents() {
       this.registerChangeCreateEntityEvent();
       this.registerVTUpdateFieldsTaskEvents();
-   },
-   registerChangeCreateEntityEvent: function () {
+   }
+
+   registerChangeCreateEntityEvent() {
       var thisInstance = this;
       jQuery('#createEntityModule').on('change', function (e) {
          var relatedModule = jQuery(e.currentTarget).val();
@@ -1085,11 +1121,12 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             });
          });
       });
-   },
+   }
+
    /**
     * Function which will register change event on recurrence field checkbox
     */
-   registerRecurrenceFieldCheckBox: function () {
+   registerRecurrenceFieldCheckBox() {
       var thisInstance = this;
       jQuery('#saveTask').find('input[name="recurringcheck"]').on('change', function (e) {
          var element = jQuery(e.currentTarget);
@@ -1100,11 +1137,12 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
             repeatUI.addClass('hide');
          }
       });
-   },
+   }
+
    /**
     * Function which will register the change event for recurring type
     */
-   registerRecurringTypeChangeEvent: function () {
+   registerRecurringTypeChangeEvent() {
       var thisInstance = this;
       jQuery('#recurringType').on('change', function (e) {
          var currentTarget = jQuery(e.currentTarget);
@@ -1112,22 +1150,24 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          thisInstance.changeRecurringTypesUIStyles(recurringType);
 
       });
-   },
+   }
+
    /**
     * Function which will register the change event for repeatMonth radio buttons
     */
-   registerRepeatMonthActions: function () {
+   registerRepeatMonthActions() {
       var thisInstance = this;
       jQuery('#saveTask').find('input[name="repeatMonth"]').on('change', function (e) {
          //If repeatDay radio button is checked then only select2 elements will be enable
          thisInstance.repeatMonthOptionsChangeHandling();
       });
-  },
+  }
+
    /**
     * Function which will change the UI styles based on recurring type
     * @params - recurringType - which recurringtype is selected
     */
-   changeRecurringTypesUIStyles: function (recurringType) {
+   changeRecurringTypesUIStyles(recurringType) {
       var thisInstance = this;
       if (recurringType == 'Daily' || recurringType == 'Yearly') {
          jQuery('#repeatWeekUI').removeClass('show').addClass('hide');
@@ -1139,11 +1179,12 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          jQuery('#repeatWeekUI').removeClass('show').addClass('hide');
          jQuery('#repeatMonthUI').removeClass('hide').addClass('show');
       }
-   },
+   }
+
    /**
     * This function will handle the change event for RepeatMonthOptions
     */
-   repeatMonthOptionsChangeHandling: function () {
+   repeatMonthOptionsChangeHandling() {
       //If repeatDay radio button is checked then only select2 elements will be enable
       if (jQuery('#repeatDay').is(':checked')) {
          jQuery('#repeatMonthDate').attr('disabled', true);
@@ -1154,18 +1195,20 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          jQuery('#repeatMonthDayType').select2("disable");
          jQuery('#repeatMonthDay').select2("disable");
       }
-   },
-   checkHiddenStatusofCcandBcc: function () {
+   }
+
+   checkHiddenStatusofCcandBcc() {
       var ccLink = jQuery('#ccLink');
       var bccLink = jQuery('#bccLink');
       if (ccLink.is(':hidden') && bccLink.is(':hidden')) {
          ccLink.closest('div.row').addClass('hide');
       }
-   },
+   }
+
    /*
     * Function to register the events for bcc and cc links
     */
-   registerCcAndBccEvents: function () {
+   registerCcAndBccEvents() {
       var thisInstance = this;
       jQuery('#ccLink').on('click', function (e) {
          var ccContainer = jQuery('#ccContainer');
@@ -1183,272 +1226,272 @@ Settings_Vtiger_Edit_Js("Settings_Workflows_Edit_Js", {
          jQuery(e.currentTarget).hide();
          thisInstance.checkHiddenStatusofCcandBcc();
       });
-   },
-   
-	/**
-	 * Function to register event for scheduled workflows UI
-	 */
-	registerEventForScheduledWorkflow : function() {
-		var thisInstance = this;
-		jQuery('input[name="workflow_trigger"]').on('click', function(e) {
-			var element = jQuery(e.currentTarget);
-			var scheduleBoxContainer = jQuery('#scheduleBox');
-            var recurrenceBoxContainer = jQuery('.workflowRecurrenceBlock');
-            if(element.is(':checked') && element.val() == '6') {
-                scheduleBoxContainer.removeClass('hide');
-                recurrenceBoxContainer.addClass('hide');
-            } else if(element.is(':checked') && element.val() == '3') {
-                recurrenceBoxContainer.removeClass('hide');
-                recurrenceBoxContainer.find('input[type="radio"]').click();
-                scheduleBoxContainer.addClass('hide');
-            } else {
-                scheduleBoxContainer.addClass('hide');
-                recurrenceBoxContainer.addClass('hide');
-            }
-		});
-		vtUtils.registerEventForTimeFields('#schtime', true);
-		vtUtils.registerEventForDateFields(jQuery('#scheduleByDate'));
-        jQuery(".weekDaySelect").bind("mousedown", function(e) {
-            e.metaKey = true;
-        }).selectable();
-        jQuery( ".weekDaySelect" ).on( "selectableselected selectableunselected", function( event, ui ) {
-            var inputElement = jQuery('#schdayofweek');
-            var weekDaySelect = jQuery('.weekDaySelect');
-            var selectedArray = new Array();
-            weekDaySelect.find('.ui-selected').each(function(){
-                var value = jQuery(this).data('value');
-                selectedArray.push(value);
-            });
-            var selected = selectedArray.join(',');
-            inputElement.val(selected);
-        });
-		var currentYear = new Date().getFullYear();
-		jQuery('#annualDatePicker').datepick({autoSize: true, multiSelect:100,monthsToShow: [1,2],
-				minDate: '01/01/'+currentYear, maxDate: '12/31/'+currentYear,
-				yearRange: currentYear+':'+currentYear,
-				onShow : function() {
-					//Hack to remove the year
-					thisInstance.removeYearInAnnualWorkflow();
-				},
-				onSelect : function(dates) {
-					var datesInfo = [];
-					var values = [];
-					var html='';
-					// reset the annual dates
-					var annualDatesEle = jQuery('#annualDates');
-					thisInstance.updateAnnualDates(annualDatesEle);
-					for(index in dates) {
-						var date = dates[index];
-						datesInfo.push({
-								id:thisInstance.DateToYMD(date),
-								text:thisInstance.DateToYMD(date)
-							});
-						values.push(thisInstance.DateToYMD(date));
-						html += '<option selected value='+thisInstance.DateToYMD(date)+'>'+thisInstance.DateToYMD(date)+'</option>';
-					}
-					annualDatesEle.append(html);
-					annualDatesEle.trigger("change");
-				}
-			});
-			var annualDatesEle = jQuery('#annualDates');
-			thisInstance.updateAnnualDates(annualDatesEle);
-			annualDatesEle.trigger("change");
-	},
+   }
 
-	removeYearInAnnualWorkflow : function() {
-		setTimeout(function() {
-			var year = jQuery('.datepick-month.first').find('.datepick-month-year').get(1);
-			jQuery(year).hide();
-			var monthHeaders = $('.datepick-month-header');
-			jQuery.each(monthHeaders, function( key, ele ) {
-				var header = jQuery(ele);
-				var str = header.html().replace(/[\d]+/, '');
-				header.html(str);
-			});
-		},100);
-	},
-
-	updateAnnualDates : function(annualDatesEle) {
-		annualDatesEle.html('');
-		var annualDatesJSON = jQuery('#hiddenAnnualDates').val();
-		if(annualDatesJSON) {
-			var hiddenDates = '';
-			var annualDates = JSON.parse(annualDatesJSON);
-			for(j in annualDates) {
-				hiddenDates += '<option selected value='+annualDates[j]+'>'+annualDates[j]+'</option>';
-			}
-			annualDatesEle.html(hiddenDates);
-		}
-	},
-
-	DateToYMD : function (date) {
-        var year, month, day;
-        year = String(date.getFullYear());
-        month = String(date.getMonth() + 1);
-        if (month.length == 1) {
-            month = "0" + month;
-        }
-        day = String(date.getDate());
-        if (day.length == 1) {
-            day = "0" + day;
-        }
-        return year + "-" + month + "-" + day;
-    },
-
-	registerEventForChangeInScheduledType : function() {
-		var thisInstance = this;
-		jQuery('#schtypeid').on('change', function(e){
-			var element = jQuery(e.currentTarget);
-			var value = element.val();
-
-			thisInstance.showScheduledTime();
-			thisInstance.hideScheduledWeekList();
-			thisInstance.hideScheduledMonthByDateList();
-			thisInstance.hideScheduledSpecificDate();
-			thisInstance.hideScheduledAnually();
-
-			if(value == '1') {	//hourly
-				thisInstance.hideScheduledTime();
-			} else if(value == '3') {	//weekly
-				thisInstance.showScheduledWeekList();
-			} else if(value == '4') {	//specific date
-				thisInstance.showScheduledSpecificDate();
-			} else if(value == '5') {	//monthly by day
-				thisInstance.showScheduledMonthByDateList();
-			} else if(value == '7') {
-				thisInstance.showScheduledAnually();
-			}
-		});
-	},
-
-	hideScheduledTime : function() {
-		jQuery('#scheduledTime').addClass('hide');
-	},
-
-	showScheduledTime : function() {
-		jQuery('#scheduledTime').removeClass('hide');
-	},
-
-	hideScheduledWeekList : function() {
-		jQuery('#scheduledWeekDay').addClass('hide');
-	},
-
-	showScheduledWeekList : function() {
-		jQuery('#scheduledWeekDay').removeClass('hide');
-	},
-
-	hideScheduledMonthByDateList : function() {
-		jQuery('#scheduleMonthByDates').addClass('hide');
-	},
-
-	showScheduledMonthByDateList : function() {
-		jQuery('#scheduleMonthByDates').removeClass('hide');
-	},
-
-	hideScheduledSpecificDate : function() {
-		jQuery('#scheduleByDate').addClass('hide');
-	},
-
-	showScheduledSpecificDate : function() {
-		jQuery('#scheduleByDate').removeClass('hide');
-	},
-
-	hideScheduledAnually : function() {
-		jQuery('#scheduleAnually').addClass('hide');
-	},
-
-	showScheduledAnually : function() {
-		jQuery('#scheduleAnually').removeClass('hide');
-	},
-    
-    registerEventForChangeWorkflowState: function () {
-        var editViewContainer = this.getEditViewContainer();
-        var thisInstance = this;
-        jQuery(editViewContainer).on('switchChange.bootstrapSwitch', ".taskStatus", function (e) {
-           var currentElement = jQuery(e.currentTarget);
-           var status = 'true';
-           if(currentElement.val() == 'on'){
-               status = 'false';
-               currentElement.attr('value','off');
+   /**
+    * Function to register event for scheduled workflows UI
+    */
+   registerEventForScheduledWorkflow() {
+       var thisInstance = this;
+       jQuery('input[name="workflow_trigger"]').on('click', function(e) {
+           var element = jQuery(e.currentTarget);
+           var scheduleBoxContainer = jQuery('#scheduleBox');
+           var recurrenceBoxContainer = jQuery('.workflowRecurrenceBlock');
+           if(element.is(':checked') && element.val() == '6') {
+               scheduleBoxContainer.removeClass('hide');
+               recurrenceBoxContainer.addClass('hide');
+           } else if(element.is(':checked') && element.val() == '3') {
+               recurrenceBoxContainer.removeClass('hide');
+               recurrenceBoxContainer.find('input[type="radio"]').click();
+               scheduleBoxContainer.addClass('hide');
            } else {
-               currentElement.attr('value','on');
+               scheduleBoxContainer.addClass('hide');
+               recurrenceBoxContainer.addClass('hide');
            }
-           if(currentElement.data('statusurl')) {
-               var url = currentElement.data('statusurl') + "&status=" + status;
-               app.helper.showProgress();
-               app.request.post({url:url}).then(function(error,data){
-                   app.helper.hideProgress();
-                   if(data){
-                      app.helper.showSuccessNotification({message : app.vtranslate('JS_TASK_STATUS_CHANGED')});
-                      thisInstance.getTaskList();
+       });
+       vtUtils.registerEventForTimeFields('#schtime', true);
+       vtUtils.registerEventForDateFields(jQuery('#scheduleByDate'));
+       jQuery(".weekDaySelect").bind("mousedown", function(e) {
+           e.metaKey = true;
+       }).selectable();
+       jQuery( ".weekDaySelect" ).on( "selectableselected selectableunselected", function( event, ui ) {
+           var inputElement = jQuery('#schdayofweek');
+           var weekDaySelect = jQuery('.weekDaySelect');
+           var selectedArray = new Array();
+           weekDaySelect.find('.ui-selected').each(function(){
+               var value = jQuery(this).data('value');
+               selectedArray.push(value);
+           });
+           var selected = selectedArray.join(',');
+           inputElement.val(selected);
+       });
+       var currentYear = new Date().getFullYear();
+       jQuery('#annualDatePicker').datepick({autoSize: true, multiSelect:100,monthsToShow: [1,2],
+               minDate: '01/01/'+currentYear, maxDate: '12/31/'+currentYear,
+               yearRange: currentYear+':'+currentYear,
+               onShow : function() {
+                   //Hack to remove the year
+                   thisInstance.removeYearInAnnualWorkflow();
+               },
+               onSelect : function(dates) {
+                   var datesInfo = [];
+                   var values = [];
+                   var html='';
+                   // reset the annual dates
+                   var annualDatesEle = jQuery('#annualDates');
+                   thisInstance.updateAnnualDates(annualDatesEle);
+                   for(index in dates) {
+                       var date = dates[index];
+                       datesInfo.push({
+                               id:thisInstance.DateToYMD(date),
+                               text:thisInstance.DateToYMD(date)
+                           });
+                       values.push(thisInstance.DateToYMD(date));
+                       html += '<option selected value='+thisInstance.DateToYMD(date)+'>'+thisInstance.DateToYMD(date)+'</option>';
                    }
-               });
-           } else {
-               var parent = currentElement.closest('.listViewEntries');
-               var taskElement = parent.find('.taskData');
-               var taskData = JSON.parse(taskElement.val());
-               taskData.active = status;
-               taskElement.val(JSON.stringify(taskData));
-               app.helper.showSuccessNotification({message : app.vtranslate('JS_TASK_STATUS_CHANGED')});
+                   annualDatesEle.append(html);
+                   annualDatesEle.trigger("change");
+               }
+           });
+           var annualDatesEle = jQuery('#annualDates');
+           thisInstance.updateAnnualDates(annualDatesEle);
+           annualDatesEle.trigger("change");
+   }
+
+   removeYearInAnnualWorkflow() {
+       setTimeout(function() {
+           var year = jQuery('.datepick-month.first').find('.datepick-month-year').get(1);
+           jQuery(year).hide();
+           var monthHeaders = $('.datepick-month-header');
+           jQuery.each(monthHeaders, function( key, ele ) {
+               var header = jQuery(ele);
+               var str = header.html().replace(/[\d]+/, '');
+               header.html(str);
+           });
+       },100);
+   }
+
+   updateAnnualDates(annualDatesEle) {
+       annualDatesEle.html('');
+       var annualDatesJSON = jQuery('#hiddenAnnualDates').val();
+       if(annualDatesJSON) {
+           var hiddenDates = '';
+           var annualDates = JSON.parse(annualDatesJSON);
+           for(j in annualDates) {
+               hiddenDates += '<option selected value='+annualDates[j]+'>'+annualDates[j]+'</option>';
            }
-        });
-    },
-    
-    registerEnableFilterOption : function() {
-        var editViewContainer = this.getEditViewContainer();
-		editViewContainer.on('change','[name="conditionstype"]',function(e) {
-			var advanceFilterContainer = jQuery('#advanceFilterContainer');
-			var currentRadioButtonElement = jQuery(e.currentTarget);
-			if(currentRadioButtonElement.hasClass('recreate')){
-				if(currentRadioButtonElement.is(':checked')){
-					advanceFilterContainer.removeClass('zeroOpacity');
-					advanceFilterContainer.find('.conditionList').find('[name="columnname"]').find('optgroup:first option:first').attr('selected','selected').trigger('change');
-				}
-			} else {
-				advanceFilterContainer.addClass('zeroOpacity');
-			}
-		});
-	},
-	
-	addComponents : function() {
-        this._super();
-		this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
-	},
-   
-    registerEvents: function () {
-        this.registerEventForShowModuleFilterCondition();
-        this.registerFormSubmitEvent();
-        this.registerEnableFilterOption();
-		this.registerEventForScheduledWorkflow();
-		this.registerEventForChangeInScheduledType();
-        this.registerEventForChangeWorkflowState();
-    }
-});
+           annualDatesEle.html(hiddenDates);
+       }
+   }
+
+   DateToYMD(date) {
+       var year, month, day;
+       year = String(date.getFullYear());
+       month = String(date.getMonth() + 1);
+       if (month.length == 1) {
+           month = "0" + month;
+       }
+       day = String(date.getDate());
+       if (day.length == 1) {
+           day = "0" + day;
+       }
+       return year + "-" + month + "-" + day;
+   }
+
+   registerEventForChangeInScheduledType() {
+       var thisInstance = this;
+       jQuery('#schtypeid').on('change', function(e){
+           var element = jQuery(e.currentTarget);
+           var value = element.val();
+
+           thisInstance.showScheduledTime();
+           thisInstance.hideScheduledWeekList();
+           thisInstance.hideScheduledMonthByDateList();
+           thisInstance.hideScheduledSpecificDate();
+           thisInstance.hideScheduledAnually();
+
+           if(value == '1') {	//hourly
+               thisInstance.hideScheduledTime();
+           } else if(value == '3') {	//weekly
+               thisInstance.showScheduledWeekList();
+           } else if(value == '4') {	//specific date
+               thisInstance.showScheduledSpecificDate();
+           } else if(value == '5') {	//monthly by day
+               thisInstance.showScheduledMonthByDateList();
+           } else if(value == '7') {
+               thisInstance.showScheduledAnually();
+           }
+       });
+   }
+
+   hideScheduledTime() {
+       jQuery('#scheduledTime').addClass('hide');
+   }
+
+   showScheduledTime() {
+       jQuery('#scheduledTime').removeClass('hide');
+   }
+
+   hideScheduledWeekList() {
+       jQuery('#scheduledWeekDay').addClass('hide');
+   }
+
+   showScheduledWeekList() {
+       jQuery('#scheduledWeekDay').removeClass('hide');
+   }
+
+   hideScheduledMonthByDateList() {
+       jQuery('#scheduleMonthByDates').addClass('hide');
+   }
+
+   showScheduledMonthByDateList() {
+       jQuery('#scheduleMonthByDates').removeClass('hide');
+   }
+
+   hideScheduledSpecificDate() {
+       jQuery('#scheduleByDate').addClass('hide');
+   }
+
+   showScheduledSpecificDate() {
+       jQuery('#scheduleByDate').removeClass('hide');
+   }
+
+   hideScheduledAnually() {
+       jQuery('#scheduleAnually').addClass('hide');
+   }
+
+   showScheduledAnually() {
+       jQuery('#scheduleAnually').removeClass('hide');
+   }
+
+   registerEventForChangeWorkflowState() {
+       var editViewContainer = this.getEditViewContainer();
+       var thisInstance = this;
+       jQuery(editViewContainer).on('switchChange.bootstrapSwitch', ".taskStatus", function (e) {
+          var currentElement = jQuery(e.currentTarget);
+          var status = 'true';
+          if(currentElement.val() == 'on'){
+              status = 'false';
+              currentElement.attr('value','off');
+          } else {
+              currentElement.attr('value','on');
+          }
+          if(currentElement.data('statusurl')) {
+              var url = currentElement.data('statusurl') + "&status=" + status;
+              app.helper.showProgress();
+              app.request.post({url:url}).then(function(error,data){
+                  app.helper.hideProgress();
+                  if(data){
+                     app.helper.showSuccessNotification({message : app.vtranslate('JS_TASK_STATUS_CHANGED')});
+                     thisInstance.getTaskList();
+                  }
+              });
+          } else {
+              var parent = currentElement.closest('.listViewEntries');
+              var taskElement = parent.find('.taskData');
+              var taskData = JSON.parse(taskElement.val());
+              taskData.active = status;
+              taskElement.val(JSON.stringify(taskData));
+              app.helper.showSuccessNotification({message : app.vtranslate('JS_TASK_STATUS_CHANGED')});
+          }
+       });
+   }
+
+   registerEnableFilterOption() {
+       var editViewContainer = this.getEditViewContainer();
+       editViewContainer.on('change','[name="conditionstype"]',function(e) {
+           var advanceFilterContainer = jQuery('#advanceFilterContainer');
+           var currentRadioButtonElement = jQuery(e.currentTarget);
+           if(currentRadioButtonElement.hasClass('recreate')){
+               if(currentRadioButtonElement.is(':checked')){
+                   advanceFilterContainer.removeClass('zeroOpacity');
+                   advanceFilterContainer.find('.conditionList').find('[name="columnname"]').find('optgroup:first option:first').attr('selected','selected').trigger('change');
+               }
+           } else {
+               advanceFilterContainer.addClass('zeroOpacity');
+           }
+       });
+   }
+
+   addComponents() {
+       super.addComponents();
+       this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
+   }
+
+   registerEvents() {
+       this.registerEventForShowModuleFilterCondition();
+       this.registerFormSubmitEvent();
+       this.registerEnableFilterOption();
+       this.registerEventForScheduledWorkflow();
+       this.registerEventForChangeInScheduledType();
+       this.registerEventForChangeWorkflowState();
+   }
+};
 
 //http://stackoverflow.com/questions/946534/insert-text-into-textarea-with-jquery
 jQuery.fn.extend({
-	insertAtCaret: function(myValue) {
-		return this.each(function(i) {
-			if (document.selection) {
-				//For browsers like Internet Explorer
-				this.focus();
-				var sel = document.selection.createRange();
-				sel.text = myValue;
-				this.focus();
-			} else if (this.selectionStart || this.selectionStart == '0') {
-				//For browsers like Firefox and Webkit based
-				var startPos = this.selectionStart;
-				var endPos = this.selectionEnd;
-				var scrollTop = this.scrollTop;
-				this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
-				this.focus();
-				this.selectionStart = startPos + myValue.length;
-				this.selectionEnd = startPos + myValue.length;
-				this.scrollTop = scrollTop;
-			} else {
-				this.value += myValue;
-				this.focus();
-			}
-		});
-	}
+    insertAtCaret: function(myValue) {
+        return this.each(function(i) {
+            if (document.selection) {
+                //For browsers like Internet Explorer
+                this.focus();
+                var sel = document.selection.createRange();
+                sel.text = myValue;
+                this.focus();
+            } else if (this.selectionStart || this.selectionStart == '0') {
+                //For browsers like Firefox and Webkit based
+                var startPos = this.selectionStart;
+                var endPos = this.selectionEnd;
+                var scrollTop = this.scrollTop;
+                this.value = this.value.substring(0, startPos)+myValue+this.value.substring(endPos,this.value.length);
+                this.focus();
+                this.selectionStart = startPos + myValue.length;
+                this.selectionEnd = startPos + myValue.length;
+                this.scrollTop = scrollTop;
+            } else {
+                this.value += myValue;
+                this.focus();
+            }
+        });
+    }
 });

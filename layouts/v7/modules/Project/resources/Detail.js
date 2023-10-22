@@ -7,18 +7,17 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Detail_Js("Project_Detail_Js",{
-    
-	gantt: false,
-    
-	showEditColorModel: function (url, e) {
-		var element = jQuery(e);
-		app.helper.showProgress();
-		app.request.post({url: url}).then(function(error, data) {
-			if (data) {
-				app.helper.hideProgress();
-				var callback = function (data) {
-					Project_Detail_Js.registerEditColorPreSaveEvent(data, element);
+class Project_Detail_Js extends Vtiger_Detail_Js {
+    static gantt = false;
+
+    static showEditColorModel(url, e) {
+        var element = jQuery(e);
+        app.helper.showProgress();
+        app.request.post({url: url}).then(function(error, data) {
+            if (data) {
+                app.helper.hideProgress();
+                var callback = function (data) {
+                    Project_Detail_Js.registerEditColorPreSaveEvent(data, element);
                     var form = jQuery('#editColor');
                     var params = {
                         submitHandler: function(form) {
@@ -26,192 +25,191 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                         }
                     };
                     form.vtValidate(params);
-				}
+                }
                 app.helper.showModal(data, {cb: callback});
-			}
-		});
-	},
+            }
+        });
+    }
 
-	registerEditColorPreSaveEvent: function (data, element) {
-		var selectedColorField = data.find('.selectedColor');
-		var color = element.data('color');
+    static registerEditColorPreSaveEvent(data, element) {
+        var selectedColorField = data.find('.selectedColor');
+        var color = element.data('color');
 
-		if (color) {
-			selectedColorField.val(color);
-			var customParams = {
-				color: color
-			};
-		} else {
-			//if color is not present select random color
-			var randomColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6);
-			selectedColorField.val(randomColor);
-			//color picker params for add calendar view
-			var customParams = {
-				color: randomColor
-			};
-		}
+        if (color) {
+            selectedColorField.val(color);
+            var customParams = {
+                color: color
+            };
+        } else {
+            //if color is not present select random color
+            var randomColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6);
+            selectedColorField.val(randomColor);
+            //color picker params for add calendar view
+            var customParams = {
+                color: randomColor
+            };
+        }
 
-		//register color picker
-		var params = {
-			flat: true,
-			onChange: function (hsb, hex, rgb) {
-				var selectedColor = '#' + hex;
-				selectedColorField.val(selectedColor);
-			}
-		};
+        //register color picker
+        var params = {
+            flat: true,
+            onChange: function (hsb, hex, rgb) {
+                var selectedColor = '#' + hex;
+                selectedColorField.val(selectedColor);
+            }
+        };
 
-		if (typeof customParams != 'undefined') {
-			params = jQuery.extend(params, customParams);
-		}
+        if (typeof customParams != 'undefined') {
+            params = jQuery.extend(params, customParams);
+        }
 
-		data.find('.colorPicker').ColorPicker(params);
+        data.find('.colorPicker').ColorPicker(params);
 
-		//on change of status, update color picker with the status color
-		var selectElement = data.find('[name=taskstatus]');
-		selectElement.on('change', function () {
-			var selectedOption = selectElement.find('option:selected');
-			var color = selectedOption.data('color');
-			selectedColorField.val(color);
-			data.find('.colorPicker').ColorPickerSetColor(color);
-		});
-	},
+        //on change of status, update color picker with the status color
+        var selectElement = data.find('[name=taskstatus]');
+        selectElement.on('change', function () {
+            var selectedOption = selectElement.find('option:selected');
+            var color = selectedOption.data('color');
+            selectedColorField.val(color);
+            data.find('.colorPicker').ColorPickerSetColor(color);
+        });
+    }
 
-	saveColor: function (form) {
-		var color = form.find('.selectedColor').val();
-		var status = form.find('[name=taskstatus]').val();
+    static saveColor(form) {
+        var color = form.find('.selectedColor').val();
+        var status = form.find('[name=taskstatus]').val();
 
-		app.helper.showProgress();
-		var params = {
-			'module': app.getModuleName(),
-			'action': 'SaveAjax',
-			'mode': 'saveColor',
-			'color': color,
-			'status': status
-		}
-		app.request.post({data: params}).then(
-			function(error, data) {
-				app.helper.hideProgress();
-				app.helper.hideModal();
-				if (!error) {
+        app.helper.showProgress();
+        var params = {
+            'module': app.getModuleName(),
+            'action': 'SaveAjax',
+            'mode': 'saveColor',
+            'color': color,
+            'status': status
+        }
+        app.request.post({data: params}).then(
+            function(error, data) {
+                app.helper.hideProgress();
+                app.helper.hideModal();
+                if (!error) {
                     app.helper.showSuccessNotification({message: app.vtranslate('JS_COLOR_SAVED_SUCESSFULLY')});
-					// to reload chart
-					jQuery('[data-label-key=Chart]').click();
-				} else {
+                    // to reload chart
+                    jQuery('[data-label-key=Chart]').click();
+                } else {
                     app.helper.showErrorNotification({message: error});
-				}
-			}
-		);
+                }
+            }
+        );
 
-	}
-}, {
+    }
 
-	detailViewRecentTicketsTabLabel : 'HelpDesk',
-	detailViewRecentTasksTabLabel : 'Project Tasks',
-	detailViewRecentMileStonesLabel : 'Project Milestones',
-	
-	/**
-	 * Function to register event for create related record
-	 * in summary view widgets
-	 */
-	registerSummaryViewContainerEvents : function(summaryViewContainer){
-		this._super(summaryViewContainer);
-		this.registerStatusChangeEventForWidget();
-		this.registerEventsForTasksWidget(summaryViewContainer);
-	},
-	
-	/**
-	* Function to get records according to ticket status
-	*/
-	registerStatusChangeEventForWidget : function(){
-		var thisInstance = this;
-		jQuery('[name="ticketstatus"],[name="projecttaskstatus"],[name="projecttaskprogress"]').on('change',function(e){
+    detailViewRecentTicketsTabLabel = 'HelpDesk';
+    detailViewRecentTasksTabLabel = 'Project Tasks';
+    detailViewRecentMileStonesLabel = 'Project Milestones';
+
+    /**
+     * Function to register event for create related record
+     * in summary view widgets
+     */
+    registerSummaryViewContainerEvents(summaryViewContainer) {
+        super.registerSummaryViewContainerEvents(summaryViewContainer);
+        this.registerStatusChangeEventForWidget();
+        this.registerEventsForTasksWidget(summaryViewContainer);
+    }
+
+    /**
+    * Function to get records according to ticket status
+    */
+    registerStatusChangeEventForWidget() {
+        var thisInstance = this;
+        jQuery('[name="ticketstatus"],[name="projecttaskstatus"],[name="projecttaskprogress"]').on('change',function(e){
             var picklistName = this.name;
-			var statusCondition = {};
-			var params = {};
-			var currentElement = jQuery(e.currentTarget);
-			var summaryWidgetContainer = currentElement.closest('.summaryWidgetContainer');
-			var widgetDataContainer = summaryWidgetContainer.find('.widget_contents');
-			var referenceModuleName = widgetDataContainer.find('[name="relatedModule"]').val();
-			var recordId = thisInstance.getRecordId();
-			var module = app.getModuleName();
-			var selectedStatus = currentElement.find('option:selected').val();
-			if(selectedStatus.length > 0 && referenceModuleName == "HelpDesk"){
+            var statusCondition = {};
+            var params = {};
+            var currentElement = jQuery(e.currentTarget);
+            var summaryWidgetContainer = currentElement.closest('.summaryWidgetContainer');
+            var widgetDataContainer = summaryWidgetContainer.find('.widget_contents');
+            var referenceModuleName = widgetDataContainer.find('[name="relatedModule"]').val();
+            var recordId = thisInstance.getRecordId();
+            var module = app.getModuleName();
+            var selectedStatus = currentElement.find('option:selected').val();
+            if(selectedStatus.length > 0 && referenceModuleName == "HelpDesk"){
                 var searchInfo = new Array();
                 searchInfo.push('ticketstatus');
                 searchInfo.push('e');
                 searchInfo.push(selectedStatus);
                 statusCondition['ticketstatus'] = searchInfo;
-				params['whereCondition'] = JSON.stringify(statusCondition);
-			} else if(referenceModuleName == "ProjectTask" && picklistName == 'projecttaskstatus'){
-				if(selectedStatus.length > 0) {
+                params['whereCondition'] = JSON.stringify(statusCondition);
+            } else if(referenceModuleName == "ProjectTask" && picklistName == 'projecttaskstatus'){
+                if(selectedStatus.length > 0) {
                     var searchInfo = new Array();
                     searchInfo.push('projecttaskstatus');
                     searchInfo.push('e');
                     searchInfo.push(selectedStatus);
                     statusCondition['projecttaskstatus'] = searchInfo;
-					params['whereCondition'] = JSON.stringify(statusCondition);
-				}
-				jQuery('[name="projecttaskprogress"]').val('').select2("val", '');
-			}
+                    params['whereCondition'] = JSON.stringify(statusCondition);
+                }
+                jQuery('[name="projecttaskprogress"]').val('').select2("val", '');
+            }
             else if(referenceModuleName == "ProjectTask" && picklistName == 'projecttaskprogress'){
-				if(selectedStatus.length > 0) {
+                if(selectedStatus.length > 0) {
                     var searchInfo = new Array();
                     searchInfo.push('projecttaskprogress');
                     searchInfo.push('e');
                     searchInfo.push(selectedStatus);
                     statusCondition['projecttaskprogress'] = searchInfo;
-					params['whereCondition'] = JSON.stringify(statusCondition);
-				}
-				jQuery('[name="projecttaskstatus"]').val('').select2("val", '');
-			}
-			
-			params['record'] = recordId;
-			params['view'] = 'Detail';
-			params['module'] = module;
-			params['page'] = widgetDataContainer.find('[name="page"]').val();
-			params['limit'] = widgetDataContainer.find('[name="pageLimit"]').val();
-			params['relatedModule'] = referenceModuleName;
-			params['mode'] = 'showRelatedRecords';
-			app.helper.showProgress();
-			app.request.post({data: params}).then(
-				function(error, data) {
+                    params['whereCondition'] = JSON.stringify(statusCondition);
+                }
+                jQuery('[name="projecttaskstatus"]').val('').select2("val", '');
+            }
+            
+            params['record'] = recordId;
+            params['view'] = 'Detail';
+            params['module'] = module;
+            params['page'] = widgetDataContainer.find('[name="page"]').val();
+            params['limit'] = widgetDataContainer.find('[name="pageLimit"]').val();
+            params['relatedModule'] = referenceModuleName;
+            params['mode'] = 'showRelatedRecords';
+            app.helper.showProgress();
+            app.request.post({data: params}).then(
+                function(error, data) {
                     app.helper.hideProgress();
-					widgetDataContainer.html(data);
-				}
-			);
-	   })
-	},
-	
-	/**
-	 * Function to load module summary of Projects
-	 */
-	loadModuleSummary : function(){
-		var summaryParams = {};
-		summaryParams['module'] = app.getModuleName();
-		summaryParams['view'] = "Detail";
-		summaryParams['mode'] = "showModuleSummaryView";
-		summaryParams['record'] = jQuery('#recordId').val();
-		
-		app.request.post({data: summaryParams}).then(
-			function(error, data) {
-				jQuery('.summaryView').html(data);
-			}
-		);
-	},
-    
+                    widgetDataContainer.html(data);
+                }
+            );
+       })
+    }
+
+    /**
+     * Function to load module summary of Projects
+     */
+    loadModuleSummary() {
+        var summaryParams = {};
+        summaryParams['module'] = app.getModuleName();
+        summaryParams['view'] = "Detail";
+        summaryParams['mode'] = "showModuleSummaryView";
+        summaryParams['record'] = jQuery('#recordId').val();
+        
+        app.request.post({data: summaryParams}).then(
+            function(error, data) {
+                jQuery('.summaryView').html(data);
+            }
+        );
+    }
+
     /**
      * Function to load the gantt chart
      */
-    loadGanttChart : function(container) {
+    loadGanttChart(container) {
         var gantt;
         //load templates
         jQuery("#ganttemplates").loadTemplates();
 
-		// here starts gantt initialization
-		var ganttHeight = $(window).height() - 600;
-		if(ganttHeight < 360) {
-			ganttHeight = 360;
-		}
+        // here starts gantt initialization
+        var ganttHeight = $(window).height() - 600;
+        if(ganttHeight < 360) {
+            ganttHeight = 360;
+        }
         gantt = new GanttMaster();
         var workSpace = $("#workSpace");
         workSpace.css({height:ganttHeight});
@@ -230,15 +228,15 @@ Vtiger_Detail_Js("Project_Detail_Js",{
           workSpace.trigger("resize.gantt");
         });
 
-		Project_Detail_Js.gantt = gantt;
+        Project_Detail_Js.gantt = gantt;
 
-		// Added to make default sortorder of startdate to be ascending
-		var element = jQuery('.gdfTable.fixHead').find('.gdfColHeader[data-name=startdate]');
-		element.data('nextorder', 'asc');
-		element.trigger('click');
-    },
-    
-    loadContents : function(url,data) {
+        // Added to make default sortorder of startdate to be ascending
+        var element = jQuery('.gdfTable.fixHead').find('.gdfColHeader[data-name=startdate]');
+        element.data('nextorder', 'asc');
+        element.trigger('click');
+    }
+
+    loadContents(url, data) {
         var detailContentsHolder = this.getContentHolder();
         var thisInstance = this;
         var aDeferred = jQuery.Deferred();
@@ -260,98 +258,98 @@ Vtiger_Detail_Js("Project_Detail_Js",{
             }
         });
         return aDeferred.promise();
-	},
-	
-	/**
-	 * Function to register events for project tasks widget
-	 */
-	registerEventsForTasksWidget : function(summaryViewContainer) {
-		var thisInstance = this;
-		var tasksWidget = summaryViewContainer.find('.widgetContainer_tasks');
-		tasksWidget.on('click', '.editTaskDetails', function(e) {
-			var currentTarget = jQuery(e.currentTarget);
-			var newValue = currentTarget.text();
-			var element = currentTarget.closest('ul.dropdown-menu');
-			var editElement = element.closest('.dropdown');
-			var oldValue = element.data('oldValue');
-			if(currentTarget.hasClass('emptyOption')) {
-				newValue = '';
-			}
-            vtUtils.hideValidationMessage(editElement);
-			if(element.data('mandatory') && newValue.length <= 0) {
-				var result = app.vtranslate('JS_REQUIRED_FIELD');
-                vtUtils.showValidationMessage(editElement, result);
-				return false;
-			}
-			if(oldValue != newValue) {
-				var params = {
-					action : 'SaveAjax',
-					record : element.data('recordid'),
-					field : element.data('fieldname'),
-					value : newValue,
-					module : 'ProjectTask'
-				};
-				app.helper.showProgress();
-				app.request.post({data: params}).then(
-					function(error, data) {
-                        app.helper.hideProgress();
-						thisInstance.showRelatedRecords(tasksWidget);
-					}
-				);
-			}
-		})
-	},
-	
-	/**
-	 * Function to get the related records list
-	 * summary view widget
-	 */
-	showRelatedRecords : function(summaryWidgetContainer) {
-		var widgetHeaderContainer = summaryWidgetContainer.find('.widget_header');
-		var widgetDataContainer = summaryWidgetContainer.find('.widget_contents');
-		var referenceModuleName = widgetHeaderContainer.find('[name="relatedModule"]').val();
-		var module = app.getModuleName();
-		var params = {};
-			
-		if(referenceModuleName == 'ProjectTask') {
-			var statusCondition = {};
-			var selectedStatus = jQuery('[name="projecttaskstatus"]', widgetHeaderContainer).val();
-			if(typeof selectedStatus != "undefined" && selectedStatus.length > 0) {
-				statusCondition['vtiger_projecttask.projecttaskstatus'] = selectedStatus;
-				params['whereCondition'] = statusCondition;
-			}
-			var selectedProgress = jQuery('[name="projecttaskprogress"]', widgetHeaderContainer).val();
-			if(typeof selectedProgress != "undefined" && selectedProgress.length > 0) {
-				statusCondition['vtiger_projecttask.projecttaskprogress'] = selectedProgress;
-				params['whereCondition'] = statusCondition;
-			}
-		}
+    }
 
-		params['record'] = this.getRecordId();
-		params['view'] = 'Detail';
-		params['module'] = module;
-		params['page'] = widgetDataContainer.find('[name="page"]').val();
-		params['limit'] = widgetDataContainer.find('[name="pageLimit"]').val();
-		params['relatedModule'] = referenceModuleName;
-		params['mode'] = 'showRelatedRecords';
+    /**
+     * Function to register events for project tasks widget
+     */
+    registerEventsForTasksWidget(summaryViewContainer) {
+        var thisInstance = this;
+        var tasksWidget = summaryViewContainer.find('.widgetContainer_tasks');
+        tasksWidget.on('click', '.editTaskDetails', function(e) {
+            var currentTarget = jQuery(e.currentTarget);
+            var newValue = currentTarget.text();
+            var element = currentTarget.closest('ul.dropdown-menu');
+            var editElement = element.closest('.dropdown');
+            var oldValue = element.data('oldValue');
+            if(currentTarget.hasClass('emptyOption')) {
+                newValue = '';
+            }
+            vtUtils.hideValidationMessage(editElement);
+            if(element.data('mandatory') && newValue.length <= 0) {
+                var result = app.vtranslate('JS_REQUIRED_FIELD');
+                vtUtils.showValidationMessage(editElement, result);
+                return false;
+            }
+            if(oldValue != newValue) {
+                var params = {
+                    action : 'SaveAjax',
+                    record : element.data('recordid'),
+                    field : element.data('fieldname'),
+                    value : newValue,
+                    module : 'ProjectTask'
+                };
+                app.helper.showProgress();
+                app.request.post({data: params}).then(
+                    function(error, data) {
+                        app.helper.hideProgress();
+                        thisInstance.showRelatedRecords(tasksWidget);
+                    }
+                );
+            }
+        })
+    }
+
+    /**
+     * Function to get the related records list
+     * summary view widget
+     */
+    showRelatedRecords(summaryWidgetContainer) {
+        var widgetHeaderContainer = summaryWidgetContainer.find('.widget_header');
+        var widgetDataContainer = summaryWidgetContainer.find('.widget_contents');
+        var referenceModuleName = widgetHeaderContainer.find('[name="relatedModule"]').val();
+        var module = app.getModuleName();
+        var params = {};
+            
+        if(referenceModuleName == 'ProjectTask') {
+            var statusCondition = {};
+            var selectedStatus = jQuery('[name="projecttaskstatus"]', widgetHeaderContainer).val();
+            if(typeof selectedStatus != "undefined" && selectedStatus.length > 0) {
+                statusCondition['vtiger_projecttask.projecttaskstatus'] = selectedStatus;
+                params['whereCondition'] = statusCondition;
+            }
+            var selectedProgress = jQuery('[name="projecttaskprogress"]', widgetHeaderContainer).val();
+            if(typeof selectedProgress != "undefined" && selectedProgress.length > 0) {
+                statusCondition['vtiger_projecttask.projecttaskprogress'] = selectedProgress;
+                params['whereCondition'] = statusCondition;
+            }
+        }
+
+        params['record'] = this.getRecordId();
+        params['view'] = 'Detail';
+        params['module'] = module;
+        params['page'] = widgetDataContainer.find('[name="page"]').val();
+        params['limit'] = widgetDataContainer.find('[name="pageLimit"]').val();
+        params['relatedModule'] = referenceModuleName;
+        params['mode'] = 'showRelatedRecords';
         
         app.helper.showProgress();
-		app.request.post({data: params}).then(
-			function(error, data) {
+        app.request.post({data: params}).then(
+            function(error, data) {
                 app.helper.hideProgress();
-				widgetDataContainer.html(data);
-			}
-		);
-	},
-    
-    registerGanttChartEvents : function(container) {
+                widgetDataContainer.html(data);
+            }
+        );
+    }
+
+    registerGanttChartEvents(container) {
         this.registerZoomButtons(container);
         this.registerTaskEdit(container);
         this.registerRecordUpdateEvent(container);
-		this.registerGanttSorting(container);
-    },
-    
-    registerZoomButtons : function(container) {
+        this.registerGanttSorting(container);
+    }
+
+    registerZoomButtons(container) {
         
         container.on('click', '.zoomIn', function(e){
             e.preventDefault();
@@ -362,9 +360,9 @@ Vtiger_Detail_Js("Project_Detail_Js",{
             e.preventDefault();
             jQuery("#workSpace").trigger('zoomMinus.gantt');
         });
-    },
-    
-    registerTaskEdit : function (container) {
+    }
+
+    registerTaskEdit(container) {
         var thisInstance = this;
         container.on('click', '.editTask', function(e) {
             var element = jQuery(e.currentTarget);
@@ -389,16 +387,16 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                                 form = jQuery(form);
                                 if(form.attr('id') == 'projectTaskQuickEditForm') {
                                     app.helper.showProgress();
-									 thisInstance.saveTask(form).then(function(err, data) {
+                                     thisInstance.saveTask(form).then(function(err, data) {
                                         app.helper.hideProgress();
-										if (err === null) {
-											jQuery('.vt-notification').remove();
-											app.helper.hideModal();
-											// to reload chart
-											jQuery('[data-label-key=Chart]').click();
-										} else {
-											app.event.trigger('post.save.failed', err);
-										}
+                                        if (err === null) {
+                                            jQuery('.vt-notification').remove();
+                                            app.helper.hideModal();
+                                            // to reload chart
+                                            jQuery('[data-label-key=Chart]').click();
+                                        } else {
+                                            app.event.trigger('post.save.failed', err);
+                                        }
                                     });
                                 }
                             },
@@ -413,9 +411,9 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                 }                              
             );
         }); 
-    },
-    
-    registerRecordUpdateEvent : function(container) {
+    }
+
+    registerRecordUpdateEvent(container) {
         container.on('updateTaskRecord.gantt','#workSpace', function(e,task) {
             var dateFormat = vtUtils.getMomentDateFormat();
             var startDate = moment(task.start).format(dateFormat);
@@ -430,20 +428,20 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                 }
                 app.helper.showProgress();
                 app.request.post({data: params}).then(
-					function(error, data) {
+                    function(error, data) {
                         app.helper.hideProgress();
-						if (error === null) {
-							jQuery('.vt-notification').remove();
-						} else {
-							app.event.trigger('post.save.failed', error);
-						}
+                        if (error === null) {
+                            jQuery('.vt-notification').remove();
+                        } else {
+                            app.event.trigger('post.save.failed', error);
+                        }
                     }
                 );
             }
         });
-    },
-    
-    sortResults: function(arr, prop, asc) {
+    }
+
+    sortResults(arr, prop, asc) {
         var thisInstance = this;
         arr = arr.sort(function(a, b) {
             if (asc) { 
@@ -466,13 +464,13 @@ Vtiger_Detail_Js("Project_Detail_Js",{
         });
             
         return arr;
-    },
-    
-    isDate: function(date) {
+    }
+
+    isDate(date) {
         return (new Date(date) !== "Invalid Date" && !isNaN(new Date(date)) ) ? true : false;
-    },
-    
-    sortAlphabetically : function(a, b) {
+    }
+
+    sortAlphabetically(a, b) {
         var nameA = a.toLowerCase();
         var nameB = b.toLowerCase()
         if (nameA < nameB) {
@@ -483,9 +481,9 @@ Vtiger_Detail_Js("Project_Detail_Js",{
         }
         
         return 0;
-    },
-    
-    registerGanttSorting : function(container) { 
+    }
+
+    registerGanttSorting(container) { 
         var thisInstance = this;
         container.on('click', '.gdfColHeader', function(e) {
             var element = jQuery(e.currentTarget);
@@ -521,9 +519,9 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                 gantt.checkpoint(); //empty the undo stack
             }
         });
-    },
-    
-    saveTask : function(form) {
+    }
+
+    saveTask(form) {
         var aDeferred = jQuery.Deferred();
         var formData = form.serializeFormData();
         app.request.post({data: formData}).then(
@@ -536,32 +534,32 @@ Vtiger_Detail_Js("Project_Detail_Js",{
                 }
         );
         return aDeferred.promise();
-    },
-	
-	registerEvents : function(){
-		var detailContentsHolder = this.getContentHolder();
-		var thisInstance = this;
-		this._super();
-		
-		detailContentsHolder.on('click','.moreRecentMilestones', function(){
-			var recentMilestonesTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentMileStonesLabel);
-			recentMilestonesTab.trigger('click');
-		});
-		
-		detailContentsHolder.on('click','.moreRecentTickets', function(){
-			var recentTicketsTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentTicketsTabLabel);
-			recentTicketsTab.trigger('click');
-		});
-		
-		detailContentsHolder.on('click','.moreRecentTasks', function(){
-			var recentTasksTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentTasksTabLabel);
-			recentTasksTab.trigger('click');
-		});
+    }
+
+    registerEvents() {
+        var detailContentsHolder = this.getContentHolder();
+        var thisInstance = this;
+        super.registerEvents();
+        
+        detailContentsHolder.on('click','.moreRecentMilestones', function(){
+            var recentMilestonesTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentMileStonesLabel);
+            recentMilestonesTab.trigger('click');
+        });
+        
+        detailContentsHolder.on('click','.moreRecentTickets', function(){
+            var recentTicketsTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentTicketsTabLabel);
+            recentTicketsTab.trigger('click');
+        });
+        
+        detailContentsHolder.on('click','.moreRecentTasks', function(){
+            var recentTasksTab = thisInstance.getTabByLabel(thisInstance.detailViewRecentTasksTabLabel);
+            recentTasksTab.trigger('click');
+        });
         
         var detailViewContainer = jQuery('.detailViewContainer');
         thisInstance.registerGanttChartEvents(detailViewContainer);
         if(detailViewContainer.find('#workSpace').length != 0) {
             this.loadGanttChart(detailViewContainer);
         }
-	}
-})
+    }
+}

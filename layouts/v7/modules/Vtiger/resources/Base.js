@@ -6,20 +6,18 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  *************************************************************************************/
-Vtiger.Class('Vtiger_Base_Js', {},{
+class Vtiger_Base_Js extends Vtiger_Class_Js {
+    _components = {};
+    addComponents() {}
 
-    _components : {},
-
-    addComponents : function() {},
-
-    init : function() {
+    constructor() {
         this.addComponents();
-    },
+    }
 
-    intializeComponents : function() {
+    intializeComponents() {
         for(var componentName in this._components) {
             var componentInstance = this._components[componentName];
             componentInstance.registerEvents();
         }
-    },
-});
+    }
+};

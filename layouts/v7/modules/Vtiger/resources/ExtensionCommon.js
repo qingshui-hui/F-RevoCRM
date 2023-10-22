@@ -7,25 +7,24 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
-    
-    init : function() {
+class Vtiger_ExtensionCommon_Js extends Vtiger_Class_Js {
+    constructor() {
         this.addComponents();
-    },
-    
-    addComponents : function() {
+    }
+
+    addComponents() {
         
-    },
-    
-    getListContainer : function() {
+    }
+
+    getListContainer() {
         var container = jQuery('.listViewPageDiv');
         if(app.getParentModuleName() === 'Settings') {
             container = jQuery('.settingsPageDiv');
         }
         return container;
-    },
-    
-    registerLogDetailClickEvent : function(container) {
+    }
+
+    registerLogDetailClickEvent(container) {
         var extensionInstance = new Vtiger_Extension_Js();
         container.on('click', '.syncLogDetail', function(e) {
             var element = jQuery(e.currentTarget);
@@ -38,12 +37,12 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
             }
             app.request.post({data: params}).then(function(error, data){
                 app.helper.loadPageContentOverlay(data);
-				app.helper.showVerticalScroll(jQuery('#detailviewhtml .datacontent'), {'autoHideScrollbar': true});
+                app.helper.showVerticalScroll(jQuery('#detailviewhtml .datacontent'), {'autoHideScrollbar': true});
             });
         });
-    },
-    
-    registerAjaxEvents : function(container) {
+    }
+
+    registerAjaxEvents(container) {
         container.on('click', '.navigationLink', function(e) {
             var element = jQuery(e.currentTarget);
             var url = element.data('url');
@@ -63,9 +62,9 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
                 }
             });
         });
-    },
-    
-    registerSettingsMenuClickEvent : function(container) {
+    }
+
+    registerSettingsMenuClickEvent(container) {
         container.on('click', '.settingsPage', function(e) {
             var element = jQuery(e.currentTarget);
             var url = element.data('url');
@@ -85,9 +84,9 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
                 }
             });
         });
-    },
-    
-    registerSettingsFormSubmitEvent : function(container) {
+    }
+
+    registerSettingsFormSubmitEvent(container) {
         container.on('submit', '#settingsForm', function(e) {
             e.preventDefault();
             var form = jQuery('#settingsForm');
@@ -96,9 +95,9 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
                 form.get(0).submit();
             }
         });
-    },
-    
-    getListUrlParams : function() {
+    }
+
+    getListUrlParams() {
         var extensionInstance = new Vtiger_Extension_Js();
         var params = {
             'module' : app.getModuleName(),
@@ -109,9 +108,9 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
         }
         
         return params;
-    },
-    
-    loadListView : function(params, container) {
+    }
+
+    loadListView(params, container) {
         var params = {
             data : params
         }
@@ -122,139 +121,139 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
                 container.html(data);
             }
         });
-    },
-    
-    pageJump : function(container) {
-		var element = container.find('#totalPageCount');
-		var totalPageNumber = element.text();
-		var pageCount;
-		
-		if(totalPageNumber === ""){
-			var totalCountElem = container.find('#totalCount');
-			var totalRecordCount = totalCountElem.val();
-			if(totalRecordCount !== '') {
-				var recordPerPage = container.find('#pageLimit').val();
-				if(recordPerPage === '0') recordPerPage = 1;
-				pageCount = Math.ceil(totalRecordCount/recordPerPage);
-				if(pageCount === 0){
-					pageCount = 1;
-				}
-				element.text(pageCount);
-				return;
-			}
-		}
-	},
-	
-	pageJumpOnSubmit : function(container) {
-		var thisInstance = this;
-		
-		var currentPageElement = container.find('#pageNumber');
-		var currentPageNumber = parseInt(currentPageElement.val());
-		var newPageNumber = parseInt(container.find('#pageToJump').val());
-		var totalPages = parseInt(container.find('#totalPageCount').text());
+    }
 
-		if(newPageNumber > totalPages){
-			var message = app.vtranslate('JS_PAGE_NOT_EXIST');
-			app.helper.showErrorNotification({'message':message})
-			return;
-		}
+    pageJump(container) {
+        var element = container.find('#totalPageCount');
+        var totalPageNumber = element.text();
+        var pageCount;
+        
+        if(totalPageNumber === ""){
+            var totalCountElem = container.find('#totalCount');
+            var totalRecordCount = totalCountElem.val();
+            if(totalRecordCount !== '') {
+                var recordPerPage = container.find('#pageLimit').val();
+                if(recordPerPage === '0') recordPerPage = 1;
+                pageCount = Math.ceil(totalRecordCount/recordPerPage);
+                if(pageCount === 0){
+                    pageCount = 1;
+                }
+                element.text(pageCount);
+                return;
+            }
+        }
+    }
 
-		if(newPageNumber === currentPageNumber){
-			var message = app.vtranslate('JS_YOU_ARE_IN_PAGE_NUMBER')+" "+ newPageNumber;
-			app.helper.showAlertNotification({'message': message});
-			return;
-		}
+    pageJumpOnSubmit(container) {
+        var thisInstance = this;
+        
+        var currentPageElement = container.find('#pageNumber');
+        var currentPageNumber = parseInt(currentPageElement.val());
+        var newPageNumber = parseInt(container.find('#pageToJump').val());
+        var totalPages = parseInt(container.find('#totalPageCount').text());
+
+        if(newPageNumber > totalPages){
+            var message = app.vtranslate('JS_PAGE_NOT_EXIST');
+            app.helper.showErrorNotification({'message':message})
+            return;
+        }
+
+        if(newPageNumber === currentPageNumber){
+            var message = app.vtranslate('JS_YOU_ARE_IN_PAGE_NUMBER')+" "+ newPageNumber;
+            app.helper.showAlertNotification({'message': message});
+            return;
+        }
 
         var params = thisInstance.getListUrlParams();
         params.page = newPageNumber;
-		thisInstance.loadListView(params, container);
-	},
-    
-    totalNumOfRecords : function (currentEle, container) {
-		var thisInstance = this;
-		var totalRecordsElement = container.find('#totalCount');
-		var totalNumberOfRecords = totalRecordsElement.val();
-		currentEle.addClass('hide');
+        thisInstance.loadListView(params, container);
+    }
 
-		if(totalNumberOfRecords === '') {
-			thisInstance.getPageCount().then(function(data){
-				totalNumberOfRecords = data.numberOfRecords;
-				totalRecordsElement.val(totalNumberOfRecords);
-				container.find('ul#listViewPageJumpDropDown #totalPageCount').text(data.page);
-				thisInstance.showPagingInfo(container);
-			});
-		}else{
-			thisInstance.showPagingInfo(container);
-		}
-	},
-    
-    showPagingInfo : function(container){
-		var totalNumberOfRecords = container.find('#totalCount').val();
-		var pageNumberElement = container.find('.pageNumbersText');
-		var pageRange = pageNumberElement.text();
-		var newPagingInfo = pageRange.trim()+" "+app.vtranslate('of')+" "+totalNumberOfRecords+"  ";
-		var listViewEntriesCount = parseInt(jQuery('#noOfEntries').val());
-		
-		if(listViewEntriesCount !== 0){
-			container.find('.pageNumbersText').html(newPagingInfo);
-		} else {
-			container.find('.pageNumbersText').html("");
-		}
-	},
-    
-    registerPaginationEvents : function(container) {
-		var thisInstance = this;
-		var paginationObj = new Vtiger_Pagination_Js();
-		paginationObj.initialize(container);
-		
-		app.event.on(paginationObj.nextPageButtonClickEventName, function(){
-			var pageLimit = container.find('#pageLimit').val();
+    totalNumOfRecords(currentEle, container) {
+        var thisInstance = this;
+        var totalRecordsElement = container.find('#totalCount');
+        var totalNumberOfRecords = totalRecordsElement.val();
+        currentEle.addClass('hide');
+
+        if(totalNumberOfRecords === '') {
+            thisInstance.getPageCount().then(function(data){
+                totalNumberOfRecords = data.numberOfRecords;
+                totalRecordsElement.val(totalNumberOfRecords);
+                container.find('ul#listViewPageJumpDropDown #totalPageCount').text(data.page);
+                thisInstance.showPagingInfo(container);
+            });
+        }else{
+            thisInstance.showPagingInfo(container);
+        }
+    }
+
+    showPagingInfo(container) {
+        var totalNumberOfRecords = container.find('#totalCount').val();
+        var pageNumberElement = container.find('.pageNumbersText');
+        var pageRange = pageNumberElement.text();
+        var newPagingInfo = pageRange.trim()+" "+app.vtranslate('of')+" "+totalNumberOfRecords+"  ";
+        var listViewEntriesCount = parseInt(jQuery('#noOfEntries').val());
+        
+        if(listViewEntriesCount !== 0){
+            container.find('.pageNumbersText').html(newPagingInfo);
+        } else {
+            container.find('.pageNumbersText').html("");
+        }
+    }
+
+    registerPaginationEvents(container) {
+        var thisInstance = this;
+        var paginationObj = new Vtiger_Pagination_Js();
+        paginationObj.initialize(container);
+        
+        app.event.on(paginationObj.nextPageButtonClickEventName, function(){
+            var pageLimit = container.find('#pageLimit').val();
             var noOfEntries = container.find('#noOfEntries').val();
             var nextPageExist = container.find('#nextPageExist').val();
             var pageNumber = container.find('#pageNumber').val();
-			var nextPageNumber = parseInt(parseFloat(pageNumber)) + 1;
+            var nextPageNumber = parseInt(parseFloat(pageNumber)) + 1;
             
             if(noOfEntries === pageLimit && nextPageExist){
                 var params = thisInstance.getListUrlParams();
                 params.page = nextPageNumber;
                 
-				thisInstance.loadListView(params, container);
-			}
-		});
-		
-		app.event.on(paginationObj.previousPageButtonClickEventName, function(){
-			var pageNumber = container.find('#pageNumber').val();
-			var previousPageNumber = parseInt(parseFloat(pageNumber)) - 1;
+                thisInstance.loadListView(params, container);
+            }
+        });
+        
+        app.event.on(paginationObj.previousPageButtonClickEventName, function(){
+            var pageNumber = container.find('#pageNumber').val();
+            var previousPageNumber = parseInt(parseFloat(pageNumber)) - 1;
             
-			if(pageNumber > 1) {
+            if(pageNumber > 1) {
                 var params = thisInstance.getListUrlParams();
                 params.page = previousPageNumber;
                 
-				thisInstance.loadListView(params, container);
-			}
-		});
-		
-		app.event.on(paginationObj.pageJumpButtonClickEventName, function(event, currentEle){
-			thisInstance.pageJump(container);
-		});
-		
-		app.event.on(paginationObj.totalNumOfRecordsButtonClickEventName, function(event, currentEle){
-			thisInstance.totalNumOfRecords(currentEle, container);
-		});
-		
-		app.event.on(paginationObj.pageJumpSubmitButtonClickEvent, function(event, currentEle){
-			thisInstance.pageJumpOnSubmit(container);
-		});
-	},
-    
-    registerCRMSettingEvents : function() {
+                thisInstance.loadListView(params, container);
+            }
+        });
+        
+        app.event.on(paginationObj.pageJumpButtonClickEventName, function(event, currentEle){
+            thisInstance.pageJump(container);
+        });
+        
+        app.event.on(paginationObj.totalNumOfRecordsButtonClickEventName, function(event, currentEle){
+            thisInstance.totalNumOfRecords(currentEle, container);
+        });
+        
+        app.event.on(paginationObj.pageJumpSubmitButtonClickEvent, function(event, currentEle){
+            thisInstance.pageJumpOnSubmit(container);
+        });
+    }
+
+    registerCRMSettingEvents() {
         if(app.getParentModuleName() === 'Settings') {
             var settingsInstance = new Settings_Vtiger_Index_Js();
             settingsInstance.registerBasicSettingsEvents();
         }
-    },
-    
-    registerEvents : function(container) {
+    }
+
+    registerEvents(container) {
         if(typeof(container) == 'undefined'){
             container = this.getListContainer();
         }
@@ -265,4 +264,4 @@ Vtiger.Class("Vtiger_ExtensionCommon_Js",{}, {
         this.registerPaginationEvents(container);
         this.registerCRMSettingEvents();
     }
-});
+};

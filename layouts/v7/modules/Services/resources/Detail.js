@@ -7,6 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Products_Detail_Js("Services_Detail_Js",{},{
-	
-})
+class Services_Detail_Js extends Products_Detail_Js {}

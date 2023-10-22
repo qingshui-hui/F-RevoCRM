@@ -1,8 +1,5 @@
-Vtiger_Detail_Js("Calendar_Detail_Js", {
-    
-}, {
-    
-    _delete : function(deleteRecordActionUrl) {
+class Calendar_Detail_Js extends Vtiger_Detail_Js {
+    _delete(deleteRecordActionUrl) {
         var params = app.convertUrlToDataParams(deleteRecordActionUrl+"&ajaxDelete=true");
         app.helper.showProgress();
         app.request.post({data:params}).then(
@@ -18,14 +15,14 @@ Vtiger_Detail_Js("Calendar_Detail_Js", {
                 app.helper.showAlertBox({'message' : err});
             }
         });
-    },
-    
+    }
+
     /**
     * To Delete Record from detail View
     * @param URL deleteRecordActionUrl
     * @returns {undefined}
     */
-    remove : function(deleteRecordActionUrl) {
+    remove(deleteRecordActionUrl) {
         var thisInstance = this;
         var isRecurringEvent = jQuery('#addEventRepeatUI').data('recurringEnabled');
         if(isRecurringEvent) {
@@ -34,12 +31,11 @@ Vtiger_Detail_Js("Calendar_Detail_Js", {
                 thisInstance._delete(deleteRecordActionUrl);
             });
         } else {
-            this._super(deleteRecordActionUrl);
+            super.remove(deleteRecordActionUrl);
         }
-    },    
-    
-    registerEvents : function() {
-        this._super();
     }
-    
-});
+
+    registerEvents() {
+        super.registerEvents();
+    }
+};

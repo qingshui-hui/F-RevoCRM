@@ -7,6 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Settings_Vtiger_List_Js("Settings_Groups_List_Js",{},{
-
-});
+class Settings_Groups_List_Js extends Settings_Vtiger_List_Js {};

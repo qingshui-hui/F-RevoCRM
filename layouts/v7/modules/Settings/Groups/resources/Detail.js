@@ -7,14 +7,12 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Settings_Groups_Detail_Js",{},{
-	
-    init : function() {
+class Settings_Groups_Detail_Js extends Vtiger_Class_Js {
+    constructor() {
        this.addComponents();
-    },
-   
-    addComponents : function (){
+    }
+
+    addComponents() {
         this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
-    },
-	
-});
+    }
+};

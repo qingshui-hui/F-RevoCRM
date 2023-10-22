@@ -7,4 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Inventory_Detail_Js("PurchaseOrder_Detail_Js",{},{});
+class PurchaseOrder_Detail_Js extends Inventory_Detail_Js {};

@@ -7,7 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Calendar_Edit_Js("Events_Edit_Js",{
-
-},{
-});
+class Events_Edit_Js extends Calendar_Edit_Js {};

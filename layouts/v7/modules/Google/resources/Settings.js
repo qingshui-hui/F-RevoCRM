@@ -7,21 +7,18 @@
  * All Rights Reserved.
  *************************************************************************************/  
 
-Vtiger.Class("Google_Settings_Js", {
-    
-    postSettingsLoad : "Google.Settings.load"
-    
-}, {
-    
-    getListContainer : function() {
+class Google_Settings_Js extends Vtiger_Class_Js {
+    static postSettingsLoad = "Google.Settings.load";
+
+    getListContainer() {
         var container = jQuery('.listViewPageDiv');
         if(app.getParentModuleName() === 'Settings') {
             container = jQuery('.settingsPageDiv');
         }
         return container;
-    },
-    
-    registerAuthorizeButton : function() {
+    }
+
+    registerAuthorizeButton() {
         var container = this.getListContainer();
         container.on('click', '#authorizeButton', function(e){
                 var element = jQuery(e.currentTarget);
@@ -51,12 +48,12 @@ Vtiger.Class("Google_Settings_Js", {
                      }
                 }
         });
-    },
-    
-    registerFieldMappingClickEvent : function() {
+    }
+
+    registerFieldMappingClickEvent() {
         var thisInstance = this;
         jQuery('a#syncSetting').on('click',function(e) {
-			var syncModule = jQuery(e.currentTarget).data('syncModule');
+            var syncModule = jQuery(e.currentTarget).data('syncModule');
                 var params = {
                     module : 'Google',
                     view : 'Setting',
@@ -75,9 +72,9 @@ Vtiger.Class("Google_Settings_Js", {
                     app.helper.showModal(data, modalData);
                 });
         });
-    },
-    
-    packFieldmappingsForSubmit : function(container) {
+    }
+
+    packFieldmappingsForSubmit(container) {
         var rows = container.find('div#googlesyncfieldmapping').find('table > tbody > tr');
         var mapping = {};
         jQuery.each(rows,function(index,row) {
@@ -102,58 +99,58 @@ Vtiger.Class("Google_Settings_Js", {
             mapping[index] = map;
         });
         return JSON.stringify(mapping);
-    },
-    
-     validateFieldMappings : function(container) {
-        var aDeferred = jQuery.Deferred();
-        
-		var customFieldLabels = jQuery('input.google-custom-label',container).filter('input:text').filter(function() {
-            if(jQuery(this).val() == "") {
-                return jQuery(this).css('visibility') == 'visible';
-            }
-        });
-		
-        if(customFieldLabels.length) {
-			customFieldLabels.valid();
-            aDeferred.reject();
-        } else {
-            aDeferred.resolve();
-        }
-        return aDeferred.promise();
-    },
-    
-    registerSettingsEventsForContacts : function(container) {
+    }
+
+    validateFieldMappings(container) {
+       var aDeferred = jQuery.Deferred();
+       
+       var customFieldLabels = jQuery('input.google-custom-label',container).filter('input:text').filter(function() {
+           if(jQuery(this).val() == "") {
+               return jQuery(this).css('visibility') == 'visible';
+           }
+       });
+       
+       if(customFieldLabels.length) {
+           customFieldLabels.valid();
+           aDeferred.reject();
+       } else {
+           aDeferred.resolve();
+       }
+       return aDeferred.promise();
+   }
+
+    registerSettingsEventsForContacts(container) {
         this.registerAddCustomFieldMappingEvent(container);
         this.registerDeleteCustomFieldMappingEvent(container);
         this.registerSaveSettingsEvent(container);
         this.registerVtigerFieldSelectOnChangeEvent(container);
         this.registerGoogleTypeChangeEvent(container);
-		app.helper.showVerticalScroll(container.find('#googlesyncfieldmapping'), {'setHeight' : '400px'});
+        app.helper.showVerticalScroll(container.find('#googlesyncfieldmapping'), {'setHeight' : '400px'});
 
         jQuery('select.vtiger_field_name',container).trigger('change');
         jQuery('select.google-type',container).trigger('change');
-    },
-    
-     registerSaveSettingsEvent : function(container) {
-        var thisInstance = this;
-		if(container.find('[name="contactsyncsettings"]').length) {
-			container.find('[name="contactsyncsettings"]').vtValidate();
-		
-			container.find('button#save_syncsetting').on('click',function() {
-				thisInstance.validateFieldMappings(container).then(function() {
-					var form = container.find('form[name="contactsyncsettings"]');
-					var fieldMapping = thisInstance.packFieldmappingsForSubmit(container);
-					form.find('#user_field_mapping').val(fieldMapping);
-					var serializedFormData = form.serialize();
-					app.request.post({ data : serializedFormData}).then(function(data) {
-						app.helper.hideModal();
-					});
-				});
-			});
-		}
-    },
-    
-    registerAddCustomFieldMappingEvent : function(container) {
+    }
+
+    registerSaveSettingsEvent(container) {
+       var thisInstance = this;
+       if(container.find('[name="contactsyncsettings"]').length) {
+           container.find('[name="contactsyncsettings"]').vtValidate();
+       
+           container.find('button#save_syncsetting').on('click',function() {
+               thisInstance.validateFieldMappings(container).then(function() {
+                   var form = container.find('form[name="contactsyncsettings"]');
+                   var fieldMapping = thisInstance.packFieldmappingsForSubmit(container);
+                   form.find('#user_field_mapping').val(fieldMapping);
+                   var serializedFormData = form.serialize();
+                   app.request.post({ data : serializedFormData}).then(function(data) {
+                       app.helper.hideModal();
+                   });
+               });
+           });
+       }
+   }
+
+    registerAddCustomFieldMappingEvent(container) {
         var thisInstance = this;
         jQuery('.addCustomFieldMapping',container).on('click',function(e) {
             var currentSelectionElement = jQuery(this);
@@ -227,9 +224,9 @@ Vtiger.Class("Google_Settings_Js", {
             lastRow.find('select.google-type').trigger('change');
             
         });
-    },
-    
-    registerDeleteCustomFieldMappingEvent : function(container) {
+    }
+
+    registerDeleteCustomFieldMappingEvent(container) {
         jQuery('.deleteCustomMapping',container).on('click',function() {
             var currentRow = jQuery(this).closest('tr');
             var currentCategory = currentRow.find('select.vtiger_field_name').data('category');
@@ -237,9 +234,9 @@ Vtiger.Class("Google_Settings_Js", {
             jQuery('select.vtiger_field_name[data-category="'+currentCategory+'"]').trigger('change');
             jQuery('select.google-type[data-category="'+currentCategory+'"]').trigger('change');
         });
-    },
-    
-    updateSelectElement : function(allValuesMap, selectedValues, element) {
+    }
+
+    updateSelectElement(allValuesMap, selectedValues, element) {
         var prevSelectedValues = element.val();
         element.html('');
         for(var value in allValuesMap) {
@@ -254,9 +251,9 @@ Vtiger.Class("Google_Settings_Js", {
         if(prevSelectedValues) {
             element.select2("val", prevSelectedValues);
         }
-   },
-    
-    removeOptionFromSelectList : function(selectElement,optionValue,category) {
+   }
+
+    removeOptionFromSelectList(selectElement, optionValue, category) {
         var sourceSelectElement = jQuery(selectElement);
         var categorisedSelectElements = jQuery('select.vtiger_field_name[data-category="'+category+'"]');
         jQuery.each(categorisedSelectElements,function(index,categorisedSelectElement) {
@@ -269,9 +266,9 @@ Vtiger.Class("Google_Settings_Js", {
                 }
             }
         });
-    },
-    
-    registerVtigerFieldSelectOnChangeEvent : function(container,selectElement) {
+    }
+
+    registerVtigerFieldSelectOnChangeEvent(container, selectElement) {
         var thisInstance = this;
         if(typeof selectElement === 'undefined') {
             selectElement = jQuery('select.vtiger_field_name',container);   
@@ -294,9 +291,9 @@ Vtiger.Class("Google_Settings_Js", {
                 }
             });
         });
-    },
-    
-    registerGoogleTypeChangeEvent : function(container,selectElement) {
+    }
+
+    registerGoogleTypeChangeEvent(container, selectElement) {
         var thisInstance = this;
         
         if(typeof selectElement === 'undefined') {
@@ -336,18 +333,18 @@ Vtiger.Class("Google_Settings_Js", {
             });
         });
         
-    },
-    
-    registerBasicEvents : function() {
+    }
+
+    registerBasicEvents() {
         this.registerFieldMappingClickEvent();
         vtUtils.applyFieldElementsView(this.getListContainer());
-    },
-    
-    registerEvents : function() {
+    }
+
+    registerEvents() {
         var thisInstance = this;
         this.registerAuthorizeButton();
         app.event.on(Google_Settings_Js.postSettingsLoad,function(){
             thisInstance.registerBasicEvents();
         });
     }
-});
+};

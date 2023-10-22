@@ -7,17 +7,15 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Users_Settings_Js",{},{
-	
-	init : function() {
-		this.addComponents();
-	},
-	
-	addComponents : function() {
-		this.addComponent('Vtiger_Index_Js');
-	},
-	
-	registerEvents: function() {
-	}
+class Users_Settings_Js extends Vtiger_Class_Js {
+    constructor() {
+        this.addComponents();
+    }
 
-});
+    addComponents() {
+        this.addComponent('Vtiger_Index_Js');
+    }
+
+    registerEvents() {
+    }
+};

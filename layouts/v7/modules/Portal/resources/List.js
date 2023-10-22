@@ -6,8 +6,8 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  *************************************************************************************/
-Vtiger_List_Js("Portal_List_Js", {
-    getDefaultParams: function () {
+class Portal_List_Js extends Vtiger_List_Js {
+    static getDefaultParams() {
         var params = {
             'module': app.getModuleName(),
             'view': 'List',
@@ -17,8 +17,9 @@ Vtiger_List_Js("Portal_List_Js", {
             'search_value': jQuery('#alphabetValue').val()
         }
         return params;
-    },
-    editBookmark: function (params) {
+    }
+
+    static editBookmark(params) {
         app.request.get({data: params}).then(function (err, data) {
             var callBackFunction = function (data) {
                 Portal_List_Js.saveBookmark();
@@ -28,8 +29,9 @@ Vtiger_List_Js("Portal_List_Js", {
                 callBackFunction(data);
             }
         });
-    },
-    saveBookmark: function () {
+    }
+
+    static saveBookmark() {
         var form = jQuery('#saveBookmark');
         jQuery('#saveBookmark').on('submit', function (e) {
             e.preventDefault();
@@ -49,17 +51,20 @@ Vtiger_List_Js("Portal_List_Js", {
         };
         form.vtValidate(params);
 
-    },
-    massDeleteRecords: function () {
+    }
+
+    static massDeleteRecords() {
         var listInstance = app.controller();
         var deleteURL = 'index.php?module=' + app.getModuleName() + '&action=MassDelete';
         listInstance.performMassDeleteRecords(deleteURL);
-    },
-    loadListViewContent: function (url) {
+    }
+
+    static loadListViewContent(url) {
         var thisInstance = Portal_List_Js.getInstance();
         thisInstance.loadListViewRecords(url);
-    },
-    updatePagination: function () {
+    }
+
+    static updatePagination() {
         var previousPageExist = jQuery('#previousPageExist').val();
         var nextPageExist = jQuery('#nextPageExist').val();
         var previousPageButton = jQuery('#PreviousPageButton');
@@ -94,8 +99,8 @@ Vtiger_List_Js("Portal_List_Js", {
             }
         }
     }
-}, {
-    registerAddBookmark: function () {
+
+    registerAddBookmark() {
         jQuery('.addBookmark').on('click', function () {
             var params = {
                 'module': app.getModuleName(),
@@ -104,8 +109,9 @@ Vtiger_List_Js("Portal_List_Js", {
             };
             Portal_List_Js.editBookmark(params);
         });
-    },
-    registerEditBookmark: function () {
+    }
+
+    registerEditBookmark() {
         var container = this.getListViewContainer();
         jQuery('body').on('click', '.editPortalRecord', function (e) {
             var currentTarget = jQuery(e.currentTarget);
@@ -118,8 +124,9 @@ Vtiger_List_Js("Portal_List_Js", {
             };
             Portal_List_Js.editBookmark(params);
         });
-    },
-    registerDeleteBookmark: function () {
+    }
+
+    registerDeleteBookmark() {
         jQuery('body').on('click','.deleteRecord', function (e) {
             var currentTarget = jQuery(e.currentTarget);
             var id = currentTarget.closest('ul').data('id');
@@ -139,8 +146,9 @@ Vtiger_List_Js("Portal_List_Js", {
                 });
             });
         });
-    },
-    registerListViewSort: function () {
+    }
+
+    registerListViewSort() {
         var container = this.getListViewContainer();
         container.on('click', '.listViewContentHeaderValues', function (e) {
             var currentTarget = jQuery(e.currentTarget);
@@ -158,9 +166,9 @@ Vtiger_List_Js("Portal_List_Js", {
             url['sortorder'] = sortOrder;
             Portal_List_Js.loadListViewContent(url);
         });
-    },
-    
-    registerRowClickEvent: function () {
+    }
+
+    registerRowClickEvent() {
         var container = this.getListViewContainer();
         container.on('click', '.listViewEntries', function (e) {
             var selection = window.getSelection().toString();
@@ -177,8 +185,9 @@ Vtiger_List_Js("Portal_List_Js", {
                 window.location.href = recordUrl;
             }
         });
-    },
-    registerRemoveSortingPortal: function () {
+    }
+
+    registerRemoveSortingPortal() {
         var container = this.getListViewContainer();
         container.on('click', '.removeSortingPortal', function (e) {
             e.stopPropagation();
@@ -191,8 +200,9 @@ Vtiger_List_Js("Portal_List_Js", {
             }
             Portal_List_Js.loadListViewContent(params);
         });
-    },
-    loadListViewRecords: function (url) {
+    }
+
+    loadListViewRecords(url) {
         var aDeferred = jQuery.Deferred();
         var defaultUrl = Portal_List_Js.getDefaultParams();
         if (!jQuery.isEmptyObject(url)) {
@@ -210,8 +220,9 @@ Vtiger_List_Js("Portal_List_Js", {
             Portal_List_Js.updatePagination();
         });
         return aDeferred.promise();
-    },
-    getRecordsCount: function () {
+    }
+
+    getRecordsCount() {
         var aDeferred = jQuery.Deferred();
         var module = this.getModuleName();
         var defaultParams = this.getDefaultParams();
@@ -230,20 +241,22 @@ Vtiger_List_Js("Portal_List_Js", {
                 }
         );
         return aDeferred.promise();
-    },
-    enableListViewActions : function(){
+    }
+
+    enableListViewActions() {
         jQuery('.listViewActionsContainer').find('button').removeAttr('disabled');
         jQuery('.listViewActionsContainer').find('li').removeClass('hide');
-    },
-    
-    disableListViewActions : function(){
+    }
+
+    disableListViewActions() {
         jQuery('.listViewActionsContainer').find('.dropdown-toggle').removeAttr("disabled");
         jQuery('.listViewActionsContainer').find('li.selectFreeRecords').removeClass('hide');
-    },
-    registerEvents: function () {
-        this._super();
+    }
+
+    registerEvents() {
+        super.registerEvents();
         this.registerAddBookmark();
         this.registerEditBookmark();
         this.registerDeleteBookmark();
     }
-});
+};

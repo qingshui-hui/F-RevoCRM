@@ -7,228 +7,225 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class('Vtiger_Widget_Js',{
+class Vtiger_Widget_Js extends Vtiger_Class_Js {
+    static widgetPostLoadEvent = 'Vtiget.Dashboard.PostLoad';
+    static widgetPostRefereshEvent = 'Vtiger.Dashboard.PostRefresh';
+    static widgetPostResizeEvent = 'Vtiger.DashboardWidget.PostResize';
 
-	widgetPostLoadEvent : 'Vtiget.Dashboard.PostLoad',
-	widgetPostRefereshEvent : 'Vtiger.Dashboard.PostRefresh',
-    widgetPostResizeEvent : 'Vtiger.DashboardWidget.PostResize',
+    static getInstance(container, widgetName, moduleName) {
+        if(typeof moduleName == 'undefined') {
+            moduleName = app.getModuleName();
+        }
+        var widgetClassName = widgetName;
+        var moduleClass = window[moduleName+"_"+widgetClassName+"_Widget_Js"];
+        var fallbackClass = window["Vtiger_"+widgetClassName+"_Widget_Js"];
+        var basicClass = Vtiger_Widget_Js;
+        if(typeof moduleClass != 'undefined') {
+            var instance = new moduleClass(container);
+        }else if(typeof fallbackClass != 'undefined') {
+            var instance = new fallbackClass(container);
+        } else {
+            var instance = new basicClass(container);
+        }
+        return instance;
+    }
 
-	getInstance : function(container, widgetName, moduleName) {
-		if(typeof moduleName == 'undefined') {
-			moduleName = app.getModuleName();
-		}
-		var widgetClassName = widgetName;
-		var moduleClass = window[moduleName+"_"+widgetClassName+"_Widget_Js"];
-		var fallbackClass = window["Vtiger_"+widgetClassName+"_Widget_Js"];
-		var basicClass = Vtiger_Widget_Js;
-		if(typeof moduleClass != 'undefined') {
-			var instance = new moduleClass(container);
-		}else if(typeof fallbackClass != 'undefined') {
-			var instance = new fallbackClass(container);
-		} else {
-			var instance = new basicClass(container);
-		}
-		return instance;
-	}
-},{
+    container = false;
+    plotContainer = false;
 
-	container : false,
-	plotContainer : false,
-
-	init : function (container) {
-		this.setContainer(jQuery(container));
-		this.registerWidgetPostLoadEvent(container);
-		this.registerWidgetPostRefreshEvent(container);
+    constructor(container) {
+        this.setContainer(jQuery(container));
+        this.registerWidgetPostLoadEvent(container);
+        this.registerWidgetPostRefreshEvent(container);
         this.registerWidgetPostResizeEvent(container); 
-	},
+    }
 
-	getContainer : function() {
-		return this.container;
-	},
+    getContainer() {
+        return this.container;
+    }
 
-	setContainer : function(element) {
-		this.container = element;
-		return this;
-	},
+    setContainer(element) {
+        this.container = element;
+        return this;
+    }
 
-	isEmptyData : function() {
-		var container = this.getContainer();
-		return (container.find('.noDataMsg').length > 0) ? true : false;
-	},
+    isEmptyData() {
+        var container = this.getContainer();
+        return (container.find('.noDataMsg').length > 0) ? true : false;
+    }
 
-	getUserDateFormat : function() {
-		return jQuery('#userDateFormat').val();
-	},
+    getUserDateFormat() {
+        return jQuery('#userDateFormat').val();
+    }
 
+    getPlotContainer(useCache) {
+        if(typeof useCache == 'undefined'){
+            useCache = false;
+        }
+        if(this.plotContainer == false || !useCache) {
+            var container = this.getContainer();
+            this.plotContainer = container.find('.widgetChartContainer');
+        }
+        return this.plotContainer;
+    }
 
-	getPlotContainer : function(useCache) {
-		if(typeof useCache == 'undefined'){
-			useCache = false;
-		}
-		if(this.plotContainer == false || !useCache) {
-			var container = this.getContainer();
-			this.plotContainer = container.find('.widgetChartContainer');
-		}
-		return this.plotContainer;
-	},
-
-	restrictContentDrag : function(){
-		this.getContainer().on('mousedown.draggable', function(e){
-			var element = jQuery(e.target);
-			var isHeaderElement = element.closest('.dashboardWidgetHeader').length > 0 ? true : false;
+    restrictContentDrag() {
+        this.getContainer().on('mousedown.draggable', function(e){
+            var element = jQuery(e.target);
+            var isHeaderElement = element.closest('.dashboardWidgetHeader').length > 0 ? true : false;
             var isResizeElement = element.is(".gs-resize-handle") ? true : false;
-			if(isHeaderElement || isResizeElement){
-				return;
-			}
-			//Stop the event propagation so that drag will not start for contents
-			e.stopPropagation();
-		})
-	},
+            if(isHeaderElement || isResizeElement){
+                return;
+            }
+            //Stop the event propagation so that drag will not start for contents
+            e.stopPropagation();
+        })
+    }
 
-	convertToDateRangePicketFormat : function(userDateFormat) {
-		if ('dd.mm.yyyy' === userDateFormat) {
-			return 'dd.MM.yyyy';
-		} else if ('mm.dd.yyyy' === userDateFormat) {
-			return 'MM.dd.yyyy'
-		} else if ('yyyy.mm.dd' === userDateFormat) {
-			return 'yyyy.MM.dd';
-		} else if ('dd/mm/yyyy' === userDateFormat) {
-			return 'dd/MM/yyyy';
-		} else if ('mm/dd/yyyy' === userDateFormat) {
-			return 'MM/dd/yyyy'
-		} else if ('yyyy/mm/dd' === userDateFormat) {
-			return 'yyyy/MM/dd';
-		} else if ('yyyy-mm-dd' === userDateFormat) {
-			return 'yyyy-MM-dd';
-		} else if ('mm-dd-yyyy' === userDateFormat) {
-			return 'MM-dd-yyyy';
-		} else if ('dd-mm-yyyy' === userDateFormat) {
-			return 'dd-MM-yyyy';
-		}
-	},
+    convertToDateRangePicketFormat(userDateFormat) {
+        if ('dd.mm.yyyy' === userDateFormat) {
+            return 'dd.MM.yyyy';
+        } else if ('mm.dd.yyyy' === userDateFormat) {
+            return 'MM.dd.yyyy'
+        } else if ('yyyy.mm.dd' === userDateFormat) {
+            return 'yyyy.MM.dd';
+        } else if ('dd/mm/yyyy' === userDateFormat) {
+            return 'dd/MM/yyyy';
+        } else if ('mm/dd/yyyy' === userDateFormat) {
+            return 'MM/dd/yyyy'
+        } else if ('yyyy/mm/dd' === userDateFormat) {
+            return 'yyyy/MM/dd';
+        } else if ('yyyy-mm-dd' === userDateFormat) {
+            return 'yyyy-MM-dd';
+        } else if ('mm-dd-yyyy' === userDateFormat) {
+            return 'MM-dd-yyyy';
+        } else if ('dd-mm-yyyy' === userDateFormat) {
+            return 'dd-MM-yyyy';
+        }
+    }
 
-	loadChart : function() {
+    loadChart() {
 
-	},
+    }
 
-	positionNoDataMsg : function() {
-		var container = this.getContainer();
-		var widgetContentsContainer = container.find('.dashboardWidgetContent');
+    positionNoDataMsg() {
+        var container = this.getContainer();
+        var widgetContentsContainer = container.find('.dashboardWidgetContent');
         widgetContentsContainer.height(container.height()- 50);
-		var noDataMsgHolder = widgetContentsContainer.find('.noDataMsg');
-		noDataMsgHolder.position({
-				'my' : 'center center',
-				'at' : 'center center',
-				'of' : widgetContentsContainer
-		})
-	},
-    
-    postInitializeCalls : function() {},
+        var noDataMsgHolder = widgetContentsContainer.find('.noDataMsg');
+        noDataMsgHolder.position({
+                'my' : 'center center',
+                'at' : 'center center',
+                'of' : widgetContentsContainer
+        })
+    }
 
-	//Place holdet can be extended by child classes and can use this to handle the post load
-	postLoadWidget : function() {
-		if(!this.isEmptyData()) {
-			this.loadChart();
+    postInitializeCalls() {}
+
+    //Place holdet can be extended by child classes and can use this to handle the post load
+    postLoadWidget() {
+        if(!this.isEmptyData()) {
+            this.loadChart();
             this.postInitializeCalls();
-		}else{
-			//this.positionNoDataMsg();
-		}
-		this.registerFilter();
-		this.registerFilterChangeEvent();
-		this.restrictContentDrag();
+        }else{
+            //this.positionNoDataMsg();
+        }
+        this.registerFilter();
+        this.registerFilterChangeEvent();
+        this.restrictContentDrag();
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         widgetContent.css({height: widgetContent.height()-40});
-	},
-    
-	postResizeWidget : function() {
-		if(!this.isEmptyData()) {
-			this.loadChart();
+    }
+
+    postResizeWidget() {
+        if(!this.isEmptyData()) {
+            this.loadChart();
             this.postInitializeCalls();
-		}else{
-			//this.positionNoDataMsg();
-		}
+        }else{
+            //this.positionNoDataMsg();
+        }
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         widgetContent.css({height: widgetContent.height()-40});
-	},
+    }
 
-	postRefreshWidget : function() {
-		if(!this.isEmptyData()) {
-			this.loadChart();
+    postRefreshWidget() {
+        if(!this.isEmptyData()) {
+            this.loadChart();
             this.postInitializeCalls();
-		}else{
+        }else{
 //			this.positionNoDataMsg();
-		}
-	},
+        }
+    }
 
-	getFilterData : function() {
-		return {};
-	},
+    getFilterData() {
+        return {};
+    }
 
-	refreshWidget : function() {
-		var parent = this.getContainer();
-		var element = parent.find('a[name="drefresh"]');
-		var url = element.data('url');
+    refreshWidget() {
+        var parent = this.getContainer();
+        var element = parent.find('a[name="drefresh"]');
+        var url = element.data('url');
 
         var contentContainer = parent.find('.dashboardWidgetContent');
-		var params = {};
+        var params = {};
         params.url = url;
-		var widgetFilters = parent.find('.widgetFilter');
-		if(widgetFilters.length > 0) {
-			params.url = url;
-			params.data = {};
-			widgetFilters.each(function(index, domElement){
-				var widgetFilter = jQuery(domElement);
+        var widgetFilters = parent.find('.widgetFilter');
+        if(widgetFilters.length > 0) {
+            params.url = url;
+            params.data = {};
+            widgetFilters.each(function(index, domElement){
+                var widgetFilter = jQuery(domElement);
                 //Filter unselected checkbox, radio button elements
                 if((widgetFilter.is(":radio") || widgetFilter.is(":checkbox")) && !widgetFilter.is(":checked")){
                     return true;
                 }
-				if(widgetFilter.is('.dateRange')){
-					var name = widgetFilter.attr('name');
+                if(widgetFilter.is('.dateRange')){
+                    var name = widgetFilter.attr('name');
                     var start = widgetFilter.find('input[name="start"]').val();
                     var end = widgetFilter.find('input[name="end"]').val();
                     if(start.length <= 0 || end.length <= 0  ){
                         return true;
                     } 
                     
-					params.data[name] = {};
-					params.data[name].start = start;
-					params.data[name].end = end;
-				}else{
-					var filterName = widgetFilter.attr('name');
-					var filterValue = widgetFilter.val();
-					params.data[filterName] = filterValue;
-				}
-			});
-		}
-		var filterData = this.getFilterData();
-		if(! jQuery.isEmptyObject(filterData)) {
-			if(typeof params == 'string') {
-				url = params;
-				params = {};
-				params.url = url;
-				params.data = {};
-			}
-			params.data = jQuery.extend(params.data, this.getFilterData())
-		}
-		
-		//Sending empty object in data results in invalid request
-		if(jQuery.isEmptyObject(params.data)) {
-			delete params.data;
-		}
-		
-		app.helper.showProgress();
-		app.request.post(params).then(
-			function(err,data){
+                    params.data[name] = {};
+                    params.data[name].start = start;
+                    params.data[name].end = end;
+                }else{
+                    var filterName = widgetFilter.attr('name');
+                    var filterValue = widgetFilter.val();
+                    params.data[filterName] = filterValue;
+                }
+            });
+        }
+        var filterData = this.getFilterData();
+        if(! jQuery.isEmptyObject(filterData)) {
+            if(typeof params == 'string') {
+                url = params;
+                params = {};
+                params.url = url;
+                params.data = {};
+            }
+            params.data = jQuery.extend(params.data, this.getFilterData())
+        }
+        
+        //Sending empty object in data results in invalid request
+        if(jQuery.isEmptyObject(params.data)) {
+            delete params.data;
+        }
+        
+        app.helper.showProgress();
+        app.request.post(params).then(
+            function(err,data){
                 app.helper.hideProgress();
-				
-				if(contentContainer.closest('.mCustomScrollbar').length) {
-					contentContainer.mCustomScrollbar('destroy');
-					contentContainer.html(data);
-					var adjustedHeight = parent.height()-100;
-					app.helper.showVerticalScroll(contentContainer,{'setHeight' : adjustedHeight});
-				}else {
-					contentContainer.html(data);
-				}
+                
+                if(contentContainer.closest('.mCustomScrollbar').length) {
+                    contentContainer.mCustomScrollbar('destroy');
+                    contentContainer.html(data);
+                    var adjustedHeight = parent.height()-100;
+                    app.helper.showVerticalScroll(contentContainer,{'setHeight' : adjustedHeight});
+                }else {
+                    contentContainer.html(data);
+                }
                 
                 /**
                  * we are setting default height in DashBoardWidgetContents.tpl
@@ -238,26 +235,26 @@ Vtiger.Class('Vtiger_Widget_Js',{
                 if(widgetChartContainer.length > 0){
                     widgetChartContainer.css("height",parent.height() - 60);
                 }
-				contentContainer.trigger(Vtiger_Widget_Js.widgetPostRefereshEvent);
-			}
-		);
-	},
+                contentContainer.trigger(Vtiger_Widget_Js.widgetPostRefereshEvent);
+            }
+        );
+    }
 
-	registerFilter : function() {
-		var thisInstance = this;
-		var container = this.getContainer();
-		var dateRangeElement = container.find('.input-daterange');
-		if(dateRangeElement.length <= 0) {
-			return;
-		}
-		
-		dateRangeElement.addClass('dateField');
-		
-		var pickerParams = {
+    registerFilter() {
+        var thisInstance = this;
+        var container = this.getContainer();
+        var dateRangeElement = container.find('.input-daterange');
+        if(dateRangeElement.length <= 0) {
+            return;
+        }
+        
+        dateRangeElement.addClass('dateField');
+        
+        var pickerParams = {
             format : thisInstance.getUserDateFormat(),
         };
-		vtUtils.registerEventForDateFields(dateRangeElement, pickerParams);
-		
+        vtUtils.registerEventForDateFields(dateRangeElement, pickerParams);
+        
         dateRangeElement.on("changeDate", function(e){
            var start = dateRangeElement.find('input[name="start"]').val();
            var end = dateRangeElement.find('input[name="end"]').val();
@@ -265,195 +262,191 @@ Vtiger.Class('Vtiger_Widget_Js',{
                container.find('a[name="drefresh"]').trigger('click');
            }
         });
-		dateRangeElement.attr('data-date-format',thisInstance.getUserDateFormat());
-	},
+        dateRangeElement.attr('data-date-format',thisInstance.getUserDateFormat());
+    }
 
-	registerFilterChangeEvent : function() {
-		this.getContainer().on('change', '.widgetFilter, .reloadOnChange', function(e) {
-			var target = jQuery(e.currentTarget);
-			if(target.hasClass('dateRange')) {
-				var start = target.find('input[name="start"]').val();
-				var end = target.find('input[name="end"]').val();
-				if(start == '' || end == '') return false;
-			}
-			
-			var widgetContainer = target.closest('li');
-			widgetContainer.find('a[name="drefresh"]').trigger('click');
-		})
-	},
+    registerFilterChangeEvent() {
+        this.getContainer().on('change', '.widgetFilter, .reloadOnChange', function(e) {
+            var target = jQuery(e.currentTarget);
+            if(target.hasClass('dateRange')) {
+                var start = target.find('input[name="start"]').val();
+                var end = target.find('input[name="end"]').val();
+                if(start == '' || end == '') return false;
+            }
+            
+            var widgetContainer = target.closest('li');
+            widgetContainer.find('a[name="drefresh"]').trigger('click');
+        })
+    }
 
-	registerWidgetPostLoadEvent : function(container) {
-		var thisInstance = this;
-		container.off(Vtiger_Widget_Js.widgetPostLoadEvent).on(Vtiger_Widget_Js.widgetPostLoadEvent, function(e) {
-			thisInstance.postLoadWidget();
-		})
-	},
-
-	registerWidgetPostRefreshEvent : function(container) {
-		var thisInstance = this;
-		container.on(Vtiger_Widget_Js.widgetPostRefereshEvent, function(e) {
-			thisInstance.postRefreshWidget();
-		});
-	},
-    
-    registerWidgetPostResizeEvent : function(container){
+    registerWidgetPostLoadEvent(container) {
         var thisInstance = this;
-		container.on(Vtiger_Widget_Js.widgetPostResizeEvent, function(e) { 
-			thisInstance.postResizeWidget();
-		});
-    },
-    
-    openUrl : function(url) {
+        container.off(Vtiger_Widget_Js.widgetPostLoadEvent).on(Vtiger_Widget_Js.widgetPostLoadEvent, function(e) {
+            thisInstance.postLoadWidget();
+        })
+    }
+
+    registerWidgetPostRefreshEvent(container) {
+        var thisInstance = this;
+        container.on(Vtiger_Widget_Js.widgetPostRefereshEvent, function(e) {
+            thisInstance.postRefreshWidget();
+        });
+    }
+
+    registerWidgetPostResizeEvent(container) {
+        var thisInstance = this;
+        container.on(Vtiger_Widget_Js.widgetPostResizeEvent, function(e) { 
+            thisInstance.postResizeWidget();
+        });
+    }
+
+    openUrl(url) {
         var win = window.open(url, '_blank');
         win.focus();
     }
-});
+};
 
 
-Vtiger_Widget_Js('Vtiger_KeyMetrics_Widget_Js', {}, {
-    postLoadWidget: function() {
-		this._super();
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+class Vtiger_KeyMetrics_Widget_Js extends Vtiger_Widget_Js {
+    postLoadWidget() {
+        super.postLoadWidget();
+        var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
-		widgetContent.css({height: widgetContent.height()-40});
-	},
+        widgetContent.css({height: widgetContent.height()-40});
+    }
 
-	postResizeWidget: function () {
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
-		var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
-		var adjustedHeight = this.getContainer().height() - 20;
-		widgetContent.css({height: adjustedHeight});
-		slimScrollDiv.css({height: adjustedHeight});
-	}
-});
+    postResizeWidget() {
+        var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+        var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
+        var adjustedHeight = this.getContainer().height() - 20;
+        widgetContent.css({height: adjustedHeight});
+        slimScrollDiv.css({height: adjustedHeight});
+    }
+};
 
-Vtiger_Widget_Js('Vtiger_TopPotentials_Widget_Js', {}, {
-    
-   postLoadWidget: function() {
-		this._super();
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+class Vtiger_TopPotentials_Widget_Js extends Vtiger_Widget_Js {
+    postLoadWidget() {
+         super.postLoadWidget();
+         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+         var adjustedHeight = this.getContainer().height()-50;
+         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
+         widgetContent.css({height: widgetContent.height()-40});
+     }
+};
+
+class Vtiger_History_Widget_Js extends Vtiger_Widget_Js {
+    postLoadWidget() {
+        super.postLoadWidget();
+        var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
-		widgetContent.css({height: widgetContent.height()-40});
-	}
-});
-
-Vtiger_Widget_Js('Vtiger_History_Widget_Js', {}, {
-
-	postLoadWidget: function() {
-		this._super();
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
-        var adjustedHeight = this.getContainer().height()-50;
-        app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
-		widgetContent.css({height: widgetContent.height()-40});
+        widgetContent.css({height: widgetContent.height()-40});
         //this.initSelect2Elements(widgetContent);
-		this.registerLoadMore();
-	},
-    
-    postResizeWidget: function() {
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+        this.registerLoadMore();
+    }
+
+    postResizeWidget() {
+        var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
         var adjustedHeight = this.getContainer().height()-100;
         widgetContent.css({height: adjustedHeight});
         slimScrollDiv.css({height: adjustedHeight});
-	},
-        
-	initSelect2Elements : function(widgetContent) {
-		var container = widgetContent.closest('.dashboardWidget');
-		var select2Elements = container.find('.select2');
-		if(select2Elements.length > 0 && jQuery.isArray(select2Elements)) {
-			select2Elements.each(function(index, domElement){
-				domElement.chosen();
-			});
-		}else{
-			select2Elements.chosen();
-		}
-	},
+    }
 
-	postRefreshWidget: function() {
-		this._super();
-		this.registerLoadMore();
-	},
+    initSelect2Elements(widgetContent) {
+        var container = widgetContent.closest('.dashboardWidget');
+        var select2Elements = container.find('.select2');
+        if(select2Elements.length > 0 && jQuery.isArray(select2Elements)) {
+            select2Elements.each(function(index, domElement){
+                domElement.chosen();
+            });
+        }else{
+            select2Elements.chosen();
+        }
+    }
 
-	registerLoadMore: function() {
-		var thisInstance  = this;
-		var parent = thisInstance.getContainer();
-		var contentContainer = parent.find('.dashboardWidgetContent');
+    postRefreshWidget() {
+        super.postRefreshWidget();
+        this.registerLoadMore();
+    }
 
-		var loadMoreHandler = contentContainer.find('.load-more');
-		loadMoreHandler.off('click');
-		loadMoreHandler.click(function(){
-			var parent = thisInstance.getContainer();
-			var element = parent.find('a[name="drefresh"]');
-			var url = element.data('url');
-			var params = url;
+    registerLoadMore() {
+        var thisInstance  = this;
+        var parent = thisInstance.getContainer();
+        var contentContainer = parent.find('.dashboardWidgetContent');
 
-			var widgetFilters = parent.find('.widgetFilter');
-			if(widgetFilters.length > 0) {
-				params = { url: url, data: {}};
-				widgetFilters.each(function(index, domElement){
-					var widgetFilter = jQuery(domElement);
-					//Filter unselected checkbox, radio button elements
-					if((widgetFilter.is(":radio") || widgetFilter.is(":checkbox")) && !widgetFilter.is(":checked")){
-						return true;
-					}
-					
-					if(widgetFilter.is('.dateRange')) {
-						var name = widgetFilter.attr('name');
-						var start = widgetFilter.find('input[name="start"]').val();
-						var end = widgetFilter.find('input[name="end"]').val();
-						if(start.length <= 0 || end.length <= 0  ){
-							return true;
-						} 
+        var loadMoreHandler = contentContainer.find('.load-more');
+        loadMoreHandler.off('click');
+        loadMoreHandler.click(function(){
+            var parent = thisInstance.getContainer();
+            var element = parent.find('a[name="drefresh"]');
+            var url = element.data('url');
+            var params = url;
 
-						params.data[name] = {};
-						params.data[name].start = start;
-						params.data[name].end = end;
-					} else {
-						var filterName = widgetFilter.attr('name');
-						var filterValue = widgetFilter.val();
-						params.data[filterName] = filterValue;
-					}
-				});
-			}
+            var widgetFilters = parent.find('.widgetFilter');
+            if(widgetFilters.length > 0) {
+                params = { url: url, data: {}};
+                widgetFilters.each(function(index, domElement){
+                    var widgetFilter = jQuery(domElement);
+                    //Filter unselected checkbox, radio button elements
+                    if((widgetFilter.is(":radio") || widgetFilter.is(":checkbox")) && !widgetFilter.is(":checked")){
+                        return true;
+                    }
+                    
+                    if(widgetFilter.is('.dateRange')) {
+                        var name = widgetFilter.attr('name');
+                        var start = widgetFilter.find('input[name="start"]').val();
+                        var end = widgetFilter.find('input[name="end"]').val();
+                        if(start.length <= 0 || end.length <= 0  ){
+                            return true;
+                        } 
 
-			var filterData = thisInstance.getFilterData();
-			if(! jQuery.isEmptyObject(filterData)) {
-				if(typeof params == 'string') {
-					params = { url: url, data: {}};
-				}
-				params.data = jQuery.extend(params.data, thisInstance.getFilterData())
-			}
+                        params.data[name] = {};
+                        params.data[name].start = start;
+                        params.data[name].end = end;
+                    } else {
+                        var filterName = widgetFilter.attr('name');
+                        var filterValue = widgetFilter.val();
+                        params.data[filterName] = filterValue;
+                    }
+                });
+            }
 
-			// Next page.
-			params.data['page'] = loadMoreHandler.data('nextpage');
+            var filterData = thisInstance.getFilterData();
+            if(! jQuery.isEmptyObject(filterData)) {
+                if(typeof params == 'string') {
+                    params = { url: url, data: {}};
+                }
+                params.data = jQuery.extend(params.data, thisInstance.getFilterData())
+            }
+
+            // Next page.
+            params.data['page'] = loadMoreHandler.data('nextpage');
 
             app.helper.showProgress();
-			app.request.post(params).then(function(err,data){
-				app.helper.hideProgress();
-				loadMoreHandler.parent().parent().replaceWith(jQuery(data).html());
-				thisInstance.registerLoadMore();
-			}, function(){
-				app.helper.hideProgress();
-			});
-		});
-	}
+            app.request.post(params).then(function(err,data){
+                app.helper.hideProgress();
+                loadMoreHandler.parent().parent().replaceWith(jQuery(data).html());
+                thisInstance.registerLoadMore();
+            }, function(){
+                app.helper.hideProgress();
+            });
+        });
+    }
+};
 
-});
 
-
-Vtiger_Widget_Js('Vtiger_Funnel_Widget_Js',{},{
-
-    postInitializeCalls: function() {
+class Vtiger_Funnel_Widget_Js extends Vtiger_Widget_Js {
+    postInitializeCalls() {
         var thisInstance = this;
         this.getPlotContainer(false).off('vtchartClick').on('vtchartClick',function(e,data){
             if(data.url)
                 thisInstance.openUrl(data.url);
         });
-    },
-    
-    generateLinks : function() {
+    }
+
+    generateLinks() {
         var data = this.getContainer().find('.widgetData').val();
         var parsedData = JSON.parse(data);
         var linksData = [];
@@ -465,41 +458,39 @@ Vtiger_Widget_Js('Vtiger_Funnel_Widget_Js',{},{
             linksData.push(newData);
         }
         return linksData;
-    },
+    }
 
-	loadChart : function() {
-		var container = this.getContainer();
-		var data = container.find('.widgetData').val();
+    loadChart() {
+        var container = this.getContainer();
+        var data = container.find('.widgetData').val();
         var chartOptions = {
             renderer:'funnel',
             links: this.generateLinks()
         };
         this.getPlotContainer(false).vtchart(data,chartOptions);
-	}
-    
-});
+    }
+};
 
 
 
-Vtiger_Widget_Js('Vtiger_Pie_Widget_Js',{},{
+class Vtiger_Pie_Widget_Js extends Vtiger_Widget_Js {
+    /**
+     * Function which will give chart related Data
+     */
+    generateData() {
+        var container = this.getContainer();
+        var jData = container.find('.widgetData').val();
+        var data = JSON.parse(jData);
+        var chartData = [];
+        for(var index in data) {
+            var row = data[index];
+            var rowData = [row.last_name, parseFloat(row.amount), row.id];
+            chartData.push(rowData);
+        }
+        return {'chartData':chartData};
+    }
 
-	/**
-	 * Function which will give chart related Data
-	 */
-	generateData : function() {
-		var container = this.getContainer();
-		var jData = container.find('.widgetData').val();
-		var data = JSON.parse(jData);
-		var chartData = [];
-		for(var index in data) {
-			var row = data[index];
-			var rowData = [row.last_name, parseFloat(row.amount), row.id];
-			chartData.push(rowData);
-		}
-		return {'chartData':chartData};
-	},
-    
-    generateLinks : function() {
+    generateLinks() {
         var jData = this.getContainer().find('.widgetData').val();
         var statData = JSON.parse(jData);
         var links = [];
@@ -507,51 +498,50 @@ Vtiger_Widget_Js('Vtiger_Pie_Widget_Js',{},{
             links.push(statData[i]['links']);
         }
         return links;
-    },
-    
-    postInitializeCalls: function() {
+    }
+
+    postInitializeCalls() {
         var thisInstance = this;
         this.getPlotContainer(false).off('vtchartClick').on('vtchartClick',function(e,data){
             if(data.url)
                 thisInstance.openUrl(data.url);
         });
-    },
+    }
 
-	loadChart : function() {
-		var chartData = this.generateData();
+    loadChart() {
+        var chartData = this.generateData();
         var chartOptions = {
             renderer:'pie',
             links: this.generateLinks()
         };
         this.getPlotContainer(false).vtchart(chartData,chartOptions);
-	}
-});
+    }
+};
 
 
-Vtiger_Widget_Js('Vtiger_Barchat_Widget_Js',{},{
-
-	generateChartData : function() {
-		var container = this.getContainer();
-		var jData = container.find('.widgetData').val();
-		var data = JSON.parse(jData);
-		var chartData = [];
-		var xLabels = new Array();
-		var yMaxValue = 0;
-		for(var index in data) {
-			var row = data[index];
-			row[0] = parseFloat(row[0]);
-			xLabels.push(app.getDecodedValue(row[1]));
-			chartData.push(row[0]);
-			if(parseInt(row[0]) > yMaxValue){
-				yMaxValue = parseInt(row[0]);
-			}
-		}
+class Vtiger_Barchat_Widget_Js extends Vtiger_Widget_Js {
+    generateChartData() {
+        var container = this.getContainer();
+        var jData = container.find('.widgetData').val();
+        var data = JSON.parse(jData);
+        var chartData = [];
+        var xLabels = new Array();
+        var yMaxValue = 0;
+        for(var index in data) {
+            var row = data[index];
+            row[0] = parseFloat(row[0]);
+            xLabels.push(app.getDecodedValue(row[1]));
+            chartData.push(row[0]);
+            if(parseInt(row[0]) > yMaxValue){
+                yMaxValue = parseInt(row[0]);
+            }
+        }
         // yMaxValue Should be 25% more than Maximum Value
-		yMaxValue = yMaxValue + 2 + (yMaxValue/100)*25;
-		return {'chartData':[chartData], 'yMaxValue':yMaxValue, 'labels':xLabels};
-	},
-    
-    generateLinks : function() {
+        yMaxValue = yMaxValue + 2 + (yMaxValue/100)*25;
+        return {'chartData':[chartData], 'yMaxValue':yMaxValue, 'labels':xLabels};
+    }
+
+    generateLinks() {
         var container = this.getContainer();
         var jData = container.find('.widgetData').val();
         var statData = JSON.parse(jData);
@@ -560,93 +550,89 @@ Vtiger_Widget_Js('Vtiger_Barchat_Widget_Js',{},{
             links.push(statData[i]['links']);
         }
         return links;
-    },
-    
-    postInitializeCalls : function() {
+    }
+
+    postInitializeCalls() {
         var thisInstance = this;
         this.getPlotContainer(false).off('vtchartClick').on('vtchartClick',function(e,data){
             if(data.url)
                 thisInstance.openUrl(data.url);
         });
-    },
+    }
 
-	loadChart : function() {
-		var data = this.generateChartData();
+    loadChart() {
+        var data = this.generateChartData();
         var chartOptions = {
             renderer:'bar',
             links: this.generateLinks()
         };
         this.getPlotContainer(false).vtchart(data,chartOptions);
-	}
-    
-});
+    }
+};
 
-Vtiger_Widget_Js('Vtiger_MultiBarchat_Widget_Js',{
+class Vtiger_MultiBarchat_Widget_Js extends Vtiger_Widget_Js {
+    /**
+     * Function which will give char related Data like data , x labels and legend labels as map
+     */
+    static getCharRelatedData() {
+        var container = this.getContainer();
+        var data = container.find('.widgetData').val();
+        var users = new Array();
+        var stages = new Array();
+        var count = new Array();
+        for(var i=0; i<data.length;i++) {
+            if($.inArray(data[i].last_name, users) == -1) {
+                users.push(data[i].last_name);
+            }
+            if($.inArray(data[i].sales_stage, stages) == -1) {
+                stages.push(data[i].sales_stage);
+            }
+        }
 
-	/**
-	 * Function which will give char related Data like data , x labels and legend labels as map
-	 */
-	getCharRelatedData : function() {
-		var container = this.getContainer();
-		var data = container.find('.widgetData').val();
-		var users = new Array();
-		var stages = new Array();
-		var count = new Array();
-		for(var i=0; i<data.length;i++) {
-			if($.inArray(data[i].last_name, users) == -1) {
-				users.push(data[i].last_name);
-			}
-			if($.inArray(data[i].sales_stage, stages) == -1) {
-				stages.push(data[i].sales_stage);
-			}
-		}
+        for(j in stages) {
+            var salesStageCount = new Array();
+            for(i in users) {
+                var salesCount = 0;
+                for(var k in data) {
+                    var userData = data[k];
+                    if(userData.sales_stage == stages[j] && userData.last_name == users[i]) {
+                        salesCount = parseInt(userData.count);
+                        break;
+                    }
+                }
+                salesStageCount.push(salesCount);
+            }
+            count.push(salesStageCount);
+        }
+        return {
+            'data' : count,
+            'ticks' : users,
+            'labels' : stages
+        }
+    }
 
-		for(j in stages) {
-			var salesStageCount = new Array();
-			for(i in users) {
-				var salesCount = 0;
-				for(var k in data) {
-					var userData = data[k];
-					if(userData.sales_stage == stages[j] && userData.last_name == users[i]) {
-						salesCount = parseInt(userData.count);
-						break;
-					}
-				}
-				salesStageCount.push(salesCount);
-			}
-			count.push(salesStageCount);
-		}
-		return {
-			'data' : count,
-			'ticks' : users,
-			'labels' : stages
-		}
-	},
-    
-    postInitializeCalls : function() {
+    static postInitializeCalls() {
         var thisInstance = this;
         this.getPlotContainer(false).off('vtchartClick').on('vtchartClick',function(e,data){
             if(data.url)
                 thisInstance.openUrl(data.url);
         });
-    },
-    
-	loadChart : function(){
-		var chartRelatedData = this.getCharRelatedData();
+    }
+
+    static loadChart() {
+        var chartRelatedData = this.getCharRelatedData();
         var chartOptions = {
             renderer:'multibar',
             links:chartRelatedData.links
         };
         this.getPlotContainer(false).data('widget-data',JSON.stringify(this.getCharRelatedData()));
         this.getPlotContainer(false).vtchart(chartRelatedData,chartOptions);
-	}
-
-});
+    }
+};
 
 // NOTE Widget-class name camel-case convention
-Vtiger_Widget_Js('Vtiger_MiniList_Widget_Js', {
-    
-    registerMoreClickEvent : function(e) {
+class Vtiger_MiniList_Widget_Js extends Vtiger_Widget_Js {
+    static registerMoreClickEvent(e) {
         var moreLink = jQuery(e.currentTarget);
         var linkId = moreLink.data('linkid');
         var widgetId = moreLink.data('widgetid');
@@ -672,231 +658,224 @@ Vtiger_Widget_Js('Vtiger_MiniList_Widget_Js', {
             }
         });
     }
-    
-}, {
-	postLoadWidget: function() {
+
+    postLoadWidget() {
         app.helper.hideModal();
         this.restrictContentDrag();
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
         widgetContent.css({height: widgetContent.height()-40});
-	},
-    
-    postResizeWidget: function() {
+    }
+
+    postResizeWidget() {
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
         var adjustedHeight = this.getContainer().height()-100;
         widgetContent.css({height: adjustedHeight});
         slimScrollDiv.css({height: adjustedHeight});
-	}
-});
+    }
+};
 
-Vtiger_Widget_Js('Vtiger_TagCloud_Widget_Js',{},{
-
-	postLoadWidget : function() {
-		this._super();
-		this.registerTagCloud();
-		this.registerTagClickEvent();
+class Vtiger_TagCloud_Widget_Js extends Vtiger_Widget_Js {
+    postLoadWidget() {
+        super.postLoadWidget();
+        this.registerTagCloud();
+        this.registerTagClickEvent();
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
         widgetContent.css({height: widgetContent.height()-40});
-	},
+    }
 
-	registerTagCloud : function() {
-		jQuery('#tagCloud').find('a').tagcloud({
-			size: {
-			  start: parseInt('12'),
-			  end: parseInt('30'),
-			  unit: 'px'
-			},
-			color: {
-			  start: "#0266c9",
-			  end: "#759dc4"
-			}
-		});
-	},
+    registerTagCloud() {
+        jQuery('#tagCloud').find('a').tagcloud({
+            size: {
+              start: parseInt('12'),
+              end: parseInt('30'),
+              unit: 'px'
+            },
+            color: {
+              start: "#0266c9",
+              end: "#759dc4"
+            }
+        });
+    }
 
-	registerChangeEventForModulesList : function() {
-		jQuery('#tagSearchModulesList').on('change',function(e) {
-			var modulesSelectElement = jQuery(e.currentTarget);
-			if(modulesSelectElement.val() == 'all'){
-				jQuery('[name="tagSearchModuleResults"]').removeClass('hide');
-			} else{
-				jQuery('[name="tagSearchModuleResults"]').removeClass('hide');
-				var selectedOptionValue = modulesSelectElement.val();
-				jQuery('[name="tagSearchModuleResults"]').filter(':not(#'+selectedOptionValue+')').addClass('hide');
-			}
-		});
-	},
+    registerChangeEventForModulesList() {
+        jQuery('#tagSearchModulesList').on('change',function(e) {
+            var modulesSelectElement = jQuery(e.currentTarget);
+            if(modulesSelectElement.val() == 'all'){
+                jQuery('[name="tagSearchModuleResults"]').removeClass('hide');
+            } else{
+                jQuery('[name="tagSearchModuleResults"]').removeClass('hide');
+                var selectedOptionValue = modulesSelectElement.val();
+                jQuery('[name="tagSearchModuleResults"]').filter(':not(#'+selectedOptionValue+')').addClass('hide');
+            }
+        });
+    }
 
-	registerTagClickEvent : function(){
-		var thisInstance = this;
-		var container = this.getContainer();
-		container.on('click','.tagName',function(e) {
-			var tagElement = jQuery(e.currentTarget);
-			var tagId = tagElement.data('tagid');
-			var params = {
-				'module' : app.getModuleName(),
-				'view' : 'TagCloudSearchAjax',
-				'tag_id' : tagId,
-				'tag_name' : tagElement.text()
-			}
-			app.request.post({"data":params}).then(
-				function(err,data) {
+    registerTagClickEvent() {
+        var thisInstance = this;
+        var container = this.getContainer();
+        container.on('click','.tagName',function(e) {
+            var tagElement = jQuery(e.currentTarget);
+            var tagId = tagElement.data('tagid');
+            var params = {
+                'module' : app.getModuleName(),
+                'view' : 'TagCloudSearchAjax',
+                'tag_id' : tagId,
+                'tag_name' : tagElement.text()
+            }
+            app.request.post({"data":params}).then(
+                function(err,data) {
                     app.helper.showModal(data);
                     vtUtils.applyFieldElementsView(jQuery(".myModal"));
-					thisInstance.registerChangeEventForModulesList();
-				}
-			)
-		});
-	},
+                    thisInstance.registerChangeEventForModulesList();
+                }
+            )
+        });
+    }
 
-	postRefreshWidget : function() {
-		this._super();
-		this.registerTagCloud();
-	},
+    postRefreshWidget() {
+        super.postRefreshWidget();
+        this.registerTagCloud();
+    }
 
-	postResizeWidget: function () {
-		var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
-		var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
-		var adjustedHeight = this.getContainer().height() - 20;
-		widgetContent.css({height: adjustedHeight});
-		slimScrollDiv.css({height: adjustedHeight});
-	}
-});
+    postResizeWidget() {
+        var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
+        var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
+        var adjustedHeight = this.getContainer().height() - 20;
+        widgetContent.css({height: adjustedHeight});
+        slimScrollDiv.css({height: adjustedHeight});
+    }
+};
 
 /* Notebook Widget */
-Vtiger_Widget_Js('Vtiger_Notebook_Widget_Js', {
-
-}, {
-
-	// Override widget specific functions.
-	postLoadWidget: function() {
-		this.reinitNotebookView();
+class Vtiger_Notebook_Widget_Js extends Vtiger_Widget_Js {
+    // Override widget specific functions.
+    postLoadWidget() {
+        this.reinitNotebookView();
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
         //widgetContent.css({height: widgetContent.height()-40});
-	},
-    
-    postResizeWidget: function() {
+    }
+
+    postResizeWidget() {
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var slimScrollDiv = jQuery('.slimScrollDiv', this.getContainer());
         var adjustedHeight = this.getContainer().height()-100;
         widgetContent.css({height: adjustedHeight});
         slimScrollDiv.css({height: adjustedHeight});
         widgetContent.find('.dashboard_notebookWidget_viewarea').css({height:adjustedHeight});
-	},
-    
-    postRefreshWidget : function() {
+    }
+
+    postRefreshWidget() {
         this.reinitNotebookView();
         var widgetContent = jQuery('.dashboardWidgetContent', this.getContainer());
         var adjustedHeight = this.getContainer().height()-50;
         app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
-    },
-    
-	reinitNotebookView: function() {
-		var self = this;
-		jQuery('.dashboard_notebookWidget_edit', this.container).click(function(){
-			self.editNotebookContent();
-		});
-		jQuery('.dashboard_notebookWidget_save', this.container).click(function(){
-			self.saveNotebookContent();
-		});
-	},
+    }
 
-	editNotebookContent: function() {
-		jQuery('.dashboard_notebookWidget_text', this.container).show();
-		jQuery('.dashboard_notebookWidget_view', this.container).hide();
-	},
+    reinitNotebookView() {
+        var self = this;
+        jQuery('.dashboard_notebookWidget_edit', this.container).click(function(){
+            self.editNotebookContent();
+        });
+        jQuery('.dashboard_notebookWidget_save', this.container).click(function(){
+            self.saveNotebookContent();
+        });
+    }
 
-	saveNotebookContent: function() {
-		var self = this;
-		var refreshContainer = this.container.find('.refresh');
-		var textarea = jQuery('.dashboard_notebookWidget_textarea', this.container);
+    editNotebookContent() {
+        jQuery('.dashboard_notebookWidget_text', this.container).show();
+        jQuery('.dashboard_notebookWidget_view', this.container).hide();
+    }
 
-		var url = this.container.data('url');
+    saveNotebookContent() {
+        var self = this;
+        var refreshContainer = this.container.find('.refresh');
+        var textarea = jQuery('.dashboard_notebookWidget_textarea', this.container);
 
-		app.helper.showProgress();
-		var params = {
-			url: url,
-			data: {
-				content: 'true',
-				mode: 'save',
-				contents: textarea.val(),
-			}
-		};
-		app.request.post(params).then(function (err, data) {
-			app.helper.hideProgress();
-			var parent = self.getContainer();
-			var widgetContent = parent.find('.dashboardWidgetContent');
-			widgetContent.mCustomScrollbar('destroy');
-			widgetContent.html(data);
-			var adjustedHeight = parent.height() - 50;
-			app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
-			
-			self.reinitNotebookView();
-		});
-	},
-	
-	refreshWidget : function() {
-		var parent = this.getContainer();
-		var element = parent.find('a[name="drefresh"]');
-		var url = element.data('url');
+        var url = this.container.data('url');
+
+        app.helper.showProgress();
+        var params = {
+            url: url,
+            data: {
+                content: 'true',
+                mode: 'save',
+                contents: textarea.val(),
+            }
+        };
+        app.request.post(params).then(function (err, data) {
+            app.helper.hideProgress();
+            var parent = self.getContainer();
+            var widgetContent = parent.find('.dashboardWidgetContent');
+            widgetContent.mCustomScrollbar('destroy');
+            widgetContent.html(data);
+            var adjustedHeight = parent.height() - 50;
+            app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight});
+            
+            self.reinitNotebookView();
+        });
+    }
+
+    refreshWidget() {
+        var parent = this.getContainer();
+        var element = parent.find('a[name="drefresh"]');
+        var url = element.data('url');
 
         var contentContainer = parent.find('.dashboardWidgetContent');
-		var params = {};
+        var params = {};
         params.url = url;
-		
-		app.helper.showProgress();
-		app.request.post(params).then(
-			function(err,data){
+        
+        app.helper.showProgress();
+        app.request.post(params).then(
+            function(err,data){
                 app.helper.hideProgress();
-				
-				if(contentContainer.closest('.mCustomScrollbar').length) {
-					contentContainer.mCustomScrollbar('destroy');
-					contentContainer.html(data);
-					var adjustedHeight = parent.height()-50;
-					app.helper.showVerticalScroll(contentContainer,{'setHeight' : adjustedHeight});
-				}else {
-					contentContainer.html(data);
-				}
                 
-				contentContainer.trigger(Vtiger_Widget_Js.widgetPostRefereshEvent);
-			}
-		);
-	},
-});
+                if(contentContainer.closest('.mCustomScrollbar').length) {
+                    contentContainer.mCustomScrollbar('destroy');
+                    contentContainer.html(data);
+                    var adjustedHeight = parent.height()-50;
+                    app.helper.showVerticalScroll(contentContainer,{'setHeight' : adjustedHeight});
+                }else {
+                    contentContainer.html(data);
+                }
+                
+                contentContainer.trigger(Vtiger_Widget_Js.widgetPostRefereshEvent);
+            }
+        );
+    }
+};
 
-Vtiger_History_Widget_Js('Vtiger_OverdueActivities_Widget_Js', {}, {
-
-	registerLoadMore: function() {
-		var thisInstance  = this;
-		var parent = thisInstance.getContainer();
+class Vtiger_OverdueActivities_Widget_Js extends Vtiger_History_Widget_Js {
+    registerLoadMore() {
+        var thisInstance  = this;
+        var parent = thisInstance.getContainer();
         parent.off('click', 'a[name="history_more"]'); 
         parent.on('click','a[name="history_more"]', function(e) {
-			var parent = thisInstance.getContainer();
+            var parent = thisInstance.getContainer();
             var element = jQuery(e.currentTarget);
             var type = parent.find("[name='type']").val();
-			var url = element.data('url');
-			var params = url+'&content=true&type='+type;
+            var url = element.data('url');
+            var params = url+'&content=true&type='+type;
             app.request.post({"url":params}).then(function(err,data) {
                 element.parent().remove();
-				var widgetContent = jQuery('.dashboardWidgetContent', parent);
-				var dashboardWidgetData = parent.find('.dashboardWidgetContent .dashboardWidgetData');
-				var scrollTop = dashboardWidgetData.height() * dashboardWidgetData.length - 100;
-				widgetContent.mCustomScrollbar('destroy');
+                var widgetContent = jQuery('.dashboardWidgetContent', parent);
+                var dashboardWidgetData = parent.find('.dashboardWidgetContent .dashboardWidgetData');
+                var scrollTop = dashboardWidgetData.height() * dashboardWidgetData.length - 100;
+                widgetContent.mCustomScrollbar('destroy');
                 parent.find('.dashboardWidgetContent').append(data);
-				
-				var adjustedHeight = parent.height()-100;
-				app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight, 'setTop' : scrollTop+'px'});
-				
+                
+                var adjustedHeight = parent.height()-100;
+                app.helper.showVerticalScroll(widgetContent,{'setHeight' : adjustedHeight, 'setTop' : scrollTop+'px'});
+                
             });
-		});
-	}
+        });
+    }
+};
 
-});
-
-Vtiger_OverdueActivities_Widget_Js('Vtiger_CalendarActivities_Widget_Js', {}, {});
+class Vtiger_CalendarActivities_Widget_Js extends Vtiger_OverdueActivities_Widget_Js {};

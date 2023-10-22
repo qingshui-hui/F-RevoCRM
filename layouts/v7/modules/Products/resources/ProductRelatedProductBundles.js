@@ -7,12 +7,13 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-Vtiger_Popup_Js("Products_ProductRelatedProductBundles_Js", {}, {
-    popupSelectedRecords : {},
+class Products_ProductRelatedProductBundles_Js extends Vtiger_Popup_Js {
+    popupSelectedRecords = {};
+
     /**
      * Function to register event for enabling list price
      */
-    registerEventForCheckboxChange: function() {
+    registerEventForCheckboxChange() {
         var thisInstance = this;
         var popupPageContentsContainer = this.getPopupPageContainer();
         popupPageContentsContainer.on('click', 'input.entryCheckBox', function(e) {
@@ -33,8 +34,9 @@ Vtiger_Popup_Js("Products_ProductRelatedProductBundles_Js", {}, {
 
         });
 
-    },
-    registerSelectButton: function() {
+    }
+
+    registerSelectButton() {
         var popupPageContentsContainer = jQuery('#popupPage');
         var self = this;
         popupPageContentsContainer.on('click','button.addProducts', function(e){
@@ -63,9 +65,10 @@ Vtiger_Popup_Js("Products_ProductRelatedProductBundles_Js", {}, {
                 }
             });
         });
-    },
-    selectAllHandler: function(e) {
-        this._super(e);
+    }
+
+    selectAllHandler(e) {
+        super.selectAllHandler(e);
         var currentElement = jQuery(e.currentTarget);
         var isMainCheckBoxChecked = currentElement.is(':checked');
         var tableElement = currentElement.closest('table');
@@ -76,58 +79,60 @@ Vtiger_Popup_Js("Products_ProductRelatedProductBundles_Js", {}, {
             jQuery('input.entryCheckBox', tableElement).closest('tr').find('.qtyForEdit').addClass('hide').removeClass('show');
             jQuery('input.entryCheckBox', tableElement).closest('tr').find('.qtyForDisplay').addClass('show').removeClass('hide');
         }
-    },
-    registerEventForActionsButtons: function() {
+    }
+
+    registerEventForActionsButtons() {
         var thisInstance = this;
         var popupPageContentsContainer = this.getPopupPageContainer();
         popupPageContentsContainer.on('click', 'a.cancelLink', function(e) {
             thisInstance.done();
         });
-    },
-    registerEventForListViewEntryClick: function() {
+    }
+
+    registerEventForListViewEntryClick() {
         var popupPageContentsContainer = this.getPopupPageContainer();
         popupPageContentsContainer.on('click', '.listViewEntries', function(e) {
             return;
         });
-    },
-    
+    }
+
     /**
-	 * Function to get complete params
-	 */
-	getCompleteParams : function(){
-		var params = this._super();
+     * Function to get complete params
+     */
+    getCompleteParams() {
+        var params = super.getCompleteParams();
         var selectedRecords = this.popupSelectedRecords;
         params["selectedRecords"] = selectedRecords;
         return params;
-	},
-    
+    }
+
     /**
-	 * Function to handle next page navigation
-	 */
-	nextPageHandler : function(){
+     * Function to handle next page navigation
+     */
+    nextPageHandler() {
        app.event.trigger("pre.popupNavigationButton.click");
         var aDeferred = jQuery.Deferred();
-        this._super().then(function(data){
+        super.nextPageHandler().then(function(data){
             aDeferred.resolve(data);
         });
         return aDeferred.promise();
-	},
-    
-     /**
-	 * Function to handle Previous page navigation
-	 */
-	previousPageHandler : function(){
+    }
+
+    /**
+    * Function to handle Previous page navigation
+    */
+    previousPageHandler() {
         app.event.trigger("pre.popupNavigationButton.click");
         var aDeferred = jQuery.Deferred();
-        this._super().then(function(data){
+        super.previousPageHandler().then(function(data){
             aDeferred.resolve(data);
         });
         return aDeferred.promise();
-	},
-    
-    registerEvents: function() {
+    }
+
+    registerEvents() {
         var thisInstance = this;
-        this._super();
+        super.registerEvents();
         this.registerEventForActionsButtons();
         
         app.event.on("pre.popupNavigationButton.click",function(event){
@@ -148,5 +153,4 @@ Vtiger_Popup_Js("Products_ProductRelatedProductBundles_Js", {}, {
             }
         })
     }
-
-});
+};

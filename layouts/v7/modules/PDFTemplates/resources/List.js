@@ -7,8 +7,8 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_List_Js("PDFTemplates_List_Js", {
-    massDeleteRecords: function (url, instance) {
+class PDFTemplates_List_Js extends Vtiger_List_Js {
+    static massDeleteRecords(url, instance) {
         var listInstance = Vtiger_List_Js.getInstance();
         if (typeof instance != "undefined") {
             listInstance = instance;
@@ -48,8 +48,9 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
         } else {
             listInstance.noRecordSelectedAlert();
         }
-    },
-    deleteRecord: function (recordId) {
+    }
+
+    static deleteRecord(recordId) {
         var listInstance = Vtiger_List_Js.getInstance();
         var message = app.vtranslate('LBL_DELETE_CONFIRMATION');
 
@@ -98,23 +99,20 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
         );
     }
 
-}, {
-    
-    registerRowDoubleClickEvent: function () {
+    registerRowDoubleClickEvent() {
         
-	},
-	
-	addIndexComponent : function() {
-		this.addModuleSpecificComponent('Index','Vtiger','Settings');
-	},
-	
-    
+    }
+
+    addIndexComponent() {
+        this.addModuleSpecificComponent('Index','Vtiger','Settings');
+    }
+
     /**
      * Function to override function written in Vtiger List.js file to add extra parameter for
      * every page navigation click and sorting
      * @returns {ListAnonym$6.getDefaultParams.params}
      */
-    getDefaultParams: function () {
+    getDefaultParams() {
         var container = this.getListViewContainer();
         var pageNumber = container.find('#pageNumber').val();
         var module = "PDFTemplates";
@@ -141,8 +139,9 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
         params.tag = container.find('[name="tag"]').val();
         params.viewType = container.find('[name="viewType"]').val();
         return params;
-    },
-    registerAccordionClickEvent: function () {
+    }
+
+    registerAccordionClickEvent() {
         jQuery('.settingsgroup-accordion a[data-parent="#accordion"]').on('click', function (e) {
             var target = jQuery(e.currentTarget);
             var closestItag = target.find('i');
@@ -155,11 +154,12 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
 
             jQuery('.settingsgroup i').not(closestItag).removeClass('fa-chevron-down').addClass('fa-chevron-right');
         });
-    },
+    }
+
     /*
      * Function to register the list view delete record click event
      */
-    registerDeleteRecordClickEvent: function () {
+    registerDeleteRecordClickEvent() {
         jQuery('#page').on('click', '.deleteRecordButton', function(e){
             var elem = jQuery(e.currentTarget);
             var originalDropDownMenu = elem.closest('.dropdown-menu').data('original-menu');
@@ -167,8 +167,9 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
             var recordId = parent.closest('tr').data('id');
             PDFTemplates_List_Js.deleteRecord(recordId);
         });
-    },
-    registerViewType: function () {
+    }
+
+    registerViewType() {
         var thisInstance = this;
         var listViewContentDiv = this.getListViewContainer();
         listViewContentDiv.on('click', '.viewType', function (e) {
@@ -187,73 +188,74 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
                 listViewInstance.updatePagination();
             });
         });
-    },
+    }
+
     /**
      * Function to show on mouseover and to hide on mouseleave 
      */
-    registerThumbnailHoverActionEvent: function () {
+    registerThumbnailHoverActionEvent() {
         jQuery('#listViewContent').on('mouseover', '.thumbnail, .templateActions', function (e) {
             jQuery(e.currentTarget).find('div').eq(1).removeClass('hide').addClass('templateActions');
         });
         jQuery('#listViewContent').on('mouseleave', '.thumbnail, .templateActions', function (e) {
             jQuery(e.currentTarget).find('div').eq(1).removeClass('templateActions').addClass('hide');
         });
-    },
-    
+    }
+
     /**
      * Function to create the template or edit the existing template
      */
-    registerTemplateEditEvent: function () {
+    registerTemplateEditEvent() {
         jQuery('#listViewContent').on('click', '.imageDiv img,.editTemplate', function (e) {
             var templateId = jQuery(e.currentTarget).data('value');
             var redirectUrl = 'index.php?module=PDFTemplates&view=Edit&record='+templateId;
             window.location.href = redirectUrl;
         });
-    },
-    
+    }
+
     /**
      * Function will duplicate the existing template
      */
-    registerTemplateDuplicationEvent: function () {
+    registerTemplateDuplicationEvent() {
         jQuery('#listViewContent').on('click', '.templateDuplication', function (e) {
             var templateId = jQuery(e.currentTarget).attr('data-value');
             var redirectUrl = 'index.php?module=PDFTemplates&view=Edit&record='+templateId+'&isDuplicate=true';
             window.location.href = redirectUrl;
         });
-    },
-    
-     loadListViewRecords : function(urlParams) {
-        var self = this;
-        var aDeferred = jQuery.Deferred();
-        var defParams = this.getDefaultParams();
-        if(typeof urlParams == "undefined") {
-            urlParams = {};
-        }
-        if(typeof urlParams.search_params == "undefined") {
-            urlParams.search_params = JSON.stringify(this.getListSearchParams(false));
-        }
-        urlParams = jQuery.extend(defParams, urlParams);
-        app.helper.showProgress();
-		
-        app.request.post({data:urlParams}).then(function(err, res){
-            aDeferred.resolve(res);
-            self.placeListContents(res);
-            app.event.trigger('post.listViewFilter.click', jQuery('.searchRow'));
-            app.helper.hideProgress();
-            self.markSelectedIdsCheckboxes();
-            self.registerDynamicListHeaders();
-            self.registerDeleteRecordClickEvent();
-            self.registerDynamicDropdownPosition();
-            self.registerDropdownPosition();//for every ajax request more-drop down in listview
-        });
-        return aDeferred.promise();
-    },
-    
+    }
+
+    loadListViewRecords(urlParams) {
+       var self = this;
+       var aDeferred = jQuery.Deferred();
+       var defParams = this.getDefaultParams();
+       if(typeof urlParams == "undefined") {
+           urlParams = {};
+       }
+       if(typeof urlParams.search_params == "undefined") {
+           urlParams.search_params = JSON.stringify(this.getListSearchParams(false));
+       }
+       urlParams = jQuery.extend(defParams, urlParams);
+       app.helper.showProgress();
+       
+       app.request.post({data:urlParams}).then(function(err, res){
+           aDeferred.resolve(res);
+           self.placeListContents(res);
+           app.event.trigger('post.listViewFilter.click', jQuery('.searchRow'));
+           app.helper.hideProgress();
+           self.markSelectedIdsCheckboxes();
+           self.registerDynamicListHeaders();
+           self.registerDeleteRecordClickEvent();
+           self.registerDynamicDropdownPosition();
+           self.registerDropdownPosition();//for every ajax request more-drop down in listview
+       });
+       return aDeferred.promise();
+   }
+
     /**
      * Function to preview existing pdf template
      * @returns {undefined}
      */
-    registerPreviewTemplateEvent: function(){
+    registerPreviewTemplateEvent() {
         var thisInstance = this;
         jQuery('#listViewContent').on('click','.previewTemplate',function(e){
             var record = jQuery(e.currentTarget).data('value');
@@ -270,14 +272,14 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
                 });
             });
         });  
-    },
-    
+    }
+
     /**
      * Function to show template content
      * @param {type} record
      * @returns {undefined}
      */
-    showTemplateContent: function(record){
+    showTemplateContent(record) {
         var params={
             "module" : "PDFTemplates",
             "action" : "ShowTemplateContent",
@@ -289,10 +291,10 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
             var templateContent = data.content;
             jQuery('#TemplateIFrame').contents().find('html').html(templateContent);
         });
-    },
-    
-    registerEvents: function () {
-        this._super();
+    }
+
+    registerEvents() {
+        super.registerEvents();
         this.registerAccordionClickEvent();
         this.registerViewType();
         this.registerThumbnailHoverActionEvent();
@@ -305,4 +307,4 @@ Vtiger_List_Js("PDFTemplates_List_Js", {
         }
         
     }
-});
+};
