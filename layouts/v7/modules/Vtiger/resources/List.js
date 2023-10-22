@@ -17,21 +17,21 @@ class Vtiger_List_Js extends Vtiger_Class_Js {
             var parentModule = app.getParentModuleName();
             if (parentModule == 'Settings') {
                 var moduleClassName = parentModule + "_" + module + "_List_Js";
-                if (typeof window[moduleClassName] == 'undefined') {
+                if (eval(`typeof ${moduleClassName}`) == 'undefined') {
                     moduleClassName = module + "_List_Js";
                 }
                 var fallbackClassName = parentModule + "_Vtiger_List_Js";
-                if (typeof window[fallbackClassName] == 'undefined') {
+                if (eval(`typeof ${fallbackClassName}`) == 'undefined') {
                     fallbackClassName = "Vtiger_List_Js";
                 }
             } else {
                 moduleClassName = module + "_List_Js";
                 fallbackClassName = "Vtiger_List_Js";
             }
-            if (typeof window[moduleClassName] != 'undefined') {
-                var instance = new window[moduleClassName]();
-            } else {
-                var instance = new window[fallbackClassName]();
+            if (eval(`typeof ${moduleClassName}`) != 'undefined') {
+                var instance = eval(`new ${moduleClassName}()`);
+            }else{
+                var instance = eval(`new ${fallbackClassName}()`);
             }
             Vtiger_List_Js.listInstance = instance;
             return instance;

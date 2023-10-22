@@ -40,8 +40,8 @@ class Reports_ChartDetail_Js extends Reports_Detail_Js {
         var chartClass = window["Report_" + chartClassName + "_Js"];
 
         var instance = false;
-        if (typeof chartClass != 'undefined')
-            instance = new chartClass();
+        if (eval(`typeof ${chartClass}`) != 'undefined')
+            instance = eval(`new ${chartClass}()`);
         return instance;
     }
 

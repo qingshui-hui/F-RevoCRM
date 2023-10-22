@@ -19,12 +19,12 @@ class Vtiger_Field_Js {
         }
         var moduleField = moduleName+"_Field_Js";
         var moduleFieldObj = window[moduleField];
-        if (typeof moduleFieldObj != 'undefined'){
+        if (eval(`typeof ${moduleFieldObj}`) != 'undefined'){
              var fieldClass = moduleFieldObj;
         }else{
             var fieldClass = Vtiger_Field_Js;
         }
-        var fieldObj = new fieldClass();
+        var fieldObj = eval(`new ${fieldClass}()`);
 
         if(typeof data == 'undefined'){
             data = {};

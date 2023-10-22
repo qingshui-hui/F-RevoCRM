@@ -17,15 +17,15 @@ class Vtiger_Widget_Js extends Vtiger_Class_Js {
             moduleName = app.getModuleName();
         }
         var widgetClassName = widgetName;
-        var moduleClass = window[moduleName+"_"+widgetClassName+"_Widget_Js"];
-        var fallbackClass = window["Vtiger_"+widgetClassName+"_Widget_Js"];
+        var moduleClass = moduleName+"_"+widgetClassName+"_Widget_Js";
+        var fallbackClass = "Vtiger_"+widgetClassName+"_Widget_Js";
         var basicClass = Vtiger_Widget_Js;
-        if(typeof moduleClass != 'undefined') {
+        if(eval(`typeof ${moduleClass}`) != 'undefined') {
             var instance = new moduleClass(container);
-        }else if(typeof fallbackClass != 'undefined') {
-            var instance = new fallbackClass(container);
+        }else if(eval(`typeof ${fallbackClass}`) != 'undefined') {
+            var instance = (`new ${fallbackClass}(container)`);
         } else {
-            var instance = new basicClass(container);
+            var instance = (`new ${basicClass}(container)`);
         }
         return instance;
     }

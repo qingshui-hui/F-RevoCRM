@@ -48,7 +48,7 @@ class Reports_Edit_Js extends Vtiger_Edit_Js {
             var view = jQuery('input[name="view"]').val();
             var moduleName = jQuery('input[name="module"]').val();
             var moduleClassName = moduleName+"_"+view+step+"_Js";
-            Reports_Edit_Js.instance[step] =  new window[moduleClassName]();
+            Reports_Edit_Js.instance[step] =  eval(`new ${moduleClassName}()`);
             return Reports_Edit_Js.instance[step]
         }
     }

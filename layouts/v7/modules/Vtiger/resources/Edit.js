@@ -32,21 +32,21 @@ class Vtiger_Edit_Js extends Vtiger_Index_Js {
         var parentModule = app.getParentModuleName();
         if(parentModule == 'Settings'){
             var moduleClassName = parentModule+"_"+moduleName+"_Edit_Js";
-            if(typeof window[moduleClassName] == 'undefined'){
+            if(eval(`typeof ${moduleClassName}`) == 'undefined'){
                 moduleClassName = moduleName+"_Edit_Js";
             }
             var fallbackClassName = parentModule+"_Vtiger_Edit_Js";
-            if(typeof window[fallbackClassName] == 'undefined') {
+            if(eval(`typeof ${fallbackClassName}`) == 'undefined') {
                 fallbackClassName = "Vtiger_Edit_Js";
             }
         } else {
             moduleClassName = moduleName+"_Edit_Js";
             fallbackClassName = "Vtiger_Edit_Js";
         }
-        if(typeof window[moduleClassName] != 'undefined'){
-            var instance = new window[moduleClassName]();
+        if(eval(`typeof ${moduleClassName}`) != 'undefined'){
+            var instance = eval(`new ${moduleClassName}()`);
         }else{
-            var instance = new window[fallbackClassName]();
+            var instance = eval(`new ${fallbackClassName}()`);
         }
         return instance;
     }

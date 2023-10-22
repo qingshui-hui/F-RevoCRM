@@ -18,10 +18,10 @@ class Vtiger_Popup_Js {
             var moduleClassName = module+"_Popup_Js";
         }
         var fallbackClassName = Vtiger_Popup_Js;
-        if(typeof window[moduleClassName] != 'undefined'){
-            var instance = new window[moduleClassName]();
+        if(eval(`typeof ${moduleClassName}`) != 'undefined'){
+            var instance = eval(`new ${moduleClassName}()`);
         }else{
-            var instance = new fallbackClassName();
+            var instance = eval(`new ${fallbackClassName}()`);
         }
         return instance;
     }

@@ -18,10 +18,10 @@ class Vtiger_Detail_Js extends Vtiger_Class_Js {
             var view = app.view;
             var moduleClassName = module+"_"+view+"_Js";
             var fallbackClassName = Vtiger_Detail_Js;
-            if(typeof window[moduleClassName] != 'undefined'){
-                var instance = new window[moduleClassName]();
+            if(eval(`typeof ${moduleClassName}`) != 'undefined'){
+                var instance = eval(`new ${moduleClassName}()`) ;
             }else{
-                var instance = new fallbackClassName();
+                var instance = eval(`new ${fallbackClassName}()`);
             }
             Vtiger_Detail_Js.detailInstance = instance;
         }
@@ -35,21 +35,21 @@ class Vtiger_Detail_Js extends Vtiger_Class_Js {
     var parentModule = app.getParentModuleName();
     if(parentModule == 'Settings'){
         var moduleClassName = parentModule+"_"+moduleName+"_Detail_Js";
-        if(typeof window[moduleClassName] == 'undefined'){
+        if(eval(`typeof ${moduleClassName}`) == 'undefined'){
             moduleClassName = moduleName+"_Detail_Js";
         }
         var fallbackClassName = parentModule+"_Vtiger_Detail_Js";
-        if(typeof window[fallbackClassName] == 'undefined') {
+        if(eval(`typeof ${fallbackClassName}`) == 'undefined') {
             fallbackClassName = "Vtiger_Detail_Js";
         }
     } else {
         moduleClassName = moduleName+"_Detail_Js";
         fallbackClassName = "Vtiger_Detail_Js";
     }
-    if(typeof window[moduleClassName] != 'undefined'){
-        var instance = new window[moduleClassName]();
+    if(eval(`typeof ${moduleClassName}`) != 'undefined'){
+        var instance = eval(`new ${moduleClassName}()`);
     }else{
-        var instance = new window[fallbackClassName]();
+        var instance = eval(`new ${fallbackClassName}()`);
     }
     return instance;
 }

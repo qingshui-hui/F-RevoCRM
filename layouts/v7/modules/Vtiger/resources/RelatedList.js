@@ -13,10 +13,10 @@ class Vtiger_RelatedList_Js {
     static getInstance(parentId, parentModule, selectedRelatedTabElement, relatedModuleName) {
         var moduleClassName = parentModule+"_RelatedList_Js";
         var fallbackClassName = Vtiger_RelatedList_Js;
-        if(typeof window[moduleClassName] != 'undefined') {
-            var instance = new window[moduleClassName](parentId, parentModule, selectedRelatedTabElement, relatedModuleName);
+        if(eval(`typeof ${moduleClassName}`) != 'undefined') {
+            var instance = eval(`new ${moduleClassName}(parentId, parentModule, selectedRelatedTabElement, relatedModuleName)`);
         } else {
-            var instance = new fallbackClassName(parentId, parentModule, selectedRelatedTabElement, relatedModuleName);
+            var instance = eval(`new ${fallbackClassName}(parentId, parentModule, selectedRelatedTabElement, relatedModuleName)`);
         }
 
         return instance;

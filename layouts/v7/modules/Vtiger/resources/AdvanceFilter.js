@@ -12,10 +12,10 @@ class Vtiger_AdvanceFilter_Js {
         var module = app.getModuleName();
         var moduleClassName = module+"_AdvanceFilter_Js";
         var fallbackClassName = "Vtiger_AdvanceFilter_Js";
-        if(typeof window[moduleClassName] != 'undefined'){
-            var instance = new window[moduleClassName](container);
+        if(eval(`typeof ${moduleClassName}`) != 'undefined'){
+            var instance = eval(`new ${moduleClassName}(container)`);
         }else{
-            instance = new window[fallbackClassName](container);
+            instance = eval(`new ${fallbackClassName}(container)`);
         }
         return instance;
     }
