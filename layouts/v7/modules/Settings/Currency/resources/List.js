@@ -8,7 +8,7 @@
  *************************************************************************************/
 class Settings_Currency_List_Js extends Settings_Currency_Js {
     constructor() {
-            super();
+        super();
         this.addComponents();
     }
 

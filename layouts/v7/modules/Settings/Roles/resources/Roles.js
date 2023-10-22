@@ -216,7 +216,7 @@ var Settings_Roles_Js = {
      */
     _registeredProfileEvents: false,
     registerProfileEvents : function() {
-        if(!this._registeredProfileEvents && typeof window['Settings_Profiles_Edit_Js'] != 'undefined'){
+        if(!this._registeredProfileEvents && eval('typeof Settings_Profiles_Edit_Js') != 'undefined'){
             var instance = new Settings_Profiles_Edit_Js();
             this._registeredProfileEvents = true;
         }

@@ -586,13 +586,14 @@ class Vtiger_DashBoard_Js extends Vtiger_Class_Js {
                  if(chartType != ''){
                     //Chart report widget 
                     var chartClassName = chartType.toCamelCase();
-                    var chartClass = window["Report_"+chartClassName + "_Js"];
-                    class Vtiger_ChartReportWidget_Widget_Js extends chartClass {
+                    var chartClass = "Report_"+chartClassName + "_Js";
+                    eval(`class Vtiger_ChartReportWidget_Widget_Js extends ${chartClass} {
                         constructor() {
                             super();
                             super.registerWidgetFullScreenView(modalWidgetContainer);
                         }
-                    };
+                    };`)
+                    window.Vtiger_ChartReportWidget_Widget_Js = Vtiger_ChartReportWidget_Widget_Js
                 }
                 var widgetInstance = Vtiger_Widget_Js.getInstance(modalWidgetContainer, widgetName);
                 modalWidgetContainer.trigger(Vtiger_Widget_Js.widgetPostLoadEvent);
@@ -911,7 +912,7 @@ class Vtiger_DashBoard_Js extends Vtiger_Class_Js {
                     if(typeof dashBoardModuleName != 'undefined' && dashBoardModuleName.length > 0 ) {
                         var dashBoardInstanceClassName = app.getModuleSpecificViewClass(app.view(),dashBoardModuleName);
                         if(dashBoardInstanceClassName != null) {
-                            var dashBoardInstance = new window[dashBoardInstanceClassName]();
+                            var dashBoardInstance = eval(`new ${dashBoardInstanceClassName}()`);
                         }
                     }
                     app.event.trigger("post.DashBoardTab.load", dashBoardInstance);

@@ -14,7 +14,7 @@ class Settings_Vtiger_CompanyDetails_Js extends Vtiger_Class_Js {
     }
 
     addComponents() {
-      this.addModuleSpecificComponent('Index', app.module, app.getParentModuleName());
+      this.addModuleSpecificComponent('Index', app.module(), app.getParentModuleName());
     }
 
     registerUpdateDetailsClickEvent() {

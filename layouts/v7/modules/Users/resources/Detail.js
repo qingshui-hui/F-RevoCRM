@@ -250,4 +250,4 @@ class Users_Detail_Js extends Vtiger_Detail_Js {
 };
 
 // Actually, Users Module is in Settings. Controller in application.js will check for Settings_Users_Detail_Js 
-Users_Detail_Js("Settings_Users_Detail_Js");
+class Settings_Users_Detail_Js extends Users_Detail_Js {}

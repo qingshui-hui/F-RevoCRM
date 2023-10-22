@@ -50,7 +50,7 @@ class Vtiger_Index_Js extends Vtiger_Class_Js {
 
         var callback = function(data){
             emailPreviewClass = app.getModuleSpecificViewClass('EmailPreview','Vtiger');
-            _controller = new window[emailPreviewClass]();
+            _controller = eval(`new ${emailPreviewClass}()`);
             _controller.registerEventsForActionButtons();
             var descriptionContent = data.find('#iframeDescription').val();
             var frameElement = jQuery("#emailPreviewIframe")[0].contentWindow.document;

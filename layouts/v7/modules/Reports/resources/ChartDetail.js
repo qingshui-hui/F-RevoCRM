@@ -37,7 +37,7 @@ class Reports_ChartDetail_Js extends Reports_Detail_Js {
         var chartClassName = chartType.toLowerCase().replace(/\b[a-z]/g, function(letter) {
             return letter.toUpperCase();
         });
-        var chartClass = window["Report_" + chartClassName + "_Js"];
+        var chartClass = "Report_" + chartClassName + "_Js";
 
         var instance = false;
         if (eval(`typeof ${chartClass}`) != 'undefined')

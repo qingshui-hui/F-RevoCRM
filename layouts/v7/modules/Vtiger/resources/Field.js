@@ -18,11 +18,10 @@ class Vtiger_Field_Js {
             var moduleName = app.getModuleName();
         }
         var moduleField = moduleName+"_Field_Js";
-        var moduleFieldObj = window[moduleField];
-        if (eval(`typeof ${moduleFieldObj}`) != 'undefined'){
-             var fieldClass = moduleFieldObj;
+        if (eval(`typeof ${moduleField}`) != 'undefined'){
+             var fieldClass = moduleField;
         }else{
-            var fieldClass = Vtiger_Field_Js;
+            var fieldClass = 'Vtiger_Field_Js';
         }
         var fieldObj = eval(`new ${fieldClass}()`);
 
@@ -115,14 +114,14 @@ class Vtiger_Field_Js {
         var type = this.getType();
         var typeClassName = type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
 
-        var moduleUiTypeClassName = window[currentModule + "_" + typeClassName+"_Field_Js"];
-        var BasicUiTypeClassName = window["Vtiger_"+ typeClassName + "_Field_Js"];
+        var moduleUiTypeClassName = currentModule + "_" + typeClassName+"_Field_Js";
+        var BasicUiTypeClassName = "Vtiger_"+ typeClassName + "_Field_Js";
 
-        if(typeof moduleUiTypeClassName != 'undefined') {
-            var instance = new moduleUiTypeClassName();
+        if(eval(`typeof ${moduleUiTypeClassName}`) != 'undefined') {
+            var instance = eval(`new ${moduleUiTypeClassName}()`);
             return instance.setData(this.getData());
-        }else if (typeof BasicUiTypeClassName != 'undefined') {
-            var instance = new BasicUiTypeClassName();
+        }else if (eval(`typeof ${BasicUiTypeClassName}`) != 'undefined') {
+            var instance = eval(`new ${BasicUiTypeClassName}()`);
             return instance.setData(this.getData());
         }
         return this;

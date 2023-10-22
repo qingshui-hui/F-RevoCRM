@@ -2948,7 +2948,7 @@ class Vtiger_List_Js extends Vtiger_Class_Js {
             var $tr = $(this);
             var leftPos = 0;
             for(var i=0; i<staticCol; i++) {
-                $column = $tr.find("th:eq("+ i +"),td:eq("+ i +")");
+                var $column = $tr.find("th:eq("+ i +"),td:eq("+ i +")");
     
                 if($column.is("th")) {
                     $column.addClass("fix-title-column");

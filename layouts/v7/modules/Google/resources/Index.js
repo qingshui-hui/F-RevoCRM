@@ -8,10 +8,6 @@
  *************************************************************************************/  
 
 class Google_Index_Js extends Vtiger_ExtensionCommon_Js {
-    constructor() {
-        super();
-        this.addComponents();
-    }
 
     addComponents() {
         this.addComponent('Google_Settings_Js');

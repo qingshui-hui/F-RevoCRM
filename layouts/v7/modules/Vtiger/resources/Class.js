@@ -9,11 +9,12 @@
 
 class Vtiger_Class_Js {
     addComponent(componentName) {
-        if(window[componentName]){
+        if(componentName && eval(`typeof ${componentName}`) !== "undefined"){
+            console.log(componentName)
             if(typeof this._components == "undefined") {
                 this._components = {};
             }
-            this._components[componentName] = window[componentName];
+            this._components[componentName] = eval(componentName);
         }
         
     }
@@ -39,7 +40,7 @@ class Vtiger_Class_Js {
             if(componentName in this._componentInstances) {
                 continue;
             }
-            this._componentInstances[componentName] = new this._components[componentName]();
+            this._componentInstances[componentName] = eval(`new ${this._components[componentName]}()`);
             
             var componentInstance = this._componentInstances[componentName]
             if(typeof componentInstance.intializeComponents == "function")

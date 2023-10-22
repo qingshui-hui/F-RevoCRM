@@ -1314,7 +1314,7 @@ class MailManager_List_Js extends Vtiger_List_Js {
             vtUtils.applyFieldElementsView(form);
             var moduleName = form.find('[name="module"]').val();
             var targetClass = app.getModuleSpecificViewClass('Edit', moduleName);
-            var targetInstance = new window[targetClass]();
+            var targetInstance = eval(`new ${targetClass}()`);
             targetInstance.registerBasicEvents(form);
             var newParams = {};
             newParams.callbackFunction = function() {

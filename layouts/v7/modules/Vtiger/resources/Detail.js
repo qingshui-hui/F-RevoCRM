@@ -15,9 +15,9 @@ class Vtiger_Detail_Js extends Vtiger_Class_Js {
     static getInstance() {
         if( Vtiger_Detail_Js.detailInstance == false ){
             var module = app.getModuleName();
-            var view = app.view;
+            var view = app.view();
             var moduleClassName = module+"_"+view+"_Js";
-            var fallbackClassName = Vtiger_Detail_Js;
+            var fallbackClassName = 'Vtiger_Detail_Js';
             if(eval(`typeof ${moduleClassName}`) != 'undefined'){
                 var instance = eval(`new ${moduleClassName}()`) ;
             }else{
@@ -1038,7 +1038,7 @@ class Vtiger_Detail_Js extends Vtiger_Class_Js {
             var relatedModuleName = thisInstance.getRelatedModuleName();
         }
         var relatedListClass = 'Vtiger_RelatedList_Js';
-        if(typeof window[relatedListClass] != 'undefined'){
+        if(eval(`typeof ${relatedListClass}`) != 'undefined'){
             return Vtiger_RelatedList_Js.getInstance(recordId, moduleName, selectedTabElement, relatedModuleName);
         }
         return null;

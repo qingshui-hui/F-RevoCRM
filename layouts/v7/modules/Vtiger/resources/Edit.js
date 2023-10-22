@@ -362,7 +362,7 @@ class Vtiger_Edit_Js extends Vtiger_Index_Js {
     }
 
     restoreDateAndTimeField(container) {
-        thisInstance = this;
+        var thisInstance = this;
         // onload後に復元対象のvalueが復元されるので少し遅延させる
         setTimeout(function () {
             thisInstance.restoreAssignedUserIdField();
@@ -422,7 +422,7 @@ class Vtiger_Edit_Js extends Vtiger_Index_Js {
     restorePicklistField() {
         var $fields = jQuery('select[data-fieldtype="picklist"]');
         $fields.each(function(index, element) {
-            $element = jQuery(element);
+            var $element = jQuery(element);
             if ($element.val()) {
                 $element.trigger('change');
             }

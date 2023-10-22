@@ -14,7 +14,7 @@ class Settings_Vtiger_ConfigEditorDetail_Js extends Vtiger_Class_Js {
     }
 
     addComponents() {
-        this.addModuleSpecificComponent('Index', app.getModuleName, app.getParentModuleName());
+        this.addModuleSpecificComponent('Index', app.getModuleName(), app.getParentModuleName());
     }
 
     /*

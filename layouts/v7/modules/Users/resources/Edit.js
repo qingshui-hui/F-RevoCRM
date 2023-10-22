@@ -123,4 +123,4 @@ class Users_Edit_Js extends Vtiger_Edit_Js {
 };
 
 // Actually, Users Module is in Settings. Controller in application.js will check for Settings_Users_Edit_Js 
-Users_Edit_Js("Settings_Users_Edit_Js");
+class Settings_Users_Edit_Js extends Users_Edit_Js {}

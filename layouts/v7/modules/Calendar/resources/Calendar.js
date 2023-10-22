@@ -1253,49 +1253,49 @@ class Calendar_Calendar_Js extends Vtiger_Class_Js {
 
     _updateAllOnCalendar(calendarModule) {
         var thisInstance = this;
-        this.getCalendarViewContainer().fullCalendar('addEventSource',
-            updateAllOnCalendarEvent = function (start, end, timezone, render) {
-                    var activeFeeds = jQuery('[data-calendar-feed="' + calendarModule + '"]:checked');
+        var updateAllOnCalendarEvent = function (start, end, timezone, render) {
+            var activeFeeds = jQuery('[data-calendar-feed="' + calendarModule + '"]:checked');
 
-                    var activeFeedsRequestParams = {};
+            var activeFeedsRequestParams = {};
+            activeFeeds.each(function () {
+                var feedCheckbox = jQuery(this);
+                var feedRequestParams = thisInstance.getFeedRequestParams(start, end, feedCheckbox);
+                activeFeedsRequestParams[feedCheckbox.data('calendarSourcekey')] = feedRequestParams;
+            });
+
+            if (activeFeeds.length) {
+                var requestParams = {
+                    'module': app.getModuleName(),
+                    'action': 'Feed',
+                    'mode': 'batch',
+                    'feedsRequest': activeFeedsRequestParams
+                };
+                var events = [];
+                app.helper.showProgress();
+                activeFeeds.attr('disabled', 'disabled');
+                app.request.post({'data': requestParams}).then(function (e, data) {
+                    if (!e) {
+                        data = JSON.parse(data);
+                        for (var feedType in data) {
+                            var feed = JSON.parse(data[feedType]);
+                            feed.forEach(function (entry) {
+                                events.push(entry);
+                            });
+                        }
+                    } else {
+                        console.log("error in response : ", e);
+                    }
                     activeFeeds.each(function () {
                         var feedCheckbox = jQuery(this);
-                        var feedRequestParams = thisInstance.getFeedRequestParams(start, end, feedCheckbox);
-                        activeFeedsRequestParams[feedCheckbox.data('calendarSourcekey')] = feedRequestParams;
+                        thisInstance.removeEvents(feedCheckbox);
                     });
-
-                    if (activeFeeds.length) {
-                        var requestParams = {
-                            'module': app.getModuleName(),
-                            'action': 'Feed',
-                            'mode': 'batch',
-                            'feedsRequest': activeFeedsRequestParams
-                        };
-                        var events = [];
-                        app.helper.showProgress();
-                        activeFeeds.attr('disabled', 'disabled');
-                        app.request.post({'data': requestParams}).then(function (e, data) {
-                            if (!e) {
-                                data = JSON.parse(data);
-                                for (var feedType in data) {
-                                    var feed = JSON.parse(data[feedType]);
-                                    feed.forEach(function (entry) {
-                                        events.push(entry);
-                                    });
-                                }
-                            } else {
-                                console.log("error in response : ", e);
-                            }
-                            activeFeeds.each(function () {
-                                var feedCheckbox = jQuery(this);
-                                thisInstance.removeEvents(feedCheckbox);
-                            });
-                            render(events);
-                            activeFeeds.removeAttr('disabled');
-                            app.helper.hideProgress();
-                        });
-                    }
-            });
+                    render(events);
+                    activeFeeds.removeAttr('disabled');
+                    app.helper.hideProgress();
+                });
+            }
+    }
+        this.getCalendarViewContainer().fullCalendar('addEventSource', updateAllOnCalendarEvent);
         this.getCalendarViewContainer().fullCalendar('removeEventSource', updateAllOnCalendarEvent);
         this.getCalendarViewContainer().fullCalendar('refetchEvents');
 
@@ -2086,8 +2086,8 @@ class Calendar_Calendar_Js extends Vtiger_Class_Js {
     }
 
     updateSideberCalendarLinks(view, date) {
-        $privateCalendarLinkElm = $('#modules-menu .LBL_CALENDAR_VIEW > a');
-        $sharedCalendarLinkElm = $('#modules-menu .LBL_SHARED_CALENDAR > a');
+        var $privateCalendarLinkElm = $('#modules-menu .LBL_CALENDAR_VIEW > a');
+        var $sharedCalendarLinkElm = $('#modules-menu .LBL_SHARED_CALENDAR > a');
         
         $privateCalendarLinkElm.attr('href', 'index.php?module=Calendar&view=Calendar&lastViewDate='+date+'&Viewtype='+view);
         $sharedCalendarLinkElm.attr('href', 'index.php?module=Calendar&view=SharedCalendar&lastViewDate='+date+'&Viewtype='+view);

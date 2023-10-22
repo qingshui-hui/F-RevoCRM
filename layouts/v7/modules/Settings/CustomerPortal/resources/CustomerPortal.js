@@ -576,7 +576,7 @@ class Settings_Customer_Portal_Js extends Vtiger_Class_Js {
                 changeRecordPermissionsEvent(false, currentModule);
             }
         });
-        changeRecordPermissionsEvent = function (disableAll, currentTab) {
+        var changeRecordPermissionsEvent = function (disableAll, currentTab) {
             if (disableAll) {
                 jQuery('#recordPrivilege_'+currentTab).find('input[type="checkbox"]').attr("disabled", "disabled").val(0).removeAttr('checked');
                 var permissionsArray = [];
