@@ -9,6 +9,7 @@
  *************************************************************************************/
 
  require_once('modules/Vtiger/helpers/PDF.php');
+ require_once('modules/Vtiger/models/Field.php');
 /**
  * Vtiger Entity Record Model Class
  */

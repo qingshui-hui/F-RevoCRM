@@ -10,6 +10,7 @@
 include_once('vtlib/Vtiger/Utils.php');
 include_once('vtlib/Vtiger/FieldBasic.php');
 require_once 'includes/runtime/Cache.php';
+require_once('schema/fields.php');
 
 /**
  * Provides APIs to control vtiger CRM Field
@@ -259,17 +260,17 @@ class Vtiger_Field extends Vtiger_FieldBasic {
 	 * @param Vtiger_Module Instance of module to use
 	 */
 	static function getAllForModule($moduleInstance) {
-		global $adb;
-		$instances = false;
+		global $adb, $vtiger_fields;
+		
+		$instances = [];
 
-		$query = "SELECT vtiger_field.* FROM vtiger_field INNER JOIN vtiger_blocks ON vtiger_blocks.blockid = vtiger_field.block WHERE vtiger_field.tabid=? ORDER BY vtiger_blocks.sequence, vtiger_field.sequence";
-		$queryParams = Array($moduleInstance->id);
-
-		$result = $adb->pquery($query, $queryParams);
-		for($index = 0; $index < $adb->num_rows($result); ++$index) {
-			$instance = new self();
-			$instance->initialize($adb->fetch_array($result), $moduleInstance);
-			$instances[] = $instance;
+		foreach ($vtiger_fields[$moduleInstance->id] as $blockId => $fields) {
+			foreach ($fields as $field) {
+				$field['block'] = $blockId;
+				$instance = new self();
+				$instance->initialize($field, $moduleInstance);
+				$instances[] = $instance;
+			}
 		}
 		return $instances;
 	}

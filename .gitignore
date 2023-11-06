@@ -35,3 +35,5 @@ config.inc.php
 .vscode
 docker-compose.override.yml
 .env
+
+/vendor/
