@@ -1,0 +1,17 @@
+{
+    "name": "kowa/crm-github",
+    "autoload": {
+        "psr-4": {
+            "Kowa\\CrmGithub\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "saiki",
+            "email": "stakanari987@gmail.com"
+        }
+    ],
+    "require": {
+        "tysonandre/var_representation_polyfill": "^0.1.3"
+    }
+}
