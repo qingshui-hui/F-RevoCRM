@@ -7,16 +7,13 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-Vtiger_List_Js("Documents_List_Js", {
-    
-    massMove : function(url) {
+class Documents_List_Js extends Vtiger_List_Js {
+    static massMove(url) {
         var self = new Documents_List_Js();
         self.massMove(url);
     }
-    
-}, {
-    
-    registerSearchEvent : function(container) {
+
+    registerSearchEvent(container) {
         container.find('#searchFolders').on('keydown', function(e) {
             if(e.keyCode === 13) {
                 e.preventDefault();
@@ -37,9 +34,9 @@ Vtiger_List_Js("Documents_List_Js", {
                 return false;
             }).addClass('hide');
         });
-    },
-    
-    registerFolderSelectionEvent : function(container) {
+    }
+
+    registerFolderSelectionEvent(container) {
         jQuery('.folder', container).on('click', function() {
             jQuery('.folder', container).removeClass('selectedFolder');
             var currentSelection = jQuery(this);
@@ -47,9 +44,9 @@ Vtiger_List_Js("Documents_List_Js", {
             var folderId = currentSelection.data('folderId');
             jQuery('input[name="folderid"]').val(folderId);
         });
-    },
-    
-    registerMoveDocumentsEvent : function(container) {
+    }
+
+    registerMoveDocumentsEvent(container) {
         var self = this;
         container.find('#moveDocuments').on('submit', function(e) {
             e.preventDefault();
@@ -76,37 +73,37 @@ Vtiger_List_Js("Documents_List_Js", {
                 });
             }
         });
-    },
-    
-    registerMoveDocumentsEvents : function(container) {
+    }
+
+    registerMoveDocumentsEvents(container) {
         this.registerSearchEvent(container);
         this.registerFolderSelectionEvent(container);
         this.registerMoveDocumentsEvent(container);
-    },
-    
-    massMove : function(url) {
+    }
+
+    massMove(url) {
         var self = this;
         var listInstance = Vtiger_List_Js.getInstance();
-		var validationResult = listInstance.checkListRecordSelected();
-		if(!validationResult){
-			var selectedIds = listInstance.readSelectedIds(true);
-			var excludedIds = listInstance.readExcludedIds(true);
-			var cvId = listInstance.getCurrentCvId();
-			var postData = {
-				"selected_ids":selectedIds,
-				"excluded_ids" : excludedIds,
-				"viewname" : cvId
-			};
+        var validationResult = listInstance.checkListRecordSelected();
+        if(!validationResult){
+            var selectedIds = listInstance.readSelectedIds(true);
+            var excludedIds = listInstance.readExcludedIds(true);
+            var cvId = listInstance.getCurrentCvId();
+            var postData = {
+                "selected_ids":selectedIds,
+                "excluded_ids" : excludedIds,
+                "viewname" : cvId
+            };
 
             if(app.getModuleName() === 'Documents'){
                 var defaultparams = listInstance.getDefaultParams();
                 postData['folder_id'] = defaultparams['folder_id'];
                 postData['folder_value'] = defaultparams['folder_value'];
             }
-			var params = {
-				"url":url,
-				"data" : postData
-			};
+            var params = {
+                "url":url,
+                "data" : postData
+            };
             
             app.helper.showProgress();
             app.request.get(params).then(function(e,res) {
@@ -119,27 +116,27 @@ Vtiger_List_Js("Documents_List_Js", {
                     });
                 }
             });
-		} else{
-			listInstance.noRecordSelectedAlert();
-		}
-    },
-    
-    unMarkAllFilters : function() {
+        } else{
+            listInstance.noRecordSelectedAlert();
+        }
+    }
+
+    unMarkAllFilters() {
         jQuery('.listViewFilter').removeClass('active');
-    },
-    
-    unMarkAllTags : function() {
+    }
+
+    unMarkAllTags() {
         var container = jQuery('#listViewTagContainer');
         container.find('.tag').removeClass('active').find('i.activeToggleIcon').removeClass('fa-circle-o').addClass('fa-circle');
-    },
-    
-    unMarkAllFolders : function() {
+    }
+
+    unMarkAllFolders() {
         jQuery('.documentFolder').removeClass('active');
         jQuery('.documentFolder').find('i').removeClass('fa-folder-open')
         .addClass('fa-folder');
-    },
-    
-    registerFoldersClickEvent : function() {
+    }
+
+    registerFoldersClickEvent() {
         var self = this;
         var filters = jQuery('#module-filters');
         filters.on('click', '.documentFolder',function(e) {
@@ -159,21 +156,21 @@ Vtiger_List_Js("Documents_List_Js", {
                 folder_value : el.data('folderName')
             });
             
-			var filtername = jQuery('a[class="filterName"]',element).text();
-			jQuery('.module-action-content').find('.filter-name')
+            var filtername = jQuery('a[class="filterName"]',element).text();
+            jQuery('.module-action-content').find('.filter-name')
             .html('&nbsp;&nbsp;<span class="fa fa-chevron-right" aria-hidden="true"></span> ').text(filtername);
         });
-    },
-    
-    registerFiltersClickEvent : function() {
+    }
+
+    registerFiltersClickEvent() {
         var self = this;
         var filters = jQuery('#module-filters');
         filters.on('click', '.listViewFilter', function() {
             self.unMarkAllFolders();
         });
-    },
-    
-    addFolderToList : function(folderDetails) {
+    }
+
+    addFolderToList(folderDetails) {
         var html = ''+
         '<li style="font-size:12px;" class="documentFolder">'+
             '<a class="filterName" href="javascript:void(0);" data-filter-id="'+folderDetails.folderid+'" data-folder-name="'+folderDetails.folderName+'" title="'+folderDetails.folderDesc+'">'+
@@ -183,9 +180,9 @@ Vtiger_List_Js("Documents_List_Js", {
             '<div class="dropdown pull-right">'+
                 '<span class="fa fa-caret-down dropdown-toggle" data-toggle="dropdown" aria-expanded="true"></span>'+
                 '<ul class="dropdown-menu dropdown-menu-right vtDropDown" role="menu">'+
-					'<li class="editFolder " data-folder-id="'+folderDetails.folderid+'">'+
-						'<a role="menuitem" ><i class="fa fa-pencil-square-o"></i>&nbsp;Edit</a>'+
-					'</li>'+
+                    '<li class="editFolder " data-folder-id="'+folderDetails.folderid+'">'+
+                        '<a role="menuitem" ><i class="fa fa-pencil-square-o"></i>&nbsp;Edit</a>'+
+                    '</li>'+
                     '<li class="deleteFolder" data-deletable="1" data-folder-id="'+folderDetails.folderid+'">'+
                         '<a role="menuitem"><i class="fa fa-trash"></i>&nbsp;Delete</a>'+
                     '</li>'+
@@ -193,9 +190,9 @@ Vtiger_List_Js("Documents_List_Js", {
             '</div>'+
         '</li>';
         jQuery('#folders-list').append(html).find('.documentFolder:last').find('.foldername').text(folderDetails.folderName);
-    },
-    
-    registerAddFolderModalEvents : function(container) {
+    }
+
+    registerAddFolderModalEvents(container) {
         var self = this;
         var addFolderForm = jQuery('#addDocumentsFolder');
         addFolderForm.vtValidate({
@@ -220,9 +217,9 @@ Vtiger_List_Js("Documents_List_Js", {
                 });
             }
         });
-    },
-    
-    registerAddFolderEvent : function() {
+    }
+
+    registerAddFolderEvent() {
         var self = this;
         var filters = jQuery('#module-filters');
         filters.find('#createFolder').on('click', function() {
@@ -242,9 +239,9 @@ Vtiger_List_Js("Documents_List_Js", {
                 }
             });
         });
-    },
-    
-    registerFoldersSearchEvent : function() {
+    }
+
+    registerFoldersSearchEvent() {
         var filters = jQuery('#module-filters');
         filters.find('.search-folders').on('keyup', function(e) {
             var element = jQuery(e.currentTarget);
@@ -259,16 +256,16 @@ Vtiger_List_Js("Documents_List_Js", {
                     filterEle.removeClass('hide');
                 }
             });
-			
-			if(jQuery('li.documentFolder', filters).not('.hide').length > 0) {
-				jQuery('#folders-list', filters).find('.noFolderText').hide();
-			}else {
-				jQuery('#folders-list', filters).find('.noFolderText').show();
-			}
+            
+            if(jQuery('li.documentFolder', filters).not('.hide').length > 0) {
+                jQuery('#folders-list', filters).find('.noFolderText').hide();
+            }else {
+                jQuery('#folders-list', filters).find('.noFolderText').show();
+            }
         });
-    },
-    
-    registerDeleteFolderEvent : function() {
+    }
+
+    registerDeleteFolderEvent() {
         var filters = jQuery('#module-filters');
         filters.on('click','li.deleteFolder',function(e) {
             var element = jQuery(e.currentTarget);
@@ -308,15 +305,15 @@ Vtiger_List_Js("Documents_List_Js", {
                 });
             }
         });
-    },
-    
-    updateFolderInList : function(folderDetails) {
+    }
+
+    updateFolderInList(folderDetails) {
         jQuery('#folders-list').find('a.filterName[data-filter-id="'+folderDetails.folderid+'"]')
                 .attr('title', folderDetails.folderDesc)
                 .find('.foldername').text(folderDetails.folderName);
-    },
-    
-    registerEditFolderModalEvents : function(container) {
+    }
+
+    registerEditFolderModalEvents(container) {
         var self = this;
         container.find('#addDocumentsFolder').on('submit', function(e) {
             e.preventDefault();
@@ -338,9 +335,9 @@ Vtiger_List_Js("Documents_List_Js", {
                 }
             });
         });
-    },
-    
-    registerFolderEditEvent : function() {
+    }
+
+    registerFolderEditEvent() {
         var self = this;
         var filters = jQuery('#module-filters');
         filters.on('click','li.editFolder',function(e) {
@@ -364,27 +361,27 @@ Vtiger_List_Js("Documents_List_Js", {
                 }
             });
         });
-    },
-    
-    registerRowDoubleClickEvent: function () {
-        return true;
-    },
+    }
 
-	getDefaultParams: function() {
-		var search_value = jQuery('.sidebar-menu').find('.documentFolder.active').find('.filterName').data('folder-name');
-		var customParams = {
-			'folder_id' : 'folderid',
-			'folder_value' : search_value
-		};
-		var params = this._super();
-		if(search_value){
-			jQuery.extend(params,customParams);
-		}
-		return params;
-	},
-    
-    registerEvents: function() {
-        this._super();
+    registerRowDoubleClickEvent() {
+        return true;
+    }
+
+    getDefaultParams() {
+        var search_value = jQuery('.sidebar-menu').find('.documentFolder.active').find('.filterName').data('folder-name');
+        var customParams = {
+            'folder_id' : 'folderid',
+            'folder_value' : search_value
+        };
+        var params = super.getDefaultParams();
+        if(search_value){
+            jQuery.extend(params,customParams);
+        }
+        return params;
+    }
+
+    registerEvents() {
+        super.registerEvents();
         
         this.registerFoldersClickEvent();
         this.registerAddFolderEvent();
@@ -392,14 +389,14 @@ Vtiger_List_Js("Documents_List_Js", {
         this.registerFolderEditEvent();
         this.registerDeleteFolderEvent();
         this.registerFiltersClickEvent();
-		
-		//To make folder non-deletable if a document is uploaded
-		app.event.on('post.documents.save', function(event, data){
-			var folderid = data.folderid;
-			var folder = jQuery('#folders-list').find('[data-folder-id="'+folderid+'"]').filter('.deleteFolder');
-			if(folder.length) {
-				folder.attr('data-deletable', '0');
-			}
-		})
+        
+        //To make folder non-deletable if a document is uploaded
+        app.event.on('post.documents.save', function(event, data){
+            var folderid = data.folderid;
+            var folder = jQuery('#folders-list').find('[data-folder-id="'+folderid+'"]').filter('.deleteFolder');
+            if(folder.length) {
+                folder.attr('data-deletable', '0');
+            }
+        })
     }
-});
+};

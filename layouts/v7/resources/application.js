@@ -290,15 +290,15 @@ window.app = (function () {
 			var handlerClass = module+'_'+view+'_Js';
 			if (parentModule == 'Settings') {
 				handlerClass = parentModule+'_'+module+'_'+view+'_Js';
-				if (typeof window[handlerClass] == 'undefined') {
+				if (eval(`typeof ${handlerClass}`) == 'undefined') {
 					handlerClass = parentModule+'_Vtiger_'+view+'_Js';
 				}
 			}
-			if (typeof window[handlerClass] != 'undefined') {
+			if (eval(`typeof ${handlerClass}`) != 'undefined') {
 				controllerClass = handlerClass;
 			} else {
 				handlerClass = 'Vtiger_'+view+'_Js';
-				if (typeof window[handlerClass] != 'undefined') {
+				if (eval(`typeof ${handlerClass}`) != 'undefined') {
 					controllerClass = handlerClass;
 				}
 			}
@@ -308,7 +308,7 @@ window.app = (function () {
 			if (_controller == null) {
 				var controllerClass = this.getModuleSpecificViewClass(_view);
 				if (controllerClass) {
-					_controller = new window[controllerClass]();
+					_controller = eval(`new ${controllerClass}()`)
 					_controller.intializeComponents();
 					_controller.registerEvents();
 				}

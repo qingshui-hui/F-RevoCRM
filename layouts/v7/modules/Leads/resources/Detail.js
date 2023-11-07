@@ -7,15 +7,17 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Detail_Js("Leads_Detail_Js", {
+class Leads_Detail_Js extends Vtiger_Detail_Js {
     //cache will store the convert lead data(Model)
-    cache: {},
+    static cache = {};
+
     //Holds detail view instance
-    detailCurrentInstance: false,
+    static detailCurrentInstance = false;
+
     /* function to trigger Convert Lead action
      * @param: Convert Lead url, currentElement.
      */
-    convertLead: function (convertLeadUrl, buttonElement) {
+    static convertLead(convertLeadUrl, buttonElement) {
         var instance = Leads_Detail_Js.detailCurrentInstance;
         //Initially clear the elements to overwtite earliear cache
         instance.convertLeadContainer = false;
@@ -40,63 +42,71 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
         }
     }
 
-}, {
     //Contains the convert lead form
-    convertLeadForm: false,
+    convertLeadForm = false;
+
     //contains the convert lead container
-    convertLeadContainer: false,
+    convertLeadContainer = false;
+
     //contains all the checkbox elements of modules
-    convertLeadModules: false,
+    convertLeadModules = false;
+
     //constructor
-    init: function () {
-        this._super();
+    constructor() {
+        super();
         Leads_Detail_Js.detailCurrentInstance = this;
-   },
+   }
+
     /*
      * function to enable all the input and textarea elements
      */
-    removeDisableAttr: function (moduleBlock) {
+    removeDisableAttr(moduleBlock) {
         moduleBlock.find('input,textarea,select').removeAttr('disabled');
-    },
+    }
+
     /*
      * function to disable all the input and textarea elements
      */
-    addDisableAttr: function (moduleBlock) {
+    addDisableAttr(moduleBlock) {
         moduleBlock.find('input,textarea,select').attr('disabled', 'disabled');
-    },
+    }
+
     /*
      * function to get Convert Lead Form
      */
-    getConvertLeadForm: function () {
+    getConvertLeadForm() {
         if (this.convertLeadForm == false) {
             this.convertLeadForm = jQuery('#convertLeadForm');
         }
         return this.convertLeadForm;
-    },
+    }
+
     /*
      * function to get all the checkboxes which are representing the modules selection
      */
-    getConvertLeadModules: function () {
+    getConvertLeadModules() {
         var container = this.getConvertLeadContainer();
         if (this.convertLeadModules == false) {
             this.convertLeadModules = jQuery('.convertLeadModuleSelection', container);
         }
         return this.convertLeadModules;
-    },
+    }
+
     /*
      * function to get Convert Lead Container
      */
-    getConvertLeadContainer: function () {
+    getConvertLeadContainer() {
         if (this.convertLeadContainer == false) {
             this.convertLeadContainer = jQuery('#leadAccordion');
         }
         return this.convertLeadContainer;
-    },
+    }
+
     /*
      * function to display the convert lead model
      * @param: data used to show the model, currentElement.
      */
-    displayConvertLeadModel: function (data, buttonElement) {
+    displayConvertLeadModel(data, buttonElement) {
         var instance = this;
         var errorElement = jQuery(data).find('#convertLeadError');
         if (errorElement.length != '0') {
@@ -121,12 +131,13 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
             }
             app.helper.showModal(data, {"cb": callBackFunction});
         }
-    },
+    }
+
     /*
      * function to check which module is selected 
      * to disable or enable all the elements with in the block
      */
-    checkingModuleSelection: function (element) {
+    checkingModuleSelection(element) {
         var instance = this;
         var module = jQuery(element).val();
         var moduleBlock = jQuery(element).closest('.accordion-group').find('#' + module + '_FieldInfo');
@@ -135,18 +146,20 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
         } else {
             instance.addDisableAttr(moduleBlock);
         }
-    },
-    registerForReferenceField: function () {
+    }
+
+    registerForReferenceField() {
         var container = this.getConvertLeadContainer();
         var referenceField = jQuery('.reference', container);
         if (referenceField.length > 0) {
             jQuery('#AccountsModule').attr('readonly', 'readonly');
         }
-    },
+    }
+
     /*
      * function to register Convert Lead Events
      */
-    registerConvertLeadEvents: function () {
+    registerConvertLeadEvents() {
         var container = this.getConvertLeadContainer();
         var instance = this;
 
@@ -197,11 +210,12 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
             }
             e.stopImmediatePropagation();
         });
-    },
+    }
+
     /*
      * function to register Convert Lead Submit Event
      */
-    registerConvertLeadSubmit: function () {
+    registerConvertLeadSubmit() {
         var thisInstance = this;
         var formElement = this.getConvertLeadForm();
 
@@ -243,8 +257,9 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
             }
         }
         formElement.vtValidate(params);
-    },
-    registerForDisableCheckEvent: function () {
+    }
+
+    registerForDisableCheckEvent() {
         var container = this.getConvertLeadContainer();
         var oppAccMandatory = jQuery('#oppAccMandatory').val();
         var oppConMandatory = jQuery('#oppConMandatory').val();
@@ -269,5 +284,5 @@ Vtiger_Detail_Js("Leads_Detail_Js", {
                 jQuery('#AccountsModule').removeAttr('disabled');
             }
         });
-    },
-});
+    }
+};

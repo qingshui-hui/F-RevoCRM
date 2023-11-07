@@ -8,8 +8,8 @@
  *
  *********************************************************************************/
 
-Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
-    showPopover : function(e) {
+class Settings_ExtensionStore_ExtensionStore_Js extends Vtiger_Index_Js {
+    static showPopover(e) {
         var ele = jQuery(e);
         var options = {
             placement : ele.data('position'),
@@ -17,22 +17,23 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
         };
         ele.popover(options);
     }
-}, {
+
     /**
      * Function to get import module index params
      */
-    getImportModuleIndexParams: function() {
+    getImportModuleIndexParams() {
         var params = {
             'module': app.getModuleName(),
             'parent': app.getParentModuleName(),
             'view': 'ExtensionStore'
         };
         return params;
-    },
+    }
+
     /**
      * Function to get import module with respect to view
      */
-    getImportModuleStepView: function(params) {
+    getImportModuleStepView(params) {
         var aDeferred = jQuery.Deferred();
         app.helper.showProgress();
         app.request.post({data: params}).then(
@@ -45,11 +46,12 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
                 }
         );
         return aDeferred.promise();
-    },
+    }
+
     /**
      * Function to register raty
      */
-    registerRaty: function() {
+    registerRaty() {
         jQuery('.rating').raty({
             score: function() {
                 return this.getAttribute('data-score');
@@ -58,24 +60,26 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
                 return this.getAttribute('data-readonly');
             }
         });
-    },
+    }
+
     /**
      * Function to register event for index of import module
      */
-    registerEventForIndexView: function() {
+    registerEventForIndexView() {
         this.registerRaty();
         var detailContentsHolder = jQuery('.contentsDiv');
         app.helper.showScroll(jQuery('.extensionDescription'), {'height': '120px', 'width': '100%'});
         this.registerEventsForExtensionStore(detailContentsHolder);
-    },
-    
-    getContainer : function() {
+    }
+
+    getContainer() {
         return jQuery('.contentsDiv');
-    },
+    }
+
     /**
      * Function to register event related to Import extrension Modules in index
      */
-    registerEventsForExtensionStore: function(container) {
+    registerEventsForExtensionStore(container) {
         var thisInstance = this;
         thisInstance.registerShowCardInfoEvent();
         jQuery(container).find('.installExtension, .installPaidExtension').on('click', function(e) {
@@ -278,10 +282,9 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
 
             app.showModalWindow(extensionLoaderModal);
         });
-    },
-    
-    
-    registerEventForSearchExtension : function(container) {
+    }
+
+    registerEventForSearchExtension(container) {
       var thisInstance = this; 
       container.on('keydown', '#searchExtension', function(e) {
             var currentTarget = jQuery(e.currentTarget);
@@ -311,8 +314,9 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
                 );
             }
         });  
-    },
-    updateTrialStatus: function(trialStatus, extensionName) {
+    }
+
+    updateTrialStatus(trialStatus, extensionName) {
         var trialParams = {
             'module': app.getModuleName(),
             'parent': app.getParentModuleName(),
@@ -328,16 +332,18 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
         this.getImportModuleStepView(trialParams).then(function(data) {
             return data;
         });
-    },
-    installExtension: function(e) {
+    }
+
+    installExtension(e) {
         var thisInstance = this;
         var element = jQuery(e.currentTarget);
         thisInstance.ExtensionDetails(element);
-    },
+    }
+
     /**
      * Function to download Extension
      */
-    ExtensionDetails: function(element) {
+    ExtensionDetails(element) {
         var thisInstance = this;
         var extensionContainer = element.closest('.extension_container');
         var extensionId = extensionContainer.find('[name="extensionId"]').val();
@@ -358,11 +364,12 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
             detailContentsHolder.html(data);
             thisInstance.registerEventsForExtensionStoreDetail(detailContentsHolder);
         });
-    },
+    }
+
     /**
      * Function to register event related to Import extrension Modules in detail
      */
-    registerEventsForExtensionStoreDetail: function(container) {
+    registerEventsForExtensionStoreDetail(container) {
         var container = jQuery(container);
         var thisInstance = this;
         this.registerRaty();
@@ -385,39 +392,39 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
             }
             
             app.helper.showConfirmationBox({message:'<b>'+app.vtranslate('JS_ARE_YOU_SURE_INSTALL')+'?</b>'}).then(function(){
-				var extensionId = jQuery('[name="extensionId"]').val();
-				var targetModule = jQuery('[name="targetModule"]').val();
-				var moduleType = jQuery('[name="moduleType"]').val();
-				var moduleAction = jQuery('[name="moduleAction"]').val();
-				var fileName = jQuery('[name="fileName"]').val();
+                var extensionId = jQuery('[name="extensionId"]').val();
+                var targetModule = jQuery('[name="targetModule"]').val();
+                var moduleType = jQuery('[name="moduleType"]').val();
+                var moduleAction = jQuery('[name="moduleAction"]').val();
+                var fileName = jQuery('[name="fileName"]').val();
 
-				var params = {
-					'module': app.getModuleName(),
-					'parent': app.getParentModuleName(),
-					'view': 'ExtensionStore',
-					'mode': 'installationLog',
-					'extensionId': extensionId,
-					'moduleAction': moduleAction,
-					'targetModule': targetModule,
-					'moduleType': moduleType,
-					'fileName': fileName
-				}
+                var params = {
+                    'module': app.getModuleName(),
+                    'parent': app.getParentModuleName(),
+                    'view': 'ExtensionStore',
+                    'mode': 'installationLog',
+                    'extensionId': extensionId,
+                    'moduleAction': moduleAction,
+                    'targetModule': targetModule,
+                    'moduleType': moduleType,
+                    'fileName': fileName
+                }
 
-				thisInstance.getImportModuleStepView(params).then(function(installationLogData) {
-					var callBackFunction = function(data) {
-						var installationStatus = jQuery(data).find('[name="installationStatus"]').val();
-						if (installationStatus == "success") {
-							jQuery('#installExtension').remove();
-							jQuery('#launchExtension').removeClass('hide');
-							jQuery('.writeReview').removeClass('hide');
-						}
-						app.helper.showScroll(jQuery('#installationLog'), {'height': '150px'});
-					};
-					var modalData = {
-						cb: callBackFunction
-					};
-					app.helper.showModal(installationLogData, modalData);
-				});
+                thisInstance.getImportModuleStepView(params).then(function(installationLogData) {
+                    var callBackFunction = function(data) {
+                        var installationStatus = jQuery(data).find('[name="installationStatus"]').val();
+                        if (installationStatus == "success") {
+                            jQuery('#installExtension').remove();
+                            jQuery('#launchExtension').removeClass('hide');
+                            jQuery('.writeReview').removeClass('hide');
+                        }
+                        app.helper.showScroll(jQuery('#installationLog'), {'height': '150px'});
+                    };
+                    var modalData = {
+                        cb: callBackFunction
+                    };
+                    app.helper.showModal(installationLogData, modalData);
+                });
             });
             
         });
@@ -517,83 +524,83 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
 
             app.helper.showModal(customerReviewModal,params);
         });
-    },
-    
-   registerSetupCardDetailEvent : function(modalData,element) {
+    }
+
+    registerSetupCardDetailEvent(modalData, element) {
+         var thisInstance = this;
+         var container = thisInstance.getContainer();
+         jQuery(modalData).on('click', '[name="resetButton"]', function(e) {
+             jQuery(modalData).find('[name="cardNumber"],[name="expMonth"],[name="expYear"],[name="cvccode"]').val('');
+         });
+         var form = modalData.find('.setUpCardForm');
+         var params = {
+             submitHandler: function(form) {
+                 var form = jQuery(form);
+                 // to Prevent submit if already submitted
+                 form.find("button[name='saveButton']").attr("disabled","disabled");
+                 if(this.numberOfInvalids() > 0) {
+                     return false;
+                 }
+                 
+                 var formData = form.serializeFormData();
+                 app.helper.showProgress();
+                 app.request.post({data: formData}).then(
+                         function(error, result) {
+                             if (!error) {
+                                 jQuery(container).find('[name="customerCardId"]').val(result.id);
+                                 app.helper.hideProgress();
+                                 jQuery(container).find('.viewCardInfoModal').find('.cardNumber').html(result['number']);
+                                 var expiryDate = result['expmonth']+'-'+result['expyear'];
+                                 jQuery(container).find('.viewCardInfoModal').find('.expiryDate').html(expiryDate);
+                                 if(typeof element !== 'undefined') {
+                                     element.html(app.vtranslate('JS_UPDATE_CARD_DETAILS'));
+                                     element.attr('id','updateCardDetails');
+                                 }
+                                 thisInstance.registerShowCardInfoEvent();
+                                 app.helper.hidePopup();
+                                 app.helper.hideModal();
+                                 app.helper.showSuccessNotification({"message": app.vtranslate('JS_CARD_DETAILS_UPDATED')});
+                             } else {
+                                 app.helper.hideProgress();
+                                 app.helper.showErrorNotification({"message": error});
+                                 form.find('.saveButton').removeAttr('disabled');
+                                 return false;
+                             }
+                         }
+                 );
+             }
+         };
+         form.vtValidate(params);
+    }
+
+    registerShowCardInfoEvent() {
         var thisInstance = this;
-        var container = thisInstance.getContainer();
-        jQuery(modalData).on('click', '[name="resetButton"]', function(e) {
-            jQuery(modalData).find('[name="cardNumber"],[name="expMonth"],[name="expYear"],[name="cvccode"]').val('');
-        });
-        var form = modalData.find('.setUpCardForm');
-        var params = {
-            submitHandler: function(form) {
-                var form = jQuery(form);
-                // to Prevent submit if already submitted
-                form.find("button[name='saveButton']").attr("disabled","disabled");
-                if(this.numberOfInvalids() > 0) {
-                    return false;
-                }
-                
-                var formData = form.serializeFormData();
-                app.helper.showProgress();
-                app.request.post({data: formData}).then(
-                        function(error, result) {
-                            if (!error) {
-                                jQuery(container).find('[name="customerCardId"]').val(result.id);
-                                app.helper.hideProgress();
-                                jQuery(container).find('.viewCardInfoModal').find('.cardNumber').html(result['number']);
-                                var expiryDate = result['expmonth']+'-'+result['expyear'];
-                                jQuery(container).find('.viewCardInfoModal').find('.expiryDate').html(expiryDate);
-                                if(typeof element !== 'undefined') {
-                                    element.html(app.vtranslate('JS_UPDATE_CARD_DETAILS'));
-                                    element.attr('id','updateCardDetails');
-                                }
-                                thisInstance.registerShowCardInfoEvent();
-                                app.helper.hidePopup();
-                                app.helper.hideModal();
-                                app.helper.showSuccessNotification({"message": app.vtranslate('JS_CARD_DETAILS_UPDATED')});
-                            } else {
-                                app.helper.hideProgress();
-                                app.helper.showErrorNotification({"message": error});
-                                form.find('.saveButton').removeAttr('disabled');
-                                return false;
-                            }
-                        }
-                );
-            }
-        };
-        form.vtValidate(params);
-   }, 
-   
-   registerShowCardInfoEvent : function(){
-       var thisInstance = this;
-       var container =  thisInstance.getContainer();
-       jQuery('#updateCardDetails').off().on('click',function(e){
-            var cardInfoModal = jQuery(container).find('.viewCardInfoModal').clone(true, true);
-            cardInfoModal.removeClass('hide');
-            app.helper.showProgress();
-            
-            
-            var callBackFunction = function(data){
-                data.on('click','.updateBtn',function(){
-                    var setupcardModal = jQuery(container).find('.setUpCardModal').clone(true,true);
-                    setupcardModal.removeClass('hide');
-                    app.helper.hideModal();
-                    app.helper.showPopup(setupcardModal);
-                    thisInstance.registerSetupCardDetailEvent(setupcardModal);    
-                });
-            };
-            
-            app.helper.showModal(cardInfoModal);
-            app.helper.hideProgress();
-            if (typeof callBackFunction == 'function') {
-                callBackFunction(cardInfoModal);
-            }
-        });
-   },
-   
-    registerExtensionTabs : function(container) {
+        var container =  thisInstance.getContainer();
+        jQuery('#updateCardDetails').off().on('click',function(e){
+             var cardInfoModal = jQuery(container).find('.viewCardInfoModal').clone(true, true);
+             cardInfoModal.removeClass('hide');
+             app.helper.showProgress();
+             
+             
+             var callBackFunction = function(data){
+                 data.on('click','.updateBtn',function(){
+                     var setupcardModal = jQuery(container).find('.setUpCardModal').clone(true,true);
+                     setupcardModal.removeClass('hide');
+                     app.helper.hideModal();
+                     app.helper.showPopup(setupcardModal);
+                     thisInstance.registerSetupCardDetailEvent(setupcardModal);    
+                 });
+             };
+             
+             app.helper.showModal(cardInfoModal);
+             app.helper.hideProgress();
+             if (typeof callBackFunction == 'function') {
+                 callBackFunction(cardInfoModal);
+             }
+         });
+    }
+
+    registerExtensionTabs(container) {
         var thisInstance = this;
         container.on('click', '.extensionTab', function(e){
             var element = jQuery(e.currentTarget);
@@ -616,16 +623,16 @@ Vtiger_Index_Js("Settings_ExtensionStore_ExtensionStore_Js", {
                 }
             );
         });    
-    },
-    
-    registerEvents: function() {
+    }
+
+    registerEvents() {
         var container = jQuery('.contentsDiv');
-        this._super();
+        super.registerEvents();
         this.registerEventForIndexView();
         this.registerEventForSearchExtension(container);
         this.registerExtensionTabs(container);
     }
-});
+};
 
 jQuery(document).ready(function() {
     var settingExtensionStoreInstance = new Settings_ExtensionStore_ExtensionStore_Js();

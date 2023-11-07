@@ -7,31 +7,30 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_List_Js('Vtiger_AdvanceSearchList_Js',{},{
-
-    addComponents : function() {
+class Vtiger_AdvanceSearchList_Js extends Vtiger_List_Js {
+    addComponents() {
         this.addModuleSpecificComponent('Pagination');
         this.intializeComponents();
-    },
-    
-    getDefaultParams : function () {
-        var defaultParams = this._super();
+    }
+
+    getDefaultParams() {
+        var defaultParams = super.getDefaultParams();
         defaultParams.nolistcache = 1;
         defaultParams.view = 'ListAjax';
         defaultParams.mode = 'showSearchResults';
         defaultParams.parent = '';
         defaultParams._onlyContents = true;
         return defaultParams;
-    },
-    
-    loadFilter: function(id, loadParams) {
-		if (typeof loadParams == 'undefined') loadParams = {};
+    }
+
+    loadFilter(id, loadParams) {
+        if (typeof loadParams == 'undefined') loadParams = {};
         
-		var params = {
-			module: this.getModuleName(), 
-			view  : 'ListAjax',
-			viewname : id
-		}
+        var params = {
+            module: this.getModuleName(), 
+            view  : 'ListAjax',
+            viewname : id
+        }
         
         // Added to handle remove sorting
         var mode = loadParams.mode;
@@ -40,64 +39,64 @@ Vtiger_List_Js('Vtiger_AdvanceSearchList_Js',{},{
         loadParams.parent = '';
         params = jQuery.extend(params, loadParams);
         this.loadListViewRecords(params);
-    },
-    
-    registerEditLink : function() {
+    }
+
+    registerEditLink() {
         jQuery('#searchResults-container').on('click', 'a[name="editlink"]', function(e)  {
-			var element = jQuery(e.currentTarget);
-			var url = element.data('url');
-			var listInstance = Vtiger_List_Js.getInstance();
-			var postData = listInstance.getDefaultParams();
-			postData['view'] = app.view();
-			var recordId = app.getRecordId();
-			if(!recordId) {
-				recordId = jQuery('[name="record"]').val();
-			}
-			if(recordId && typeof recordId != "undefined") {
-				postData['record'] = recordId;
-			}
-			if(postData['module'] == 'Workflows' && postData['view'] == 'Edit') {
-				postData['mode'] = 'V7Edit';
-			}
-			for(var key in postData) {
-				if(postData[key]) {
-					postData['return'+key] = postData[key];
-					delete postData[key];
-				} else {
-					delete postData[key];
-				}
-			}
-			e.preventDefault();
-			e.stopPropagation();
-			window.location.href = url +'&'+ $.param(postData);
-		});
-	},
-   
-    registerDeleteRecordClickEvent :function(){
-		var thisInstance = this;
+            var element = jQuery(e.currentTarget);
+            var url = element.data('url');
+            var listInstance = Vtiger_List_Js.getInstance();
+            var postData = listInstance.getDefaultParams();
+            postData['view'] = app.view();
+            var recordId = app.getRecordId();
+            if(!recordId) {
+                recordId = jQuery('[name="record"]').val();
+            }
+            if(recordId && typeof recordId != "undefined") {
+                postData['record'] = recordId;
+            }
+            if(postData['module'] == 'Workflows' && postData['view'] == 'Edit') {
+                postData['mode'] = 'V7Edit';
+            }
+            for(var key in postData) {
+                if(postData[key]) {
+                    postData['return'+key] = postData[key];
+                    delete postData[key];
+                } else {
+                    delete postData[key];
+                }
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = url +'&'+ $.param(postData);
+        });
+    }
+
+    registerDeleteRecordClickEvent() {
+        var thisInstance = this;
         jQuery('#searchResults-container').off('click');
         jQuery('#searchResults-container').on('click', '.deleteRecordButton', function(e){
             var elem = jQuery(e.currentTarget);
-			var parent = elem;
-			var params = {};
+            var parent = elem;
+            var params = {};
 
             var originalDropDownMenu = elem.closest('.dropdown-menu').data('original-menu');
-			if(originalDropDownMenu && typeof originalDropDownMenu != 'undefined') {
-				parent = app.helper.getDropDownmenuParent(originalDropDownMenu);
+            if(originalDropDownMenu && typeof originalDropDownMenu != 'undefined') {
+                parent = app.helper.getDropDownmenuParent(originalDropDownMenu);
 
-				var moduleName = jQuery('#searchModuleList').val();
-				if(moduleName && typeof moduleName != 'undefined') {
-					params['module'] = moduleName;
-				}
-			}
+                var moduleName = jQuery('#searchModuleList').val();
+                if(moduleName && typeof moduleName != 'undefined') {
+                    params['module'] = moduleName;
+                }
+            }
 
             var recordId = parent.closest('tr').data('id');
-			thisInstance.deleteRecord(recordId, params);
+            thisInstance.deleteRecord(recordId, params);
 //			e.stopPropagation();
-		});
-	},
-    
-    registerDropdownPosition :function() {
+        });
+    }
+
+    registerDropdownPosition() {
         if(jQuery('.searchResults').height() <= 450){
             jQuery('.searchResults').css('padding-bottom',"100px");
         };
@@ -106,8 +105,8 @@ Vtiger_List_Js('Vtiger_AdvanceSearchList_Js',{},{
             var containerTarget = jQuery(this).closest(container);
             var dropdown = jQuery(e.currentTarget);
              if(dropdown.find('[data-toggle]').length <=0){ 
- 		                return; 
- 		            } 
+                        return; 
+                    } 
             var dropdown_menu = dropdown.find('.dropdown-menu');
 
             var dropdownStyle = dropdown_menu.find('li a');
@@ -149,18 +148,18 @@ Vtiger_List_Js('Vtiger_AdvanceSearchList_Js',{},{
                 fixed_dropdown_menu.remove();
             });
         }); 
-    },
-	
-	getListSearchParams : function(includeStarFilters) {
-		var searchParams = JSON.parse(jQuery('#searchResults-container').find('[name="currentSearchParams"]').val());
-		for(var index in searchParams) {
-			if(isNaN(index)) {
-				delete searchParams[index];
-			}
-		}
-		if(includeStarFilters) {
+    }
+
+    getListSearchParams(includeStarFilters) {
+        var searchParams = JSON.parse(jQuery('#searchResults-container').find('[name="currentSearchParams"]').val());
+        for(var index in searchParams) {
+            if(isNaN(index)) {
+                delete searchParams[index];
+            }
+        }
+        if(includeStarFilters) {
             searchParams = this.addStarSearchParams(searchParams);
         }
-		return searchParams;
-	},
-});
+        return searchParams;
+    }
+};

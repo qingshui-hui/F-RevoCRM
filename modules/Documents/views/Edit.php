@@ -23,7 +23,7 @@ Class Documents_Edit_View extends Vtiger_Edit_View {
 		$jsFileNames = array(
 				"libraries.jquery.ckeditor.ckeditor",
 				"libraries.jquery.ckeditor.adapters.jquery",
-				'modules.Vtiger.resources.CkEditor',
+				// 'modules.Vtiger.resources.CkEditor',
 		);
 		$jsScriptInstances = $this->checkAndConvertJsScripts($jsFileNames);
 		$headerScriptInstances = array_merge($headerScriptInstances, $jsScriptInstances);

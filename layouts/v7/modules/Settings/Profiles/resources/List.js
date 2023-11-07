@@ -7,10 +7,9 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Settings_Vtiger_List_Js("Settings_Profiles_List_Js",{},{
-	
-	registerEvents : function() {
-		this._super();
-	}
-});
+class Settings_Profiles_List_Js extends Settings_Vtiger_List_Js {
+    registerEvents() {
+        super.registerEvents();
+    }
+};
 

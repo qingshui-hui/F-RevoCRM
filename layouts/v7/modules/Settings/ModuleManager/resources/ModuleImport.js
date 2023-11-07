@@ -7,4 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Settings_ModuleManager_List_Js('Settings_ModuleManager_ModuleImport_Js', {}, {});
+class Settings_ModuleManager_ModuleImport_Js extends Settings_ModuleManager_List_Js {};

@@ -7,106 +7,104 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
+class Vtiger_AdvanceSearch_Js extends Vtiger_BasicSearch_Js {
+    //cache will store the search data
+    static cache = {};
 
-	//cache will store the search data
-	cache : {}
+    //container which will store the search elements
+    elementContainer = false;
 
-},{
-	//container which will store the search elements
-	elementContainer : false,
-	//instance which represents advance filter
-	advanceFilter : false,
+    //instance which represents advance filter
+    advanceFilter = false;
 
-	//states whether the validation is registred for filter elements
-	filterValidationRegistered : false,
+    //states whether the validation is registred for filter elements
+    filterValidationRegistered = false;
 
-	//contains the filter form element
-	filterForm : false,
+    //contains the filter form element
+    filterForm = false;
 
-	/**
-	 * Function which will give the container
-	 */
-	getContainer : function() {
-		return this.elementContainer;
-	},
+    /**
+     * Function which will give the container
+     */
+    getContainer() {
+        return this.elementContainer;
+    }
 
-	/**
-	 *Function which is used to set the continaer
-	 *@params : container - element which represent the container
-	 *@return current instance
-	 */
-	setContainer : function(container) {
-		this.elementContainer = container;
-		return this;
-	},
+    /**
+     *Function which is used to set the continaer
+     *@params : container - element which represent the container
+     *@return current instance
+     */
+    setContainer(container) {
+        this.elementContainer = container;
+        return this;
+    }
 
-	getFilterForm : function() {
-		return jQuery('form[name="advanceFilterForm"]',this.getContainer());
-	},
-    
-    isSearchShown : function() {
+    getFilterForm() {
+        return jQuery('form[name="advanceFilterForm"]',this.getContainer());
+    }
+
+    isSearchShown() {
         return jQuery('#advanceSearchHolder').hasClass('slideDown');
-    },
-    
-    hideSearch : function() {
+    }
+
+    hideSearch() {
         jQuery('#advanceSearchHolder').removeClass('slideDown');
-    },
-    
-    isSearchHidden : function() {
+    }
+
+    isSearchHidden() {
        var advanceSearchHolder = jQuery('#advanceSearchHolder');
        return (advanceSearchHolder.children().length > 0 && (!advanceSearchHolder.hasClass('slideDown'))) ? true : false;
-    },
-    
-    showSearch : function() {
+    }
+
+    showSearch() {
          var advanceSearchHolder = jQuery('#advanceSearchHolder');
          advanceSearchHolder.addClass('slideDown');
-    },
-    
+    }
 
-	/**
-	 * Function used to get the advance search ui
-	 * @return : deferred promise
-	 */
-	getAdvanceSearch : function() {
-		var aDeferred = jQuery.Deferred();
-		var moduleName = app.getModuleName();
-		var searchModule = this.getSearchModule();
+    /**
+     * Function used to get the advance search ui
+     * @return : deferred promise
+     */
+    getAdvanceSearch() {
+        var aDeferred = jQuery.Deferred();
+        var moduleName = app.getModuleName();
+        var searchModule = this.getSearchModule();
 
-		//Exists in the cache
-		if(searchModule in Vtiger_AdvanceSearch_Js.cache) {
-			aDeferred.resolve(Vtiger_AdvanceSearch_Js.cache[searchModule]);
-			return aDeferred.promise();
-		}
+        //Exists in the cache
+        if(searchModule in Vtiger_AdvanceSearch_Js.cache) {
+            aDeferred.resolve(Vtiger_AdvanceSearch_Js.cache[searchModule]);
+            return aDeferred.promise();
+        }
         
         //if you are in settings then module should be vtiger
         if(app.getParentModuleName().length > 0) {
-			moduleName = "Home";
+            moduleName = "Home";
         }
         
         var searchableModulesParams = {
-			"module":moduleName,
-			"view"	: "BasicAjax",
-			"mode"	: "showAdvancedSearch",
-			"source_module": searchModule
+            "module":moduleName,
+            "view"	: "BasicAjax",
+            "mode"	: "showAdvancedSearch",
+            "source_module": searchModule
         };
         
         app.helper.showProgress();
-		app.request.post({data:searchableModulesParams}).then(
-			function(err, data){
+        app.request.post({data:searchableModulesParams}).then(
+            function(err, data){
                 app.helper.hideProgress();
-				//add to cache
-				Vtiger_AdvanceSearch_Js.cache[searchModule] = data;
-				aDeferred.resolve(data);
-			},
-			function(error,err){
-				aDeferred.reject(error);
-			}
-		);
-		return aDeferred.promise();
-	},
-    
-    showAdvanceSearch : function (data) {
+                //add to cache
+                Vtiger_AdvanceSearch_Js.cache[searchModule] = data;
+                aDeferred.resolve(data);
+            },
+            function(error,err){
+                aDeferred.reject(error);
+            }
+        );
+        return aDeferred.promise();
+    }
+
+    showAdvanceSearch(data) {
         var aDeferred = jQuery.Deferred();
         if(jQuery('#advanceSearchHolder').length >0) {
             jQuery('#advanceSearchHolder').removeClass('slideDown');
@@ -119,16 +117,16 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
         }
         aDeferred.resolve();
         return aDeferred.promise();
-    },
+    }
 
-	/**
-	 * Function which intializes search
-	 */
-	initiateSearch : function() {
+    /**
+     * Function which intializes search
+     */
+    initiateSearch() {
         var aDeferred = jQuery.Deferred();
-		var thisInstance = this;
-		this.getAdvanceSearch().then(
-			function(data){
+        var thisInstance = this;
+        this.getAdvanceSearch().then(
+            function(data){
                 thisInstance.showAdvanceSearch(data).then(function(){
                     thisInstance.setContainer(jQuery('#advanceSearchContainer'));
                     vtUtils.showSelect2ElementView(thisInstance.getContainer().find('select.select2'));
@@ -138,20 +136,20 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
                     aDeferred.resolve();
                 })
                 
-			},
-			function(error) {
+            },
+            function(error) {
                 aDeferred.reject();
-			}
-		)
+            }
+        )
         return aDeferred.promise();
-	},
-    
-    getNameFields : function() {
+    }
+
+    getNameFields() {
         var form = this.getFilterForm();
         return form.find('[name="labelFields"]').data('value');
-    },
-    
-    selectBasicSearchValue : function() {
+    }
+
+    selectBasicSearchValue() {
       var value = jQuery('.keyword-input').val();
       if(value.length > 0 ) {
           var form = this.getFilterForm();
@@ -181,17 +179,17 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
           }
           
       }
-    },
+    }
 
-	/**
-	 * Function which invokes search
-	 */
-	search : function() {
-		var conditionValues = this.advanceFilter.getValues();
-		var module = this.getSearchModule();
+    /**
+     * Function which invokes search
+     */
+    search() {
+        var conditionValues = this.advanceFilter.getValues();
+        var module = this.getSearchModule();
 
-		var params = {};
-		params.module = module;
+        var params = {};
+        params.module = module;
         var searchParams = new Array();
         for(var index in conditionValues) {
             var conditionSpecificValues = conditionValues[index]['columns'];
@@ -206,97 +204,95 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
             }
             searchParams.push(conditionSpecificParams);
         }
-		params.search_params = JSON.stringify(searchParams);
+        params.search_params = JSON.stringify(searchParams);
         params.nolistcache = 1;
-		return this._search(params);
-	},
+        return this._search(params);
+    }
 
-	/**
-	 * Function which shows search results in proper manner
-	 * @params : data to be shown
-	 */
-	showSearchResults : function(data){
-		var thisInstance = this;
-		var aDeferred = jQuery.Deferred();
-		var postLoad = function(data) {
-			var blockMsg = jQuery(data).closest('.blockMsg');
-			app.showScrollBar(jQuery(data).find('.contents'));
-			aDeferred.resolve(data);
-		}
+    /**
+     * Function which shows search results in proper manner
+     * @params : data to be shown
+     */
+    showSearchResults(data) {
+        var thisInstance = this;
+        var aDeferred = jQuery.Deferred();
+        var postLoad = function(data) {
+            var blockMsg = jQuery(data).closest('.blockMsg');
+            app.showScrollBar(jQuery(data).find('.contents'));
+            aDeferred.resolve(data);
+        }
 
-		var unblockcd = function(){
-			thisInstance.getContainer().remove();
-		}
+        var unblockcd = function(){
+            thisInstance.getContainer().remove();
+        }
 
-		var html = '<div class="row-fluid">'+
-						'<span class="span4 searchHolder" style="width:280px;"></span>'+
-						'<span class="span8 filterHolder  marginLeftZero hide"></span>'+
-					'</div>';
-		var jQhtml = jQuery(html);
-		jQuery('.searchHolder',jQhtml).html(data);
+        var html = '<div class="row-fluid">'+
+                        '<span class="span4 searchHolder" style="width:280px;"></span>'+
+                        '<span class="span8 filterHolder  marginLeftZero hide"></span>'+
+                    '</div>';
+        var jQhtml = jQuery(html);
+        jQuery('.searchHolder',jQhtml).html(data);
 
-		data = jQhtml;
+        data = jQhtml;
 
-		var params = {};
-		params.data = data;
-		params.cb = postLoad;
-		params.css = {'width':'20%','text-align':'left'};
-		params.overlayCss = {'opacity':'0.2'};
-		params.unblockcb = unblockcd;
-		app.showModalWindow(params);
+        var params = {};
+        params.data = data;
+        params.cb = postLoad;
+        params.css = {'width':'20%','text-align':'left'};
+        params.overlayCss = {'opacity':'0.2'};
+        params.unblockcb = unblockcd;
+        app.showModalWindow(params);
 
-		return aDeferred.promise();
-	},
+        return aDeferred.promise();
+    }
 
-	/**
-	 * Function which will save the filter
-	 */
-	saveFilter : function(params) {
-		var aDeferred = jQuery.Deferred();
-		params.source_module = this.getSearchModule();
-		params.status = 1;
-		params.advfilterlist = JSON.stringify(this.advanceFilter.getValues(false));
+    /**
+     * Function which will save the filter
+     */
+    saveFilter(params) {
+        var aDeferred = jQuery.Deferred();
+        params.source_module = this.getSearchModule();
+        params.status = 1;
+        params.advfilterlist = JSON.stringify(this.advanceFilter.getValues(false));
 
-		params.module = 'CustomView';
-		params.action = 'Save';
+        params.module = 'CustomView';
+        params.action = 'Save';
 
-		app.request.post({data:params}).then(function(error,data){
-			aDeferred.resolve(data);
-		})
-		return aDeferred.promise();
-	},
+        app.request.post({data:params}).then(function(error,data){
+            aDeferred.resolve(data);
+        })
+        return aDeferred.promise();
+    }
 
-	/**
-	 * Function which will save the filter and show the list view of new custom view
-	 */
-	saveAndViewFilter : function(params){
+    /**
+     * Function which will save the filter and show the list view of new custom view
+     */
+    saveAndViewFilter(params) {
         app.helper.showProgress();
-		this.saveFilter(params).then(
-			function(response){
+        this.saveFilter(params).then(
+            function(response){
                 app.helper.hideProgress();
-				var url = response['listviewurl'];
-				window.location.href=url;
-			},
-			function(error) {
+                var url = response['listviewurl'];
+                window.location.href=url;
+            },
+            function(error) {
 
-			}
-		);
-	},
-    
-    initiateListInstance : function(container)   {
+            }
+        );
+    }
+
+    initiateListInstance(container) {
         var listInstance = new Vtiger_AdvanceSearchList_Js();
         listInstance.setListViewContainer(container.find('.moduleResults-container')).setModuleName(this.getSearchModule());
         listInstance.registerEvents();
-    },
+    }
 
-	
-
-	/**
-	 * Function which will perform search and other operaions
-	 */
-	performSearch : function() {
+    /**
+     * Function which will perform search and other operaions
+     */
+    performSearch() {
         var self = this;
-		this.search().then(function(data){
+        this.search().then(function(data){
             if(jQuery('#searchResults-container').find('.searchResults').length > 0)  {
                 jQuery('#searchResults-container').find('.searchResults').html(data);
             }else{
@@ -305,39 +301,39 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
             self.initiateListInstance(jQuery('.searchResults'));
             self.registerShowFiler();
             self.hideSearch();
-		});
-	},
+        });
+    }
 
-	/**
-	 * Function which will perform the validation for the advance filter fields
-	 * @return : deferred promise - resolves if validation succeded if not failure
-	 */
-	performValidation : function() {
-		var thisInstance = this;
-		this.formValidationDeferred = jQuery.Deferred();
+    /**
+     * Function which will perform the validation for the advance filter fields
+     * @return : deferred promise - resolves if validation succeded if not failure
+     */
+    performValidation() {
+        var thisInstance = this;
+        this.formValidationDeferred = jQuery.Deferred();
         thisInstance.formValidationDeferred.resolve();
-		
-		var controlForm = this.getFilterForm();
-		var validationDone = function(form, status){
-			if(status) {
-				thisInstance.formValidationDeferred.resolve();
-			}else{
-				thisInstance.formValidationDeferred.reject();
-			}
-		}
-		//To perform validation registration only once
-		if(!this.filterValidationRegistered){
-			this.filterValidationRegistered = true;
-			controlForm.validationEngine({
-				'onValidationComplete' : validationDone
-			});
-		}
-		//This will trigger the validation
-		controlForm.submit();
-		return this.formValidationDeferred.promise();
-	},
-    
-    advanceSearchTriggerIntiatorHandler  : function () {
+        
+        var controlForm = this.getFilterForm();
+        var validationDone = function(form, status){
+            if(status) {
+                thisInstance.formValidationDeferred.resolve();
+            }else{
+                thisInstance.formValidationDeferred.reject();
+            }
+        }
+        //To perform validation registration only once
+        if(!this.filterValidationRegistered){
+            this.filterValidationRegistered = true;
+            controlForm.validationEngine({
+                'onValidationComplete' : validationDone
+            });
+        }
+        //This will trigger the validation
+        controlForm.submit();
+        return this.formValidationDeferred.promise();
+    }
+
+    advanceSearchTriggerIntiatorHandler() {
         var self = this;
         if(this.isSearchShown()){
             this.hideSearch();
@@ -350,67 +346,67 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
         this.initiateSearch().then(function() {
             self.selectBasicSearchValue();
         });
-    },
-    
+    }
+
     /**
-	 * Function which will register the show filer invocation
-	 */
-	registerShowFiler : function() {
-		var thisInstance = this;
-		jQuery('#showFilter').on('click',function(e){
-			thisInstance.showAdvanceSearch();
-		});
-	},
+     * Function which will register the show filer invocation
+     */
+    registerShowFiler() {
+        var thisInstance = this;
+        jQuery('#showFilter').on('click',function(e){
+            thisInstance.showAdvanceSearch();
+        });
+    }
 
-	/**
-	 * Function which will register events
-	 */
-	registerEvents : function() {
-		var thisInstance = this;
-		var container = this.getContainer();
+    /**
+     * Function which will register events
+     */
+    registerEvents() {
+        var thisInstance = this;
+        var container = this.getContainer();
         
-		container.on('change','#searchModuleList', function(e){
-			var selectElement = jQuery(e.currentTarget);
-			var selectedModuleName = selectElement.val();
+        container.on('change','#searchModuleList', function(e){
+            var selectElement = jQuery(e.currentTarget);
+            var selectedModuleName = selectElement.val();
 
-			thisInstance.setSearchModule(selectedModuleName);
+            thisInstance.setSearchModule(selectedModuleName);
 
-			thisInstance.initiateSearch().then(function(){
+            thisInstance.initiateSearch().then(function(){
                 thisInstance.selectBasicSearchValue();
             });
-		});
+        });
 
-		jQuery('#advanceSearchButton').on('click', function(e){
-			var searchModule = thisInstance.getSearchModule();
+        jQuery('#advanceSearchButton').on('click', function(e){
+            var searchModule = thisInstance.getSearchModule();
                //If no module is selected
-			if(searchModule.length <= 0) {
-				app.getChosenElementFromSelect(jQuery('#searchModuleList'))
-						.validationEngine('showPrompt', app.vtranslate('JS_SELECT_MODULE'), 'error','topRight',true)
-				return;
-			}
-			thisInstance.performValidation().then(
-				function(){
-					 thisInstance.performSearch();
-				},
-				function(){
+            if(searchModule.length <= 0) {
+                app.getChosenElementFromSelect(jQuery('#searchModuleList'))
+                        .validationEngine('showPrompt', app.vtranslate('JS_SELECT_MODULE'), 'error','topRight',true)
+                return;
+            }
+            thisInstance.performValidation().then(
+                function(){
+                     thisInstance.performSearch();
+                },
+                function(){
 
-				}
-			);
-		});
+                }
+            );
+        });
 
-		jQuery('#advanceIntiateSave').on('click', function(e){
-			var currentElement = jQuery(e.currentTarget);
-			currentElement.addClass('hide');
-			var actionsContainer = currentElement.closest('.actions');
-			jQuery('input[name="viewname"]',actionsContainer).removeClass('hide').addClass('slideRight');
-			jQuery('#advanceSave').removeClass('hide');
-		});
+        jQuery('#advanceIntiateSave').on('click', function(e){
+            var currentElement = jQuery(e.currentTarget);
+            currentElement.addClass('hide');
+            var actionsContainer = currentElement.closest('.actions');
+            jQuery('input[name="viewname"]',actionsContainer).removeClass('hide').addClass('slideRight');
+            jQuery('#advanceSave').removeClass('hide');
+        });
 
-		jQuery('#advanceSave').on('click',function(e){
-			var actionsContainer = jQuery(e.currentTarget).closest('.actions');
-			var filterNameField = jQuery('input[name="viewname"]',actionsContainer);
-			var value = filterNameField.val();
-			if(value.length <= 0) {
+        jQuery('#advanceSave').on('click',function(e){
+            var actionsContainer = jQuery(e.currentTarget).closest('.actions');
+            var filterNameField = jQuery('input[name="viewname"]',actionsContainer);
+            var value = filterNameField.val();
+            if(value.length <= 0) {
                 vtUtils.showValidationMessage(filterNameField, app.vtranslate('JS_REQUIRED_FIELD'), {
                     position: {
                         my: 'bottom left',
@@ -418,30 +414,30 @@ Vtiger_BasicSearch_Js("Vtiger_AdvanceSearch_Js",{
                         container: container.closest('.data')
                     }
                 });
-				return;
-			}
+                return;
+            }
 
-			var searchModule = thisInstance.getSearchModule();
-			//If no module is selected
-			if(searchModule.length <= 0) {
-				app.getChosenElementFromSelect(jQuery('#searchModuleList'))
-						.validationEngine('showPrompt', app.vtranslate('JS_SELECT_MODULE'), 'error','topRight',true)
-				return;
-			}
+            var searchModule = thisInstance.getSearchModule();
+            //If no module is selected
+            if(searchModule.length <= 0) {
+                app.getChosenElementFromSelect(jQuery('#searchModuleList'))
+                        .validationEngine('showPrompt', app.vtranslate('JS_SELECT_MODULE'), 'error','topRight',true)
+                return;
+            }
 
-			thisInstance.performValidation().then(function(){
-				var params = {};
-				params.viewname = value;
-				thisInstance.saveAndViewFilter(params);
-			});
-		});
+            thisInstance.performValidation().then(function(){
+                var params = {};
+                params.viewname = value;
+                thisInstance.saveAndViewFilter(params);
+            });
+        });
 
-		//DO nothing on submit of filter form
-		this.getFilterForm().on('submit',function(e){
-			e.preventDefault();
-		})
+        //DO nothing on submit of filter form
+        this.getFilterForm().on('submit',function(e){
+            e.preventDefault();
+        })
 
-		//To set the search module with the currently selected values.
-		this.setSearchModule(jQuery('#searchModuleList').val());
-	}
-})
+        //To set the search module with the currently selected values.
+        this.setSearchModule(jQuery('#searchModuleList').val());
+    }
+}

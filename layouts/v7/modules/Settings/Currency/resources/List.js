@@ -6,14 +6,13 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  *************************************************************************************/
-Settings_Currency_Js('Settings_Currency_List_Js', {}, {
-	
-	init : function() {
-            this._super();
-		this.addComponents();
-	},
-	
-	addComponents : function() {
-		this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
-	}
-});
+class Settings_Currency_List_Js extends Settings_Currency_Js {
+    constructor() {
+        super();
+        this.addComponents();
+    }
+
+    addComponents() {
+        this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
+    }
+};

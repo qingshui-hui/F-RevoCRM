@@ -7,12 +7,11 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Edit_Js("Settings_Vtiger_Edit_Js",{},{
-    
-    registerEvents : function() {
-        this._super();
+class Settings_Vtiger_Edit_Js extends Vtiger_Edit_Js {
+    registerEvents() {
+        super.registerEvents();
         //Register events for settings side menu (Search and collapse open icon )
         var instance = new Settings_Vtiger_Index_Js(); 
         instance.registerBasicSettingsEvents();
     }
-})
+}

@@ -7,10 +7,8 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class('Vtiger_ListSidebar_Js',{},{
-    
-    
-    registerFilterSeach : function () {
+class Vtiger_ListSidebar_Js extends Vtiger_Class_Js {
+    registerFilterSeach() {
         var self = this;
         var filters = jQuery('#module-filters');
         filters.find('.search-list').on('keyup',function(e){
@@ -42,10 +40,10 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
                 }
             });
         })
-    },
-    
-	registerFilters: function() {
-		var self = this;
+    }
+
+    registerFilters() {
+        var self = this;
         var filters = jQuery('.module-filters').not('.module-extensions');
         var scrollContainers = filters.find(".scrollContainer");
         // applying scroll to filters, tags & extensions
@@ -58,7 +56,7 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
         
         this.registerFilterSeach();
         filters.on('click','.listViewFilter', function(e){
-			e.preventDefault();
+            e.preventDefault();
             var targetElement = jQuery(e.target);
             if(targetElement.is('.dropdown-toggle') || targetElement.closest('ul').hasClass('dropdown-menu') ) return;
             var element = jQuery(e.currentTarget);
@@ -69,8 +67,8 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
             el.closest('li').addClass('active');
             self.getParentInstance().filterClick = true;
             self.getParentInstance().loadFilter(el.data('filter-id'), {'page' : ''});
-			var filtername = jQuery('a[class="filterName"]',element).text();
-			jQuery('.module-action-content').find('.filter-name').html('&nbsp;&nbsp;<span class="fa fa-angle-right" aria-hidden="true"></span>').text(filtername);
+            var filtername = jQuery('a[class="filterName"]',element).text();
+            jQuery('.module-action-content').find('.filter-name').html('&nbsp;&nbsp;<span class="fa fa-angle-right" aria-hidden="true"></span>').text(filtername);
         });
         
         jQuery('#createFilter').on('click',function(e){
@@ -133,25 +131,25 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
         })
         
         app.event.on('ListViewFilterLoaded', function(event, container, params) {
-			// TODO - Update pagination...
-		});
-	},
-    
-    loadListView : function(viewId, params){
+            // TODO - Update pagination...
+        });
+    }
+
+    loadListView(viewId, params) {
         this.getParentInstance().resetData();
         this.getParentInstance().loadFilter(viewId, params);
-    },
-    
-    unMarkAllFilters : function() {
+    }
+
+    unMarkAllFilters() {
         jQuery('.listViewFilter').removeClass('active');
-    },
-    
-    unMarkAllTags : function() {
+    }
+
+    unMarkAllTags() {
         var container = jQuery('#listViewTagContainer');
         container.find('.tag').removeClass('active').find('i.activeToggleIcon').removeClass('fa-circle-o').addClass('fa-circle');
-    },
-    
-    registerPopOverContent: function () {
+    }
+
+    registerPopOverContent() {
         var element = jQuery(".list-group");
 
         jQuery.each(element.find('[rel="popover"]'), function (i, ele) {
@@ -221,10 +219,9 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
         });
         });
          
-    },
-    
-    
-    registerTagClick : function() {
+    }
+
+    registerTagClick() {
         var self = this;
         var container = jQuery('#listViewTagContainer');
         container.on('click', '.tag', function(e) {
@@ -260,8 +257,9 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
             container.find('.moreListTags').removeClass('hide');
             jQuery(e.currentTarget).addClass('hide');
         });
-    },
-    registerEvents : function() {
+    }
+
+    registerEvents() {
         this.registerFilters();
         this.registerTagClick();
         this.registerPopOverContent();
@@ -281,4 +279,4 @@ Vtiger.Class('Vtiger_ListSidebar_Js',{},{
             }
         });
     }
-});
+};

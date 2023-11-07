@@ -7,23 +7,22 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Edit_Js("HelpDesk_Edit_Js", {} ,{
-
-	/**
-	 * Function to register event for ckeditor for description field
-	 */
-	registerEventForCkEditor : function(){
-		var form = this.getForm();
+class HelpDesk_Edit_Js extends Vtiger_Edit_Js {
+    /**
+     * Function to register event for ckeditor for description field
+     */
+    registerEventForCkEditor() {
+        var form = this.getForm();
         var ckContentElement = form.find('[name="description"]');
         this.addFieldCkEditor(ckContentElement);
-		ckContentElement = form.find('[name="solution"]');
+        ckContentElement = form.find('[name="solution"]');
         this.addFieldCkEditor(ckContentElement);
-	},
+    }
 
-	registerEvents : function() {
+    registerEvents() {
         this.registerEventForCkEditor();
-        this._super();
-	}
-});
+        super.registerEvents();
+    }
+};
 
 

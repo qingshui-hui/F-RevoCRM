@@ -7,33 +7,32 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-jQuery.Class('Vtiger.Class',{},{
-    
-    addComponent : function(componentName) {
-        if(window[componentName]){
+class Vtiger_Class_Js {
+    addComponent(componentName) {
+        if(componentName && eval(`typeof ${componentName}`) !== "undefined"){
+            console.log(componentName)
             if(typeof this._components == "undefined") {
                 this._components = {};
             }
-            this._components[componentName] = window[componentName];
+            this._components[componentName] = eval(componentName);
         }
         
-    },
-    
-    addModuleSpecificComponent : function(view,module,parent){
-		var componentName = app.getModuleSpecificViewClass(view,module,parent);
-		this.addComponent(componentName);
-    },
-    
-    setParentInstance : function(instance){
+    }
+
+    addModuleSpecificComponent(view, module, parent) {
+        var componentName = app.getModuleSpecificViewClass(view,module,parent);
+        this.addComponent(componentName);
+    }
+
+    setParentInstance(instance) {
         this._parent = instance;
-    },
-    
-    getParentInstance : function() {
+    }
+
+    getParentInstance() {
         return this._parent;
-    },
-    
-    
-    intializeComponents : function() {
+    }
+
+    intializeComponents() {
         if(typeof this._componentInstances  == "undefined") {
             this._componentInstances = {};
         }
@@ -41,7 +40,7 @@ jQuery.Class('Vtiger.Class',{},{
             if(componentName in this._componentInstances) {
                 continue;
             }
-            this._componentInstances[componentName] = new this._components[componentName]();
+            this._componentInstances[componentName] = eval(`new ${this._components[componentName]}()`);
             
             var componentInstance = this._componentInstances[componentName]
             if(typeof componentInstance.intializeComponents == "function")
@@ -54,25 +53,25 @@ jQuery.Class('Vtiger.Class',{},{
             componentInstance.registerEvents();
             
         }
-    },
-    
-    getComponentInstance : function(componentName) {
-		if(typeof this._components != 'undefined' && typeof this._componentInstances != 'undefined'){
-			if(componentName in this._components){
-				if(componentName in this._componentInstances) {
-					return this._componentInstances[componentName];
-				}
-			}
-		}
+    }
+
+    getComponentInstance(componentName) {
+        if(typeof this._components != 'undefined' && typeof this._componentInstances != 'undefined'){
+            if(componentName in this._components){
+                if(componentName in this._componentInstances) {
+                    return this._componentInstances[componentName];
+                }
+            }
+        }
         return false;
-    },
-	
-	getModuleSpecificComponentInstance : function(view, module, parent) {
-		var componentName = app.getModuleSpecificViewClass(view,module,parent);
-		return this.getComponentInstance(componentName);
-	},
-    
-    registerEvents : function() {
+    }
+
+    getModuleSpecificComponentInstance(view, module, parent) {
+        var componentName = app.getModuleSpecificViewClass(view,module,parent);
+        return this.getComponentInstance(componentName);
+    }
+
+    registerEvents() {
         
     }
-});
+};

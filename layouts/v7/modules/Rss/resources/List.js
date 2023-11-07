@@ -7,26 +7,26 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_List_Js("Rss_List_Js",{},{ 
+class Rss_List_Js extends Vtiger_List_Js {
     /**
      * Function get the height of the document
      * @return <integer> height
      */
-    getDocumentHeight : function() {
+    getDocumentHeight() {
         return jQuery(document).height();
-    },
-    
-    registerRssAddButtonClickEvent : function() {
+    }
+
+    registerRssAddButtonClickEvent() {
         var thisInstance = this;
         jQuery('.rssAddButton').on('click', function() {
             thisInstance.showRssAddForm();
         })
-    },
-    
+    }
+
     /**
      * Function show rssAddForm model
      */
-    showRssAddForm : function() {
+    showRssAddForm() {
         var thisInstance = this;
         thisInstance.getRssAddFormUi().then(function(data) {
             var resetPasswordUi = jQuery('.rssAddFormContainer').find('#rssAddFormUi');
@@ -45,13 +45,13 @@ Vtiger_List_Js("Rss_List_Js",{},{
                 app.helper.showModal(resetPasswordUi, {cb: callback});
             }
         });
-    },
-    
+    }
+
     /**
      * Function to get the rss add form
      * @param <string> url
      */
-    getRssAddFormUi : function(url) {
+    getRssAddFormUi(url) {
         var aDeferred = jQuery.Deferred();
         var resetPasswordContainer = jQuery('.rssAddFormContainer');
         var resetPasswordUi = resetPasswordContainer.find('#rssAddFormUi');
@@ -73,13 +73,13 @@ Vtiger_List_Js("Rss_List_Js",{},{
             aDeferred.resolve();
         }
         return aDeferred.promise();
-    },
-    
+    }
+
     /**
      * Function to save rss feed
      * @parm form
      */
-    rssFeedSave : function(form) {
+    rssFeedSave(form) {
         var thisInstance = this;
         var data = form.serializeFormData();
         app.helper.showProgress();
@@ -102,25 +102,25 @@ Vtiger_List_Js("Rss_List_Js",{},{
             }
             }
         );
-    },
-    
+    }
+
     /**
      * Function to register click on the rss sidebar link
      */
-    registerRssUrlClickEvent : function() {
+    registerRssUrlClickEvent() {
         var thisInstance = this;
         jQuery('.quickWidgetContainer').on('click','.rssLink', function(e) {
             var element = jQuery(e.currentTarget);
             var id = element.data('id');
             thisInstance.getRssFeeds(id);
         });
-    },
-    
+    }
+
     /**
      * Function to get the feeds for specific id
      * @param <integer> id
      */
-    getRssFeeds : function(id) {
+    getRssFeeds(id) {
         var thisInstance = this;
         var aDeferred = jQuery.Deferred();
         var container = thisInstance.getListViewContainer();
@@ -138,22 +138,22 @@ Vtiger_List_Js("Rss_List_Js",{},{
         });
         
         return aDeferred.promise();  
-    }, 
-    
+    }
+
     /**
      * Function to get the height of the Feed Container 
      * @param container
      */
-    setFeedContainerHeight : function(container) {
+    setFeedContainerHeight(container) {
         var height = this.getDocumentHeight()/2;
         container.find('.feedListContainer').height(height);
-    },
-    
+    }
+
     /**
      * Function to register the click of feeds
      * @param container
      */
-    registerFeedClickEvent : function(container) {
+    registerFeedClickEvent(container) {
         var thisInstance = this;
         container.on('click' , '.feedLink', function(e) {  
             var element = jQuery(e.currentTarget);
@@ -161,14 +161,14 @@ Vtiger_List_Js("Rss_List_Js",{},{
             var frameElement = thisInstance.getFrameElement(url)
             container.find('.feedFrame').html(frameElement);
         });
-    },
-    
+    }
+
     /**
      * Function to get the iframe element
      * @param <string> url
      * @retrun <element> frameElement
      */
-    getFrameElement : function(url) {
+    getFrameElement(url) {
         app.helper.showProgress();
         var frameElement = jQuery('<iframe>', {
             id:  'feedFrame',
@@ -186,14 +186,14 @@ Vtiger_List_Js("Rss_List_Js",{},{
         });
         
         return frameElement;
-    },
-    
+    }
+
     /**
      * Function to get the html contents from url
      * @param <string> url
      * @return <string> html contents
      */
-    getHtml : function(url) {
+    getHtml(url) {
         var aDeferred = jQuery.Deferred();
         var params = {
             'module' : app.getModuleName(),
@@ -205,12 +205,12 @@ Vtiger_List_Js("Rss_List_Js",{},{
         });
         
         return aDeferred.promise();  
-    },
-    
+    }
+
     /**
      * Function to register record delete event 
      */
-    registerDeleteRecordClickEvent: function(){
+    registerDeleteRecordClickEvent() {
         var container = this.getListViewContainer();
         var thisInstance = this;
         jQuery('#page').on('click', '#deleteButton', function(e){
@@ -218,24 +218,24 @@ Vtiger_List_Js("Rss_List_Js",{},{
             var feedContainer = elem.closest('.feedContainer');
             thisInstance.deleteRecord(feedContainer);
         })
-    },
-    
+    }
+
     /**
      * Function to delete the record
      */
-    deleteRecord : function(container) {
+    deleteRecord(container) {
         var thisInstance = this;
         var recordId = container.find('#recordId').val();
-		var message = app.vtranslate('LBL_DELETE_CONFIRMATION');
-		app.helper.showConfirmationBox({'message' : message}).then(function(e) {
-				var module = app.getModuleName();
-				var postData = {
-					"module": module,
-					"action": "DeleteAjax",
-					"record": recordId
-				}
-				var deleteMessage = app.vtranslate('JS_RECORD_GETTING_DELETED');
-				app.helper.showProgress();
+        var message = app.vtranslate('LBL_DELETE_CONFIRMATION');
+        app.helper.showConfirmationBox({'message' : message}).then(function(e) {
+                var module = app.getModuleName();
+                var postData = {
+                    "module": module,
+                    "action": "DeleteAjax",
+                    "record": recordId
+                }
+                var deleteMessage = app.vtranslate('JS_RECORD_GETTING_DELETED');
+                app.helper.showProgress();
             app.request.post({'data': postData}).then(function (error, data) {
                 app.helper.hideProgress();
                 if (!error) {
@@ -249,27 +249,27 @@ Vtiger_List_Js("Rss_List_Js",{},{
                     function (error, err) {
 
                     }
-				);
-			},
-			function(error, err){
-			}
-		);
-    },
-    
+                );
+            },
+            function(error, err){
+            }
+        );
+    }
+
     /**
      * Function to register make default button click event
      */
-    registerMakeDefaultClickEvent : function(container) {
+    registerMakeDefaultClickEvent(container) {
         var thisInstance = this;
         container.on('click','#makeDefaultButton',function() {
             thisInstance.makeDefault(container);
         }); 
-    },
-    
+    }
+
     /**
      * Function to make a record as default rss feed
      */
-    makeDefault : function(container) {
+    makeDefault(container) {
         var listInstance = Vtiger_List_Js.getInstance();
         var recordId = container.find('#recordId').val();
         var module = app.getModuleName();
@@ -292,9 +292,9 @@ Vtiger_List_Js("Rss_List_Js",{},{
                 }
             }
         );
-    },
-    
-    loadRssWidget: function (data, result) {
+    }
+
+    loadRssWidget(data, result) {
         var aDeferred = jQuery.Deferred();
         var widgetContainer = jQuery('.widgetContainer');
         var noRssFeeds = widgetContainer.find('li.noRssFeeds');
@@ -315,9 +315,10 @@ Vtiger_List_Js("Rss_List_Js",{},{
             }
         }
         return aDeferred.promise();
-    },    
-    registerEvents : function() {
-        this._super();
+    }
+
+    registerEvents() {
+        super.registerEvents();
         var container = this.getListViewContainer();
         this.registerRssAddButtonClickEvent();
         this.registerRssUrlClickEvent();
@@ -326,4 +327,4 @@ Vtiger_List_Js("Rss_List_Js",{},{
         this.registerMakeDefaultClickEvent(container);
         this.setFeedContainerHeight(container);
     }
-});
+};

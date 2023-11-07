@@ -7,21 +7,19 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Edit_Js("Users_Edit_Js",{},{
-	
-	
-	duplicateCheckCache : {},
-    
-	/**
-	 * Function to register recordpresave event
-	 */
-	registerRecordPreSaveEvent : function(form){
-		var thisInstance = this;
-		app.event.on(Vtiger_Edit_Js.recordPresaveEvent, function(e, data) {
-			var userName = jQuery('input[name="user_name"]').val();
-			var newPassword = jQuery('input[name="user_password"]').val();
-			var confirmPassword = jQuery('input[name="confirm_password"]').val();
-			var record = jQuery('input[name="record"]').val();
+class Users_Edit_Js extends Vtiger_Edit_Js {
+    duplicateCheckCache = {};
+
+    /**
+     * Function to register recordpresave event
+     */
+    registerRecordPreSaveEvent(form) {
+        var thisInstance = this;
+        app.event.on(Vtiger_Edit_Js.recordPresaveEvent, function(e, data) {
+            var userName = jQuery('input[name="user_name"]').val();
+            var newPassword = jQuery('input[name="user_password"]').val();
+            var confirmPassword = jQuery('input[name="confirm_password"]').val();
+            var record = jQuery('input[name="record"]').val();
             var firstName = jQuery('input[name="first_name"]').val();
             var lastName = jQuery('input[name="last_name"]').val();
             var specialChars = /[<\>\"\,]/;
@@ -30,21 +28,21 @@ Vtiger_Edit_Js("Users_Edit_Js",{},{
                 e.preventDefault();
                 return false;
             }
-			var firstName = jQuery('input[name="first_name"]').val();
-			var lastName = jQuery('input[name="last_name"]').val();
-			if((firstName.indexOf(',') !== -1) || (lastName.indexOf(',') !== -1)) {
+            var firstName = jQuery('input[name="first_name"]').val();
+            var lastName = jQuery('input[name="last_name"]').val();
+            if((firstName.indexOf(',') !== -1) || (lastName.indexOf(',') !== -1)) {
                 app.helper.showErrorNotification({message :app.vtranslate('JS_COMMA_NOT_ALLOWED_USERS')});
-				e.preventDefault();
-				return false;
-			}
-			if(record == ''){
-				if(newPassword != confirmPassword){
+                e.preventDefault();
+                return false;
+            }
+            if(record == ''){
+                if(newPassword != confirmPassword){
                     app.helper.showErrorNotification({message :app.vtranslate('JS_REENTER_PASSWORDS')});
-					e.preventDefault();
-				}else if(!app.helper.checkStrengthPassword(newPassword)) {
+                    e.preventDefault();
+                }else if(!app.helper.checkStrengthPassword(newPassword)) {
                     app.helper.showErrorNotification({message :app.vtranslate('JS_INVALID_STRENGTH_PASSWORDS')});
-					e.preventDefault();
-				}
+                    e.preventDefault();
+                }
 
                 if(!(userName in thisInstance.duplicateCheckCache)) {
                     e.preventDefault();
@@ -71,58 +69,58 @@ Vtiger_Edit_Js("Users_Edit_Js",{},{
                 }
             }
         })
-	},
-	
-	checkDuplicateUser: function(userName){
-		var aDeferred = jQuery.Deferred();
-		var params = {
-				'module': app.getModuleName(),
-				'action' : "SaveAjax",
-				'mode' : 'userExists',
-				'user_name' : userName
-			}
-		app.request.post({data:params}).then(
-				function(err,data) {
-					if(data){
-						aDeferred.resolve(data);
-					}else{
-						aDeferred.reject(data);
-					}
-				}
-			);
-		return aDeferred.promise();
-	},
-	
-	/**
-	 * Function load the ckeditor for signature field in edit view of my preference page.
-	 */
-	registerSignatureEvent: function(){
-		var templateContentElement = jQuery("#Users_editView_fieldName_signature");
-		if(templateContentElement.length > 0) {
-			var ckEditorInstance = new Vtiger_CkEditor_Js();
-			//Customized toolbar configuration for ckeditor  
-			//to support basic operations
-			var customConfig = {
-				toolbar: [
-					{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup','align','list', 'indent','colors' ,'links'], items: [ 'Bold', 'Italic', 'Underline', '-','TextColor', 'BGColor' ,'-','JustifyLeft', 'JustifyCenter', 'JustifyRight', '-', 'NumberedList', 'BulletedList','-', 'Link', 'Unlink','Image','-','RemoveFormat'] },
-					{ name: 'styles', items: ['Font', 'FontSize' ] },
+    }
+
+    checkDuplicateUser(userName) {
+        var aDeferred = jQuery.Deferred();
+        var params = {
+                'module': app.getModuleName(),
+                'action' : "SaveAjax",
+                'mode' : 'userExists',
+                'user_name' : userName
+            }
+        app.request.post({data:params}).then(
+                function(err,data) {
+                    if(data){
+                        aDeferred.resolve(data);
+                    }else{
+                        aDeferred.reject(data);
+                    }
+                }
+            );
+        return aDeferred.promise();
+    }
+
+    /**
+     * Function load the ckeditor for signature field in edit view of my preference page.
+     */
+    registerSignatureEvent() {
+        var templateContentElement = jQuery("#Users_editView_fieldName_signature");
+        if(templateContentElement.length > 0) {
+            var ckEditorInstance = new Vtiger_CkEditor_Js();
+            //Customized toolbar configuration for ckeditor  
+            //to support basic operations
+            var customConfig = {
+                toolbar: [
+                    { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup','align','list', 'indent','colors' ,'links'], items: [ 'Bold', 'Italic', 'Underline', '-','TextColor', 'BGColor' ,'-','JustifyLeft', 'JustifyCenter', 'JustifyRight', '-', 'NumberedList', 'BulletedList','-', 'Link', 'Unlink','Image','-','RemoveFormat'] },
+                    { name: 'styles', items: ['Font', 'FontSize' ] },
                     {name: 'document', items:['Source']}
-				]};
-			ckEditorInstance.loadCkEditor(templateContentElement,customConfig);
-		}
-	},
-	
-	registerEvents : function() {
-        this._super();
-		var form = this.getForm();
-		this.registerRecordPreSaveEvent(form);
+                ]};
+            ckEditorInstance.loadCkEditor(templateContentElement,customConfig);
+        }
+    }
+
+    registerEvents() {
+        super.registerEvents();
+        var form = this.getForm();
+        this.registerRecordPreSaveEvent(form);
         this.registerSignatureEvent();
         Settings_Users_PreferenceEdit_Js.registerChangeEventForCurrencySeparator();
         
         var instance = new Settings_Vtiger_Index_Js(); 
         instance.registerBasicSettingsEvents();
-	}
-});
+    }
+};
 
 // Actually, Users Module is in Settings. Controller in application.js will check for Settings_Users_Edit_Js 
-Users_Edit_Js("Settings_Users_Edit_Js");
+class Settings_Users_Edit_Js extends Users_Edit_Js {}

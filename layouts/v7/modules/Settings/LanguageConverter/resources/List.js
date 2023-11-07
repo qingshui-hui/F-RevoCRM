@@ -6,14 +6,13 @@
  * Portions created by vtiger are Copyright (C) vtiger.
  * All Rights Reserved.
  *************************************************************************************/
-Settings_LanguageConverter_Js('Settings_LanguageConverter_List_Js', {}, {
-	
-	init : function() {
-            this._super();
-		this.addComponents();
-	},
-	
-	addComponents : function() {
-		this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
-	}
-});
+class Settings_LanguageConverter_List_Js extends Settings_LanguageConverter_Js {
+    constructor() {
+            super();
+        this.addComponents();
+    }
+
+    addComponents() {
+        this.addModuleSpecificComponent('Index','Vtiger',app.getParentModuleName());
+    }
+};

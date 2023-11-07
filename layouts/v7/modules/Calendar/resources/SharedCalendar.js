@@ -1,386 +1,384 @@
-Calendar_Calendar_Js('Calendar_SharedCalendar_Js', {
+class Calendar_SharedCalendar_Js extends Calendar_Calendar_Js {
+    static currentInstance = false;
+    static calendarViewContainer = false;
+    userList = [];
 
-	currentInstance : false,
-	calendarViewContainer : false
+    getCalendarViewContainer() {
+        if(!Calendar_SharedCalendar_Js.calendarViewContainer.length) {
+            Calendar_SharedCalendar_Js.calendarViewContainer = jQuery('#sharedcalendar');
+        }
+        return Calendar_SharedCalendar_Js.calendarViewContainer;
+    }
 
-}, {
-	userList: [],
+    getFeedRequestParams(start, end, feedCheckbox) {
+        var dateFormat = 'YYYY-MM-DD';
+        var startDate = start.format(dateFormat);
+        var endDate = end.format(dateFormat);
+        return {
+            'start' : startDate,
+            'end' : endDate,
+            'type' : feedCheckbox.data('calendarFeed'),
+            'userid' : feedCheckbox.data('calendarUserid'),
+            'group' : feedCheckbox.data('calendarGroup'),
+            'color' : feedCheckbox.data('calendarFeedColor'),
+            'textColor' : feedCheckbox.data('calendarFeedTextcolor')
+        };
+    }
 
-	getCalendarViewContainer : function() {
-		if(!Calendar_SharedCalendar_Js.calendarViewContainer.length) {
-			Calendar_SharedCalendar_Js.calendarViewContainer = jQuery('#sharedcalendar');
-		}
-		return Calendar_SharedCalendar_Js.calendarViewContainer;
-	},
+    removeEvents(feedCheckbox) {
+        var userId = feedCheckbox.data('calendarUserid');
+        this.getCalendarViewContainer().fullCalendar('removeEvents', 
+        function(eventObj) {
+            return parseInt(userId) === parseInt(eventObj.userid);
+        });
+    }
 
-	getFeedRequestParams : function(start,end,feedCheckbox) {
-		var dateFormat = 'YYYY-MM-DD';
-		var startDate = start.format(dateFormat);
-		var endDate = end.format(dateFormat);
-		return {
-			'start' : startDate,
-			'end' : endDate,
-			'type' : feedCheckbox.data('calendarFeed'),
-			'userid' : feedCheckbox.data('calendarUserid'),
-			'group' : feedCheckbox.data('calendarGroup'),
-			'color' : feedCheckbox.data('calendarFeedColor'),
-			'textColor' : feedCheckbox.data('calendarFeedTextcolor')
-		};
-	},
+    _colorize(feedCheckbox) {
+        var thisInstance = this;
+        var sourcekey = feedCheckbox.data('calendarSourcekey');
+        var color = feedCheckbox.data('calendarFeedColor');
+        if(color === '' || typeof color === 'undefined') {
+            color = app.storage.get(sourcekey);
+            if(!color) {
+                color = thisInstance.getRandomColor();
+                app.storage.set(sourcekey, color);
+            }
+            feedCheckbox.data('calendarFeedColor',color);
+            feedCheckbox.closest('.calendar-feed-indicator').css({'background-color':color});
+        }
+    }
 
-	removeEvents : function(feedCheckbox) {
-		var userId = feedCheckbox.data('calendarUserid');
-		this.getCalendarViewContainer().fullCalendar('removeEvents', 
-		function(eventObj) {
-			return parseInt(userId) === parseInt(eventObj.userid);
-		});
-	},
+    colorizeFeed(feedCheckbox) {
+        this._colorize(feedCheckbox);
+        this.assignFeedTextColor(feedCheckbox);
+    }
 
-	_colorize : function(feedCheckbox) {
-		var thisInstance = this;
-		var sourcekey = feedCheckbox.data('calendarSourcekey');
-		var color = feedCheckbox.data('calendarFeedColor');
-		if(color === '' || typeof color === 'undefined') {
-			color = app.storage.get(sourcekey);
-			if(!color) {
-				color = thisInstance.getRandomColor();
-				app.storage.set(sourcekey, color);
-			}
-			feedCheckbox.data('calendarFeedColor',color);
-			feedCheckbox.closest('.calendar-feed-indicator').css({'background-color':color});
-		}
-	},
+    registerAddUserCalendarViewActions(modalContainer) {
+        this.registerColorEditorEvents(modalContainer);
+    }
 
-	colorizeFeed : function(feedCheckbox) {
-		this._colorize(feedCheckbox);
-		this.assignFeedTextColor(feedCheckbox);
-	},
+    showAddUserCalendarView() {
+        var thisInstance = this;
+        var params = {
+            module : app.getModuleName(),
+            view : 'UserCalendarViews',
+            mode : 'addUserCalendar'
+        };
+        app.helper.showProgress();
+        app.request.post({'data':params}).then(function(e,data) {
+            app.helper.hideProgress();
+            if(!e) {
+                if(jQuery(data).find('select[name="usersList"] > option').length) {
+                    app.helper.showModal(data,{
+                        'cb' : function(modalContainer) {
+                            thisInstance.registerAddUserCalendarViewActions(modalContainer);
+                        }
+                    });
+                } else {
+                    app.helper.showErrorNotification({
+                        'message' : app.vtranslate('JS_NO_CALENDAR_VIEWS_TO_ADD')
+                    });
+                }
+            } else {
+                console.log("network error : ",e);
+            }
+        });
+    }
 
-	registerAddUserCalendarViewActions : function(modalContainer) {
-		this.registerColorEditorEvents(modalContainer);
-	},
+    showAddCalendarFeedEditor() {
+        this.showAddUserCalendarView();
+    }
 
-	showAddUserCalendarView : function() {
-		var thisInstance = this;
-		var params = {
-			module : app.getModuleName(),
-			view : 'UserCalendarViews',
-			mode : 'addUserCalendar'
-		};
-		app.helper.showProgress();
-		app.request.post({'data':params}).then(function(e,data) {
-			app.helper.hideProgress();
-			if(!e) {
-				if(jQuery(data).find('select[name="usersList"] > option').length) {
-					app.helper.showModal(data,{
-						'cb' : function(modalContainer) {
-							thisInstance.registerAddUserCalendarViewActions(modalContainer);
-						}
-					});
-				} else {
-					app.helper.showErrorNotification({
-						'message' : app.vtranslate('JS_NO_CALENDAR_VIEWS_TO_ADD')
-					});
-				}
-			} else {
-				console.log("network error : ",e);
-			}
-		});
-	},
+    registerUserChangeEvent(modalContainer) {
+        var thisInstance = this;
+        var calendarFeedList = jQuery('#calendarview-feeds > ul.feedslist');
+        modalContainer.find('select[name="usersList"]').on('change', 
+        function() {
+            var currentUserId = jQuery(this).val();
+            var currentColor = thisInstance.getRandomColor();
+            var feedCheckbox = calendarFeedList.find('input[data-calendar-userid="'+currentUserId+'"]');
+            if(feedCheckbox.length) {
+                currentColor = feedCheckbox.data('calendarFeedColor');
+            }
+            modalContainer.find('.selectedColor').val(currentColor);
+            modalContainer.find('.calendarColorPicker').ColorPickerSetColor(currentColor);
+        });
+    }
 
-	showAddCalendarFeedEditor : function() {
-		this.showAddUserCalendarView();
-	},
+    saveFeedSettings(modalContainer) {
+        var thisInstance = this;
+        var selectedType = modalContainer.find('.selectedType');
+        var selectedUserId = selectedType.val();
+        var selectedUserName = selectedType.data('typename');
+        var calendarGroup = selectedType.data('calendarGroup');
+        var selectedColor = modalContainer.find('.selectedColor').val();
+        var editorMode = modalContainer.find('.editorMode').val();
 
-	registerUserChangeEvent : function(modalContainer) {
-		var thisInstance = this;
-		var calendarFeedList = jQuery('#calendarview-feeds > ul.feedslist');
-		modalContainer.find('select[name="usersList"]').on('change', 
-		function() {
-			var currentUserId = jQuery(this).val();
-			var currentColor = thisInstance.getRandomColor();
-			var feedCheckbox = calendarFeedList.find('input[data-calendar-userid="'+currentUserId+'"]');
-			if(feedCheckbox.length) {
-				currentColor = feedCheckbox.data('calendarFeedColor');
-			}
-			modalContainer.find('.selectedColor').val(currentColor);
-			modalContainer.find('.calendarColorPicker').ColorPickerSetColor(currentColor);
-		});
-	},
+        var params = {
+            module: 'Calendar',
+            action: 'CalendarUserActions',
+            mode : 'addUserCalendar',
+            selectedUser : selectedUserId,
+            selectedColor : selectedColor
+        };
 
-	saveFeedSettings : function(modalContainer) {
-		var thisInstance = this;
-		var selectedType = modalContainer.find('.selectedType');
-		var selectedUserId = selectedType.val();
-		var selectedUserName = selectedType.data('typename');
-		var calendarGroup = selectedType.data('calendarGroup');
-		var selectedColor = modalContainer.find('.selectedColor').val();
-		var editorMode = modalContainer.find('.editorMode').val();
+        app.helper.showProgress();
+        app.request.post({'data':params}).then(function(e) {
+            if(!e) {
+                var calendarFeedList = jQuery('#calendarview-feeds > ul.feedslist');
+                var message = app.vtranslate('JS_CALENDAR_VIEW_COLOR_UPDATED_SUCCESSFULLY');
+                if(editorMode === 'create') {
+                    var feedIndicatorTemplate = jQuery('#calendarview-feeds').find('ul.dummy > li.feed-indicator-template');
+                    feedIndicatorTemplate.removeClass('.feed-indicator-template');
+                    var newFeedIndicator = feedIndicatorTemplate.clone(true,true);
+                    newFeedIndicator.find('span:first').text(selectedUserName);
+                    var newFeedCheckbox = newFeedIndicator.find('.toggleCalendarFeed');
+                    newFeedCheckbox.attr('data-calendar-sourcekey','Events_'+selectedUserId).
+                    attr('data-calendar-feed','Events').
+                    attr('data-calendar-fieldlabel',selectedUserName).
+                    attr('data-calendar-userid',selectedUserId).
+                    attr('data-calendar-group',calendarGroup).
+                    attr('checked','checked');
+                    calendarFeedList.append(newFeedIndicator);
+                    message = app.vtranslate('JS_CALENDAR_VIEW_ADDED_SUCCESSFULLY');
+                }
 
-		var params = {
-			module: 'Calendar',
-			action: 'CalendarUserActions',
-			mode : 'addUserCalendar',
-			selectedUser : selectedUserId,
-			selectedColor : selectedColor
-		};
+                var contrast = app.helper.getColorContrast(selectedColor);
+                var textColor = (contrast === 'dark') ? 'white' : 'black';
+                var feedCheckbox = calendarFeedList.find('input[data-calendar-userid="'+selectedUserId+'"]');
+                feedCheckbox.data('calendarFeedColor',selectedColor).
+                data('calendarFeedTextcolor',textColor);
+                var feedIndicator = feedCheckbox.closest('.calendar-feed-indicator');
+                feedIndicator.css({'background-color':selectedColor,'color':textColor});
+                thisInstance.refreshFeed(feedCheckbox);
 
-		app.helper.showProgress();
-		app.request.post({'data':params}).then(function(e) {
-			if(!e) {
-				var calendarFeedList = jQuery('#calendarview-feeds > ul.feedslist');
-				var message = app.vtranslate('JS_CALENDAR_VIEW_COLOR_UPDATED_SUCCESSFULLY');
-				if(editorMode === 'create') {
-					var feedIndicatorTemplate = jQuery('#calendarview-feeds').find('ul.dummy > li.feed-indicator-template');
-					feedIndicatorTemplate.removeClass('.feed-indicator-template');
-					var newFeedIndicator = feedIndicatorTemplate.clone(true,true);
-					newFeedIndicator.find('span:first').text(selectedUserName);
-					var newFeedCheckbox = newFeedIndicator.find('.toggleCalendarFeed');
-					newFeedCheckbox.attr('data-calendar-sourcekey','Events_'+selectedUserId).
-					attr('data-calendar-feed','Events').
-					attr('data-calendar-fieldlabel',selectedUserName).
-					attr('data-calendar-userid',selectedUserId).
-					attr('data-calendar-group',calendarGroup).
-					attr('checked','checked');
-					calendarFeedList.append(newFeedIndicator);
-					message = app.vtranslate('JS_CALENDAR_VIEW_ADDED_SUCCESSFULLY');
-				}
+                app.helper.hideProgress();
+                app.helper.hideModal();
+                app.helper.showSuccessNotification({'message':message});
+            } else {
+                console.log("error : ",e);
+            }
+        });
 
-				var contrast = app.helper.getColorContrast(selectedColor);
-				var textColor = (contrast === 'dark') ? 'white' : 'black';
-				var feedCheckbox = calendarFeedList.find('input[data-calendar-userid="'+selectedUserId+'"]');
-				feedCheckbox.data('calendarFeedColor',selectedColor).
-				data('calendarFeedTextcolor',textColor);
-				var feedIndicator = feedCheckbox.closest('.calendar-feed-indicator');
-				feedIndicator.css({'background-color':selectedColor,'color':textColor});
-				thisInstance.refreshFeed(feedCheckbox);
+    }
 
-				app.helper.hideProgress();
-				app.helper.hideModal();
-				app.helper.showSuccessNotification({'message':message});
-			} else {
-				console.log("error : ",e);
-			}
-		});
+    registerColorEditorSaveEvent(modalContainer) {
+        var thisInstance = this;
+        modalContainer.find('[name="saveButton"]').on('click', function() {
+            jQuery(this).attr('disabled','disabled');
+            var usersList = modalContainer.find('select[name="usersList"]');
+            var selectedUser = usersList.find('option:selected');
+            var selectedType = modalContainer.find('.selectedType');
+            selectedType.val(usersList.val()).data(
+                'typename',
+                selectedUser.text()
+            ).data(
+                'calendarGroup',
+                selectedUser.data('calendarGroup')
+            );
+            thisInstance.saveFeedSettings(modalContainer);
+        });        
+    }
 
-	},
+    registerColorEditorEvents(modalContainer, feedIndicator) {
+        var thisInstance = this;
+        var editorMode = modalContainer.find('.editorMode').val();
 
-	registerColorEditorSaveEvent : function(modalContainer) {
-		var thisInstance = this;
-		modalContainer.find('[name="saveButton"]').on('click', function() {
-			jQuery(this).attr('disabled','disabled');
-			var usersList = modalContainer.find('select[name="usersList"]');
-			var selectedUser = usersList.find('option:selected');
-			var selectedType = modalContainer.find('.selectedType');
-			selectedType.val(usersList.val()).data(
-				'typename',
-				selectedUser.text()
-			).data(
-				'calendarGroup',
-				selectedUser.data('calendarGroup')
-			);
-			thisInstance.saveFeedSettings(modalContainer);
-		});        
-	},
+        var colorPickerHost = modalContainer.find('.calendarColorPicker');
+        var selectedColor = modalContainer.find('.selectedColor');
+        thisInstance.initializeColorPicker(colorPickerHost, {}, function(hsb, hex, rgb) {
+            var selectedColorCode = '#'+hex;
+            selectedColor.val(selectedColorCode);
+        });
 
-	registerColorEditorEvents : function(modalContainer,feedIndicator) {
-		var thisInstance = this;
-		var editorMode = modalContainer.find('.editorMode').val();
+        thisInstance.registerUserChangeEvent(modalContainer);
 
-		var colorPickerHost = modalContainer.find('.calendarColorPicker');
-		var selectedColor = modalContainer.find('.selectedColor');
-		thisInstance.initializeColorPicker(colorPickerHost, {}, function(hsb, hex, rgb) {
-			var selectedColorCode = '#'+hex;
-			selectedColor.val(selectedColorCode);
-		});
+        var usersList = modalContainer.find('select[name="usersList"]');
+        if(editorMode === 'edit') {
+            var feedCheckbox = feedIndicator.find('input[type="checkbox"].toggleCalendarFeed');
+            usersList.select2('val',feedCheckbox.data('calendarUserid'));
+        }
+        usersList.trigger('change');
 
-		thisInstance.registerUserChangeEvent(modalContainer);
+        thisInstance.registerColorEditorSaveEvent(modalContainer);
+    }
 
-		var usersList = modalContainer.find('select[name="usersList"]');
-		if(editorMode === 'edit') {
-			var feedCheckbox = feedIndicator.find('input[type="checkbox"].toggleCalendarFeed');
-			usersList.select2('val',feedCheckbox.data('calendarUserid'));
-		}
-		usersList.trigger('change');
+    showColorEditor(feedIndicator) {
+        var thisInstance = this;
+        var params = {
+            module : app.getModuleName(),
+            view : 'UserCalendarViews',
+            mode : 'editUserCalendar'
+        };
+        app.helper.showProgress();
+        app.request.post({'data':params}).then(function(e,data) {
+            app.helper.hideProgress();
+            if(!e) {
+                app.helper.showModal(data,{
+                    'cb' : function(modalContainer) {
+                        thisInstance.registerColorEditorEvents(modalContainer,feedIndicator);
+                    }
+                });
+            } else {
+                console.log("network error : ",e);
+            }
+        });
+    }
 
-		thisInstance.registerColorEditorSaveEvent(modalContainer);
-	},
+    getFeedDeleteParameters(feedCheckbox) {
+        return {
+            module: 'Calendar',
+            action: 'CalendarUserActions',
+            mode : 'deleteUserCalendar',
+            userid : feedCheckbox.data('calendarUserid')
+        };
+    }
 
-	showColorEditor : function(feedIndicator) {
-		var thisInstance = this;
-		var params = {
-			module : app.getModuleName(),
-			view : 'UserCalendarViews',
-			mode : 'editUserCalendar'
-		};
-		app.helper.showProgress();
-		app.request.post({'data':params}).then(function(e,data) {
-			app.helper.hideProgress();
-			if(!e) {
-				app.helper.showModal(data,{
-					'cb' : function(modalContainer) {
-						thisInstance.registerColorEditorEvents(modalContainer,feedIndicator);
-					}
-				});
-			} else {
-				console.log("network error : ",e);
-			}
-		});
-	},
+    /* get user list by selected role or group */
+    getUserList(id, target) {
+        var thisInstance = Calendar_SharedCalendar_Js.currentInstance;
+        var aDeferred = jQuery.Deferred();
 
-	getFeedDeleteParameters : function(feedCheckbox) {
-		return {
-			module: 'Calendar',
-			action: 'CalendarUserActions',
-			mode : 'deleteUserCalendar',
-			userid : feedCheckbox.data('calendarUserid')
-		};
-	},
+        if(!id) {
+            //default is "My group".
+            target = 'Calendar';
+        }
 
-	/* get user list by selected role or group */
-	getUserList : function(id, target) {
-		var thisInstance = Calendar_SharedCalendar_Js.currentInstance;
-		var aDeferred = jQuery.Deferred();
+        var params = {
+            module: 'Calendar',
+            action: 'CalendarUserActions',
+            mode: 'getUserList',
+            id : id,
+            target : target
+        };
 
-		if(!id) {
-			//default is "My group".
-			target = 'Calendar';
-		}
+        AppConnector.request(params).then(function(response) {
+            var result = response['result'];
+            thisInstance.userList = result;
+            aDeferred.resolve();
+        },
+        function(error){
+            aDeferred.reject();
+        });
 
-		var params = {
-			module: 'Calendar',
-			action: 'CalendarUserActions',
-			mode: 'getUserList',
-			id : id,
-			target : target
-		};
+        return aDeferred.promise();
+    }
 
-		AppConnector.request(params).then(function(response) {
-			var result = response['result'];
-			thisInstance.userList = result;
-			aDeferred.resolve();
-		},
-		function(error){
-			aDeferred.reject();
-		});
+    /* change user list event */
+    changeUserList(callback) {
+        var thisInstance = Calendar_SharedCalendar_Js.currentInstance;
+        var id = jQuery("#calendar-groups").val();
+        var target = "Calendar";
 
-		return aDeferred.promise();
-	},
+        if(/^[0-9]+$/.test(id)) {// numbers only is group id.
+            target = "Groups";
+            jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().hide();
+        } else if (id != "default") {
+            target = "Roles";
+            jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().hide();
+        } else {
+            jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().show();
+        }
 
-	/* change user list event */
-	changeUserList : function(callback) {
-		var thisInstance = Calendar_SharedCalendar_Js.currentInstance;
-		var id = jQuery("#calendar-groups").val();
-		var target = "Calendar";
+        var promise = Calendar_SharedCalendar_Js.currentInstance.getUserList(id, target).then(function(){
+            var $area = $(".list-group.feedslist");
+            var myId = null;
+            $area.children().each(function(){
+                var currentTarget = jQuery(this).find("input");
+                var sourceKey = currentTarget.data('calendarSourcekey');
+                if($(this).is(".mine")) {
+                    myId = currentTarget.attr("data-calendar-userid");
+                    // 自分以外のユーザーの活動を移動した場合に、自分の予定が変更されないためrefreshFeedを実行する
+                    thisInstance.refreshFeed($(".activitytype-indicator.calendar-feed-indicator.mine").find("input[type='checkbox']"));
+                } else {
+                    // thisInstance.disableFeed(sourceKey);
+                    thisInstance.removeEvents(currentTarget);
+                    $(this).remove();
+                }
+            })
 
-		if(/^[0-9]+$/.test(id)) {// numbers only is group id.
-			target = "Groups";
-			jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().hide();
-		} else if (id != "default") {
-			target = "Roles";
-			jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().hide();
-		} else {
-			jQuery(".calendar-sidebar-tab > .sidebar-widget-header > .sidebar-header").parent().show();
-		}
+            var users = thisInstance.userList['users'];
+            var sharedInfo = thisInstance.userList['sharedinfo'] ? thisInstance.userList['sharedinfo'] : {};
+            var cashDisabledFeedsStorageKey = thisInstance.getDisabledFeeds();
 
-		var promise = Calendar_SharedCalendar_Js.currentInstance.getUserList(id, target).then(function(){
-			var $area = $(".list-group.feedslist");
-			var myId = null;
-			$area.children().each(function(){
-				var currentTarget = jQuery(this).find("input");
-				var sourceKey = currentTarget.data('calendarSourcekey');
-				if($(this).is(".mine")) {
-					myId = currentTarget.attr("data-calendar-userid");
-					// 自分以外のユーザーの活動を移動した場合に、自分の予定が変更されないためrefreshFeedを実行する
-					thisInstance.refreshFeed($(".activitytype-indicator.calendar-feed-indicator.mine").find("input[type='checkbox']"));
-				} else {
-					// thisInstance.disableFeed(sourceKey);
-					thisInstance.removeEvents(currentTarget);
-					$(this).remove();
-				}
-			})
+            Object.keys(users).forEach(function (id) {
+                var user = users[id];
+                if(id == myId) {
+                    thisInstance.refreshFeed($(".activitytype-indicator.calendar-feed-indicator.mine").find("input[type='checkbox']"));
+                    return ;//continue
+                }
+                var color = sharedInfo[id] ? sharedInfo[id]['color'] : "";
+                var visible = sharedInfo[id] ? sharedInfo[id]['visible'] : "0";
+                if(target != 'Calendar' || visible == 1 || !sharedInfo[id]) {
+                    var feedIndicatorTemplate = jQuery('#calendarview-feeds').find('ul.dummy > li.feed-indicator-template');
+                    feedIndicatorTemplate.removeClass('.feed-indicator-template');
+                    var newFeedIndicator = feedIndicatorTemplate.clone(true,true);
+                    newFeedIndicator.find('span:first').text(user);
+                    var newFeedCheckbox = newFeedIndicator.find('.toggleCalendarFeed');
+                    newFeedCheckbox.attr('data-calendar-sourcekey','Events_'+id).
+                    attr('data-calendar-feed','Events').
+                    attr('data-calendar-fieldlabel',user).
+                    attr('data-calendar-userid',id).
+                    attr('data-calendar-group',"").
+                    attr('checked','checked');
+                    $area.append(newFeedIndicator);
 
-			var users = thisInstance.userList['users'];
-			var sharedInfo = thisInstance.userList['sharedinfo'] ? thisInstance.userList['sharedinfo'] : {};
-			var cashDisabledFeedsStorageKey = thisInstance.getDisabledFeeds();
+                    var contrast = app.helper.getColorContrast(color);
+                    var textColor = (contrast === 'dark') ? 'white' : 'black';
+                    newFeedIndicator.css("background-color", color)
+                        .css("color", textColor);
+                    newFeedCheckbox.data('calendarFeedColor',color)
+                        .data('calendarFeedTextcolor',textColor);
 
-			Object.keys(users).forEach(function (id) {
-				var user = users[id];
-				if(id == myId) {
-					thisInstance.refreshFeed($(".activitytype-indicator.calendar-feed-indicator.mine").find("input[type='checkbox']"));
-					return ;//continue
-				}
-				var color = sharedInfo[id] ? sharedInfo[id]['color'] : "";
-				var visible = sharedInfo[id] ? sharedInfo[id]['visible'] : "0";
-				if(target != 'Calendar' || visible == 1 || !sharedInfo[id]) {
-					var feedIndicatorTemplate = jQuery('#calendarview-feeds').find('ul.dummy > li.feed-indicator-template');
-					feedIndicatorTemplate.removeClass('.feed-indicator-template');
-					var newFeedIndicator = feedIndicatorTemplate.clone(true,true);
-					newFeedIndicator.find('span:first').text(user);
-					var newFeedCheckbox = newFeedIndicator.find('.toggleCalendarFeed');
-					newFeedCheckbox.attr('data-calendar-sourcekey','Events_'+id).
-					attr('data-calendar-feed','Events').
-					attr('data-calendar-fieldlabel',user).
-					attr('data-calendar-userid',id).
-					attr('data-calendar-group',"").
-					attr('checked','checked');
-					$area.append(newFeedIndicator);
+                    thisInstance.colorizeFeed(newFeedCheckbox);
 
-					var contrast = app.helper.getColorContrast(color);
-					var textColor = (contrast === 'dark') ? 'white' : 'black';
-					newFeedIndicator.css("background-color", color)
-						.css("color", textColor);
-					newFeedCheckbox.data('calendarFeedColor',color)
-						.data('calendarFeedTextcolor',textColor);
+                    if(cashDisabledFeedsStorageKey.indexOf('Events_'+id) !== -1){
+                        // thisInstance.disableFeed('Events_'+id);
+                        newFeedCheckbox.removeAttr('checked');
+                    }else{
+                        // thisInstance.enableFeed('Events_'+id);
+                    }
+                    thisInstance.addEvents(newFeedCheckbox);
 
-					thisInstance.colorizeFeed(newFeedCheckbox);
+                    if(target != "Calendar") {
+                        newFeedIndicator.find("i").remove();
+                    }
+                }
+            });
+            thisInstance.restoreFeedsState($("#module-filters"));
+        });
+        if(callback) {
+            promise.then(callback);
+        }
+    }
 
-					if(cashDisabledFeedsStorageKey.indexOf('Events_'+id) !== -1){
-						// thisInstance.disableFeed('Events_'+id);
-						newFeedCheckbox.removeAttr('checked');
-					}else{
-						// thisInstance.enableFeed('Events_'+id);
-					}
-					thisInstance.addEvents(newFeedCheckbox);
+    setGroupSelectEnable() {
+        var elem = jQuery('#calendar-groups');
+        elem.select2().prop('disabled',false);
+        elem.prev().css("display", "block");
+    }
 
-					if(target != "Calendar") {
-						newFeedIndicator.find("i").remove();
-					}
-				}
-			});
-			thisInstance.restoreFeedsState($("#module-filters"));
-		});
-		if(callback) {
-			promise.then(callback);
-		}
-	},
+    setGroupSelectDisable() {
+        var elem = jQuery('#calendar-groups');
+        elem.select2().prop('disabled',true);
+        elem.prev().css("display", "block");
+    }
 
-	setGroupSelectEnable : function() {
-		var elem = jQuery('#calendar-groups');
-		elem.select2().prop('disabled',false);
-		elem.prev().css("display", "block");
-	},
-	setGroupSelectDisable : function() {
-		var elem = jQuery('#calendar-groups');
-		elem.select2().prop('disabled',true);
-		elem.prev().css("display", "block");
-	},
+    registerGroupChangeEvent() {
+        var elem = jQuery('#calendar-groups');
+        elem.on('change', this.changeUserList);
+        app.showSelect2ElementView(elem);
+        elem.prev().css("display", "block");
+    }
 
-	registerGroupChangeEvent : function() {
-		var elem = jQuery('#calendar-groups');
-		elem.on('change', this.changeUserList);
-		app.showSelect2ElementView(elem);
-		elem.prev().css("display", "block");
-	},
+    initializeCalendar() {
+        var calendarConfigs = this.getCalendarConfigs();
+        this.getCalendarViewContainer().fullCalendar(calendarConfigs);
+        this.performPostRenderCustomizations();
+    }
 
-	initializeCalendar : function() {
-		var calendarConfigs = this.getCalendarConfigs();
-		this.getCalendarViewContainer().fullCalendar(calendarConfigs);
-		this.performPostRenderCustomizations();
-	},
-
-	registerEvents : function() {
-		this._super();
-		Calendar_SharedCalendar_Js.currentInstance = this;
-	}
-});
+    registerEvents() {
+        super.registerEvents();
+        Calendar_SharedCalendar_Js.currentInstance = this;
+    }
+};

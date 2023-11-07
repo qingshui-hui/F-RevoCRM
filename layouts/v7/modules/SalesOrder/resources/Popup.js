@@ -7,4 +7,4 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-Inventory_Popup_Js('SalesOrder_Popup_Js', {}, {});
+class SalesOrder_Popup_Js extends Inventory_Popup_Js {};

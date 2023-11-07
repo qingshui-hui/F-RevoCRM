@@ -7,6 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Products_RelatedList_Js("Services_RelatedList_Js",{},{
-	
-})
+class Services_RelatedList_Js extends Products_RelatedList_Js {}

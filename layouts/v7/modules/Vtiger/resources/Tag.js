@@ -7,20 +7,21 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Vtiger_Tag_Js",{},{
-    
-    editTagTemplate : '<div class="popover" role="tooltip"><div class="arrow"></div>\n\
+class Vtiger_Tag_Js extends Vtiger_Class_Js {
+    editTagTemplate = '<div class="popover" role="tooltip"><div class="arrow"></div>\n\
                                 <form onsubmit="return false;">\n\
                                     <div class="popover-content"></div>\n\
                                 </form>\n\
-                                </div>',
-    editTagContainerCached : false,
-    
-    init : function() {
+                                </div>';
+
+    editTagContainerCached = false;
+
+    constructor() {
+        super();
         this.editTagContainerCached = jQuery('.editTagContainer');
-    },
-    
-    saveTag : function(callerParams) {
+    }
+
+    saveTag(callerParams) {
         var aDeferred = jQuery.Deferred();
         var params = {
             'module' : app.getModuleName(),
@@ -41,9 +42,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             }
         );
         return aDeferred.promise();
-    },
-    
-    updateTag : function(callerParams) {
+    }
+
+    updateTag(callerParams) {
         var aDeferred = jQuery.Deferred();
         var params = {
             'module' : app.getModuleName(),
@@ -59,16 +60,16 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             }
         });
         return aDeferred.promise();
-    },
-    
-    constructTagElement : function (params) {
+    }
+
+    constructTagElement(params) {
         var tagElement = jQuery(jQuery('#dummyTagElement').html()).clone(true);
         tagElement.attr('data-id',params.id).attr('data-type',params.type);
         tagElement.find('.tagLabel').html(params.name);
         return tagElement
-    },
-    
-    addTagsToShowAllTagContianer : function(tagsList) {
+    }
+
+    addTagsToShowAllTagContianer(tagsList) {
         var showAllTagContainer = jQuery('.showAllTagContainer');
         var viewAllTagContainer = jQuery('.viewAllTagsContainer');
         var currentTagHolder = showAllTagContainer.find('.currentTag');
@@ -91,9 +92,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
         if(currentTagHolder.find('.tag').length > 0){
             currentTagHolder.find('.noTagsPlaceHolder').hide();
         }
-    },
-    
-    removeTagsFromShowTagContainer : function(tagsList, container) {
+    }
+
+    removeTagsFromShowTagContainer(tagsList, container) {
         var showAllTagContainer = (typeof container === 'undefined') ? jQuery('.showAllTagContainer') : container;
         var currentTagHolder = showAllTagContainer.find('.currentTag');
         var currentTagMenu = showAllTagContainer.find('.currentTagMenu');
@@ -111,9 +112,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             currentTagMenu.find('ul').append(newTagLiEle);
             currentTagMenu.find(".noTagExistsPlaceHolder").hide();  
         }
-    },
-    
-    viewAllTags : function(container) {
+    }
+
+    viewAllTags(container) {
         var viewAllTagContainer = container.find('.viewAllTagsContainer').clone(true);
         // There is no delete option from view All Tags
         viewAllTagContainer.find(".deleteTag").remove();
@@ -125,9 +126,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
                 }
                 registerViewAllTagEvents(modalContainer);
         }});
-    },
-    
-    showAllTags : function(container, callerParams) {
+    }
+
+    showAllTags(container, callerParams) {
         var self = this;
         var showTagModal = container.find('.showAllTagContainer').clone(true);
         app.helper.showModal(showTagModal.find('.modal-dialog'),{'cb' : function(modalContainer){
@@ -239,9 +240,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
                 }
                 registerShowAllTagEvents(modalContainer);
         }});
-    },
-    
-    registerShowMassTagListener : function() {
+    }
+
+    registerShowMassTagListener() {
         var self = this;
         app.event.on('Request.MassTag.show',function(e, container, saveParams){
             if(typeof container == 'undefined') {
@@ -249,9 +250,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             }
             self.showAllTags(container, saveParams);
         });
-    },
-    
-    registerEditTagEvents : function(){
+    }
+
+    registerEditTagEvents() {
         var self = this;
         jQuery(document).on('click','.editTag', function(e){
             var element = jQuery(e.currentTarget);
@@ -289,7 +290,7 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             if(tagName.trim() == ""){
                 var message = app.vtranslate('JS_PLEASE_ENTER_VALID_TAG_NAME');
                 app.helper.showErrorNotification({'message':message});
-    			return;
+                return;
             }
             
             var valueParams = {};
@@ -322,9 +323,9 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             (e.keyCode || e.which) === 13 && 
             jQuery(e.target).closest('.editTagContainer').find('.saveTag').trigger('click');
         });
-    },
-    
-    registerViewAllTagsListener : function() {
+    }
+
+    registerViewAllTagsListener() {
         var self = this;
         app.event.on('Request.AllTag.show', function(e, container){
             if(typeof container == 'undefined') {
@@ -332,12 +333,12 @@ Vtiger.Class("Vtiger_Tag_Js",{},{
             }
             self.viewAllTags(container);
         });
-    },
-    
-    registerEvents : function() {
+    }
+
+    registerEvents() {
         this.registerShowMassTagListener();
         this.registerEditTagEvents();
         this.registerViewAllTagsListener();
     }
-});
+};
 

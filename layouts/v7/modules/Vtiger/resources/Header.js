@@ -7,9 +7,8 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-jQuery.Class("Vtiger_Header_Js", {
-   
-    previewFile : function(e,recordId) {
+class Vtiger_Header_Js {
+    static previewFile(e, recordId) {
         e.stopPropagation();
         var currentTarget = e.currentTarget;
         var currentTargetObject = jQuery(currentTarget);
@@ -36,5 +35,4 @@ jQuery.Class("Vtiger_Header_Js", {
             win.focus();
         }
     }
-},{
-});
+};

@@ -7,51 +7,51 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Vtiger_Extension_Js",{}, {
-    
-    
+class Vtiger_Extension_Js extends Vtiger_Class_Js {
     // Protected Globals
-	// Copy meta to avoid runtime tampering.
-	_module  : _EXTENSIONMETA.module,
-	_view    : _EXTENSIONMETA.view,
+    // Copy meta to avoid runtime tampering.
+    _module = _EXTENSIONMETA.module;
 
-    getExtensionModule : function() {
+    _view = _EXTENSIONMETA.view;
+
+    getExtensionModule() {
         return this._module;
-    },
-    
-    getExtensionView : function() {
+    }
+
+    getExtensionView() {
         return this._view;
-    },
-    
-    init : function() {
+    }
+
+    constructor() {
+        super();
         this.addComponents();
-    },
-    
+    }
+
     // To clear sorting information before changing Custom View
-    resetData : function() {
-		var listInstance = Vtiger_List_Js.getInstance();
+    resetData() {
+        var listInstance = Vtiger_List_Js.getInstance();
         var container = listInstance.getListViewContainer();
         container.find('#pageNumber').val("1");
         container.find('#pageToJump').val('1');
         container.find('#orderBy').val('');
         container.find("#sortOrder").val('');
-    },
-    
-    loadFilter: function(id, mode) {
-		if (typeof mode == 'undefined') mode = false;
-		var url = 'index.php?module='+app.getModuleName()+'&view=List'+
-				  '&viewname='+id+'&mode='+mode;
+    }
+
+    loadFilter(id, mode) {
+        if (typeof mode == 'undefined') mode = false;
+        var url = 'index.php?module='+app.getModuleName()+'&view=List'+
+                  '&viewname='+id+'&mode='+mode;
         window.location.href = url;
-    },
-	
-    addComponents : function() {
+    }
+
+    addComponents() {
         this.addModuleSpecificComponent('CustomView');
         this.addModuleSpecificComponent('ListSidebar');
         this.addComponent('Vtiger_Index_Js');
         this.addComponent(this.getExtensionModule() + "_" + this.getExtensionView() + "_Js");
-    },
-    
-    registerEvents : function() {
+    }
+
+    registerEvents() {
 //        if(jQuery('#listViewContent').find('table.listview-table').length){
 //            if(jQuery('.sticky-wrap').length == 0){
 //                stickyheader.controller();
@@ -62,16 +62,16 @@ Vtiger.Class("Vtiger_Extension_Js",{}, {
 //            }
 //        }
 
-		if(window.hasOwnProperty('Vtiger_List_Js')) {
-			var listInstance = new Vtiger_List_Js();
-			setTimeout(function(){
-				listInstance.registerFloatingThead();
-			}, 10);
+        if(window.hasOwnProperty('Vtiger_List_Js')) {
+            var listInstance = new Vtiger_List_Js();
+            setTimeout(function(){
+                listInstance.registerFloatingThead();
+            }, 10);
 
-			app.event.on('Vtiger.Post.MenuToggle', function() {
-				listInstance.reflowList();
-			});
-			listInstance.registerDynamicDropdownPosition();
-		}
+            app.event.on('Vtiger.Post.MenuToggle', function() {
+                listInstance.reflowList();
+            });
+            listInstance.registerDynamicDropdownPosition();
+        }
     }
-});
+};

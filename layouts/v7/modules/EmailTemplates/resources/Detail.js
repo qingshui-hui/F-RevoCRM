@@ -7,23 +7,22 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Detail_Js("EmailTemplates_Detail_Js",{
-    
+class EmailTemplates_Detail_Js extends Vtiger_Detail_Js {
     /*
-	 * function to trigger delete record action
-	 * @params: delete record url.
-	 */
-    deleteRecord : function(deleteRecordActionUrl) {
-		var message = app.vtranslate('LBL_DELETE_CONFIRMATION');
+     * function to trigger delete record action
+     * @params: delete record url.
+     */
+    static deleteRecord(deleteRecordActionUrl) {
+        var message = app.vtranslate('LBL_DELETE_CONFIRMATION');
         
         // warning message for Customer Login Details template
         if(deleteRecordActionUrl.search('record=10') != -1) { 
             var message = app.vtranslate('LBL_CUTOMER_LOGIN_DETAILS_TEMPLATE_DELETE_MESSAGE');
         }
         
-		app.helper.showConfirmationBox({'message' : message}).then(
+        app.helper.showConfirmationBox({'message' : message}).then(
             function(e) {
-				app.request.post({url: deleteRecordActionUrl+'&ajaxDelete=true'}).then(
+                app.request.post({url: deleteRecordActionUrl+'&ajaxDelete=true'}).then(
                     function(error, data){
                         if(!error){
                             window.location.href = data;
@@ -35,14 +34,13 @@ Vtiger_Detail_Js("EmailTemplates_Detail_Js",{
             },
             function(error, err){
             }
-		);
-	}
-    
-},{
+        );
+    }
+
     /**
     * Function get html content from the record given and append the code to iframe element
     */
-    showTemplateContent: function(){
+    showTemplateContent() {
         var record = jQuery('#recordId').val();
         var params={
             "module" : "EmailTemplates",
@@ -54,20 +52,20 @@ Vtiger_Detail_Js("EmailTemplates_Detail_Js",{
             var templateContent = data.content;
             jQuery('#TemplateIFrame').contents().find('html').html(templateContent);
         });
-    },
-	
-	/**
-	 * We have to load Settings Index Js but the parent module name will be empty so we are extending this api and passing 
-	 * last parameter as settings (This is useful to settings side events like accordion click and settings menu search)
-	 */
-	addIndexComponent : function() {
-		this.addModuleSpecificComponent('Index','Vtiger','Settings');
-	},
-	
-    registerEvents : function() {
+    }
+
+    /**
+     * We have to load Settings Index Js but the parent module name will be empty so we are extending this api and passing 
+     * last parameter as settings (This is useful to settings side events like accordion click and settings menu search)
+     */
+    addIndexComponent() {
+        this.addModuleSpecificComponent('Index','Vtiger','Settings');
+    }
+
+    registerEvents() {
         this.registerStarToggle();
         this.showTemplateContent();
     }
-});
+};
 
 

@@ -7,46 +7,44 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
-    triggerDelete : function(url) {
+class Settings_Tags_List_Js extends Settings_Vtiger_List_Js {
+    static triggerDelete(url) {
         var instance = app.controller();
         instance.deleteTag(url);
-    },
-    
-    triggerEdit : function(event) {
+    }
+
+    static triggerEdit(event) {
         var editIconElement = jQuery(event.target);
         var instance = app.controller();
         instance.editTag(editIconElement);
-    },
-	
-	triggerAdd : function(event) {
+    }
+
+    static triggerAdd(event) {
         var instance = app.controller();
         instance.registerTagAddEvent();
-    },
-	
-},{
-    editTagContainer : null, 
-    
-    getEditTagContainer : function() {
+    }
+
+    editTagContainer = null;
+
+    getEditTagContainer() {
         if(this.editTagContainer == null) {
             this.editTagContainer = jQuery('#editTagContainer');
         }
         return this.editTagContainer;
-    },
-    
-    /**
-	 * Function to get Page Jump Params
-	 */
-	getPageJumpParams : function(){
-		var params = this.getDefaultParams();
-		params['action'] = "ListAjax";
-		params['mode'] = "getPageCount";
+    }
 
-		return params;
-	},
-    
-    
-    deleteTag : function(url) {
+    /**
+     * Function to get Page Jump Params
+     */
+    getPageJumpParams() {
+        var params = this.getDefaultParams();
+        params['action'] = "ListAjax";
+        params['mode'] = "getPageCount";
+
+        return params;
+    }
+
+    deleteTag(url) {
         var self = this;
         app.helper.showConfirmationBox({'message' : app.vtranslate('JS_ARE_YOU_SURE_YOU_WANT_TO_DELETE')}).then(function(){
             app.request.post({'url' : url}).then(function(error, data){
@@ -55,9 +53,9 @@ Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
                 }   
             });
         })
-    },
-    
-    updateTag : function(callerParams) {
+    }
+
+    updateTag(callerParams) {
         var aDeferred = jQuery.Deferred();
         var params = {
             'module' : 'Vtiger',
@@ -73,9 +71,9 @@ Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
             }
         });
         return aDeferred.promise();
-    },
-    
-    editTag : function(rowEditIconElement) {
+    }
+
+    editTag(rowEditIconElement) {
         var thisInstance=this;
         var row = rowEditIconElement.closest('tr');
         var tagInfo = row.data('info');
@@ -93,9 +91,9 @@ Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
             app.helper.showModal(editTagContainer);
             thisInstance.registerEditTagSaveEvent();
         }
-    }, 
-    
-    registerEditTagSaveEvent : function() {
+    }
+
+    registerEditTagSaveEvent() {
         var editTagContainer = this.getEditTagContainer();
         var self = this;
         this.getEditTagContainer().find('.saveTag').on('click', function(e){
@@ -104,7 +102,7 @@ Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
             if(tagName.trim() == ""){
                 var message = app.vtranslate('JS_PLEASE_ENTER_VALID_TAG_NAME');
                 app.helper.showErrorNotification({'message':message});
-    			return;
+                return;
             }
             
             var valueParams = {};
@@ -128,75 +126,76 @@ Settings_Vtiger_List_Js('Settings_Tags_List_Js',{
         editTagContainer.on('click', '.cancelSaveTag', function(e){
             app.helper.hideModal();
         });
-    },
-	registerTagAddEvent : function() {
-		var thisInstance = this;
-		var params = {};
-		params['module'] = app.getModuleName();
-		params['parent'] = app.getParentModuleName();
-		params['view'] = 'EditAjax';
-		app.request.post({"data":params}).then(
+    }
+
+    registerTagAddEvent() {
+        var thisInstance = this;
+        var params = {};
+        params['module'] = app.getModuleName();
+        params['parent'] = app.getParentModuleName();
+        params['view'] = 'EditAjax';
+        app.request.post({"data":params}).then(
             function(err,data) {
                 if(err === null) {
-						app.helper.showModal(data);
-						var form = jQuery('#addTagSettings');
+                        app.helper.showModal(data);
+                        var form = jQuery('#addTagSettings');
 
-						form.submit(function(e) {
-							e.preventDefault();
-						});
-						var params = {
-							submitHandler : function(form) {
-								var form = jQuery(form);
-								thisInstance.saveTagDetails(form);
-							}
-						};
-						form.vtValidate(params);
+                        form.submit(function(e) {
+                            e.preventDefault();
+                        });
+                        var params = {
+                            submitHandler : function(form) {
+                                var form = jQuery(form);
+                                thisInstance.saveTagDetails(form);
+                            }
+                        };
+                        form.vtValidate(params);
                     }
                 }
-		);
-	},
-	
-	/**
-	 * This function will save the new tag details
-	 */
-	saveTagDetails : function(form) {
-		var thisInstance = this;
-		var formData = form.serializeFormData();
-		
-		var saveParams = {
+        );
+    }
+
+    /**
+     * This function will save the new tag details
+     */
+    saveTagDetails(form) {
+        var thisInstance = this;
+        var formData = form.serializeFormData();
+        
+        var saveParams = {
             'module' : 'Vtiger',
             'action' : 'TagCloud',
             'mode'   : 'saveTags',
-			'addedFrom' : 'Settings'
+            'addedFrom' : 'Settings'
         }
-		
-		var saveTagList = {};
-		saveTagList['new'] = formData['createNewTag'].split(',');
-		saveParams['tagsList'] = saveTagList;
+        
+        var saveTagList = {};
+        saveTagList['new'] = formData['createNewTag'].split(',');
+        saveParams['tagsList'] = saveTagList;
         saveParams['newTagType'] = formData['visibility'];  
-		
-		app.request.post({"data":saveParams}).then(
-			function(err,data) {
-				if(err === null) {
+        
+        app.request.post({"data":saveParams}).then(
+            function(err,data) {
+                if(err === null) {
                     app.helper.hideModal();
-					
+                    
                     var successfullSaveMessage = app.vtranslate('JS_TAG_SAVED_SUCCESSFULLY');
                     app.helper.showSuccessNotification({'message':successfullSaveMessage});
-					thisInstance.loadListViewRecords();
-				}else {
-					app.helper.showErrorNotification({'message' : err.message});
-				}
-			}
-		);
-	},
-    
-    registerEvents : function() {
+                    thisInstance.loadListViewRecords();
+                }else {
+                    app.helper.showErrorNotification({'message' : err.message});
+                }
+            }
+        );
+    }
+
+    registerEvents() {
         var self = this;
-        this._super();
+        super.registerEvents();
         app.event.on('post.listViewFilter.click', function(e){
             //clearing cached dom element. Since it will be replaced with ajax request
             self.editTagContainer = null;
             self.registerEditTagSaveEvent();
         })
     }
-});
+};

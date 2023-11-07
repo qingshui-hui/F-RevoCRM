@@ -7,4 +7,4 @@
  * All Rights Reserved.
  ************************************************************************************/
 
-Inventory_Popup_Js('Invoice_Popup_Js', {}, {});
+class Invoice_Popup_Js extends Inventory_Popup_Js {};

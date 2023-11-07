@@ -7,4 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Products_Edit_Js("Services_Edit_Js",{},{})
+class Services_Edit_Js extends Products_Edit_Js {}

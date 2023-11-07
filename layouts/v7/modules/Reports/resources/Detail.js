@@ -7,47 +7,47 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_Detail_Js("Reports_Detail_Js",{},{
-	advanceFilterInstance : false,
-	detailViewContentHolder : false,
-	HeaderContentsHolder : false, 
-	
-	detailViewForm : false,
-	getForm : function() {
-		if(this.detailViewForm == false) {
-			this.detailViewForm = jQuery('form#detailView');
-		}
-	},
-	
-	getRecordId : function(){
-		return app.getRecordId();
-	},
-	
-	getContentHolder : function() {
-		if(this.detailViewContentHolder == false) {
-			this.detailViewContentHolder = jQuery('div.editViewPageDiv');
-		}
-		return this.detailViewContentHolder;
-	},
-	
-	getHeaderContentsHolder : function(){
-		if(this.HeaderContentsHolder == false) {
-			this.HeaderContentsHolder = jQuery('div.reportsDetailHeader ');
-		}
-		return this.HeaderContentsHolder;
-	},
-	
-	calculateValues : function(){
-		//handled advanced filters saved values.
-		var advfilterlist = this.advanceFilterInstance.getValues();
-		return JSON.stringify(advfilterlist);
-	},
-		
-	registerSaveOrGenerateReportEvent : function(){
-		var thisInstance = this;
-		jQuery('.generateReport').on('click',function(e){
+class Reports_Detail_Js extends Vtiger_Detail_Js {
+    advanceFilterInstance = false;
+    detailViewContentHolder = false;
+    HeaderContentsHolder = false;
+    detailViewForm = false;
+
+    getForm() {
+        if(this.detailViewForm == false) {
+            this.detailViewForm = jQuery('form#detailView');
+        }
+    }
+
+    getRecordId() {
+        return app.getRecordId();
+    }
+
+    getContentHolder() {
+        if(this.detailViewContentHolder == false) {
+            this.detailViewContentHolder = jQuery('div.editViewPageDiv');
+        }
+        return this.detailViewContentHolder;
+    }
+
+    getHeaderContentsHolder() {
+        if(this.HeaderContentsHolder == false) {
+            this.HeaderContentsHolder = jQuery('div.reportsDetailHeader ');
+        }
+        return this.HeaderContentsHolder;
+    }
+
+    calculateValues() {
+        //handled advanced filters saved values.
+        var advfilterlist = this.advanceFilterInstance.getValues();
+        return JSON.stringify(advfilterlist);
+    }
+
+    registerSaveOrGenerateReportEvent() {
+        var thisInstance = this;
+        jQuery('.generateReport').on('click',function(e){
             e.preventDefault();
-			var advFilterCondition = thisInstance.calculateValues();
+            var advFilterCondition = thisInstance.calculateValues();
             var recordId = thisInstance.getRecordId();
             var currentMode = jQuery(e.currentTarget).data('mode');
             var postData = {
@@ -57,25 +57,25 @@ Vtiger_Detail_Js("Reports_Detail_Js",{},{
                 'module' : app.getModuleName(),
                 'mode' : currentMode
             };
-			app.helper.showProgress();
-			app.request.post({data:postData}).then(
-				function(error,data){
-					app.helper.hideProgress();
-					thisInstance.getContentHolder().find('#reportContentsDiv').html(data);
+            app.helper.showProgress();
+            app.request.post({data:postData}).then(
+                function(error,data){
+                    app.helper.hideProgress();
+                    thisInstance.getContentHolder().find('#reportContentsDiv').html(data);
                                         if(currentMode == 'save') jQuery('.reportActionButtons').addClass('hide');
 //					app.helper.showHorizontalScroll(jQuery('#reportDetails'));
 
-					// To get total records count
-					var count  = parseInt(jQuery('#updatedCount').val());
-					thisInstance.generateReportCount(count);
+                    // To get total records count
+                    var count  = parseInt(jQuery('#updatedCount').val());
+                    thisInstance.generateReportCount(count);
 
                     thisInstance.registerConditionBlockChangeEvent();
-				}
-			);
-		});
-	},
-	
-    registerEventsForActions : function() {
+                }
+            );
+        });
+    }
+
+    registerEventsForActions() {
       var thisInstance = this;
       jQuery('.reportActions').click(function(e){
         var element = jQuery(e.currentTarget); 
@@ -97,9 +97,9 @@ Vtiger_Detail_Js("Reports_Detail_Js",{},{
         form.find('#advanced_filter').val(advFilterCondition);
         form.submit();
       })  
-    },
-    
-    generateReportCount : function(count){
+    }
+
+    generateReportCount(count) {
       var thisInstance = this;  
       var advFilterCondition = thisInstance.calculateValues();
       var recordId = thisInstance.getRecordId();
@@ -132,65 +132,65 @@ Vtiger_Detail_Js("Reports_Detail_Js",{},{
             );
         }
       
-    },
-	
-	registerConditionBlockChangeEvent : function() {
-		jQuery('.reportsDetailHeader').find('#groupbyfield,#datafields,[name="columnname"],[name="comparator"]').on('change', function() {
-			jQuery('.reportActionButtons').removeClass('hide');
-		});
-		jQuery('.fieldUiHolder').find('[data-value="value"]').on('change input', function() {
-			jQuery('.reportActionButtons').removeClass('hide');
-		});
-		jQuery('.deleteCondition').on('click', function() {
-			jQuery('.reportActionButtons').removeClass('hide');
-		});
-		jQuery(document).on('datepicker-change', function() {
-			jQuery('.reportActionButtons').removeClass('hide');
-		});
-	},
-	
-	registerEventForModifyCondition : function() {
-		jQuery('button[name=modify_condition]').on('click', function(e) {
-			var icon =  jQuery(e.currentTarget).find('i');
-			var isClassExist = jQuery(icon).hasClass('fa-chevron-right');
-			if(isClassExist) {
-				jQuery(e.currentTarget).find('i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
-				jQuery('#filterContainer').removeClass('hide').show('slow');
-			} else {
-				jQuery(e.currentTarget).find('i').removeClass('fa-chevron-down').addClass('fa-chevron-right');
-				jQuery('#filterContainer').addClass('hide').hide('slow');
-			}
-			return false;
-		});
-	},
-	
-        registerOnlyAllUsersInSharedList : function(){
-            var self = this;
-            jQuery('#memberList').on('change',function(e){
-                var element = jQuery(e.currentTarget);
-                if(self.isAllUsersSelected()){
-                    element.find('option').not('[value="All::Users"]').prop('disabled',true);
-                    element.select2('val',['All::Users']);
-                    element.select2('close');
-                }else{
-                    element.find('option').removeProp('disabled');
-                }
-            });
-        },
+    }
 
-        isAllUsersSelected : function() {
-            var memberList = jQuery('#memberList').val();
-            return (memberList != null && (memberList.indexOf('All::Users') != -1)) ? true : false
-        },
-    
-	registerEvents : function(){
-		this.registerSaveOrGenerateReportEvent();
+    registerConditionBlockChangeEvent() {
+        jQuery('.reportsDetailHeader').find('#groupbyfield,#datafields,[name="columnname"],[name="comparator"]').on('change', function() {
+            jQuery('.reportActionButtons').removeClass('hide');
+        });
+        jQuery('.fieldUiHolder').find('[data-value="value"]').on('change input', function() {
+            jQuery('.reportActionButtons').removeClass('hide');
+        });
+        jQuery('.deleteCondition').on('click', function() {
+            jQuery('.reportActionButtons').removeClass('hide');
+        });
+        jQuery(document).on('datepicker-change', function() {
+            jQuery('.reportActionButtons').removeClass('hide');
+        });
+    }
+
+    registerEventForModifyCondition() {
+        jQuery('button[name=modify_condition]').on('click', function(e) {
+            var icon =  jQuery(e.currentTarget).find('i');
+            var isClassExist = jQuery(icon).hasClass('fa-chevron-right');
+            if(isClassExist) {
+                jQuery(e.currentTarget).find('i').removeClass('fa-chevron-right').addClass('fa-chevron-down');
+                jQuery('#filterContainer').removeClass('hide').show('slow');
+            } else {
+                jQuery(e.currentTarget).find('i').removeClass('fa-chevron-down').addClass('fa-chevron-right');
+                jQuery('#filterContainer').addClass('hide').hide('slow');
+            }
+            return false;
+        });
+    }
+
+    registerOnlyAllUsersInSharedList() {
+        var self = this;
+        jQuery('#memberList').on('change',function(e){
+            var element = jQuery(e.currentTarget);
+            if(self.isAllUsersSelected()){
+                element.find('option').not('[value="All::Users"]').prop('disabled',true);
+                element.select2('val',['All::Users']);
+                element.select2('close');
+            }else{
+                element.find('option').removeProp('disabled');
+            }
+        });
+    }
+
+    isAllUsersSelected() {
+        var memberList = jQuery('#memberList').val();
+        return (memberList != null && (memberList.indexOf('All::Users') != -1)) ? true : false
+    }
+
+    registerEvents() {
+        this.registerSaveOrGenerateReportEvent();
         this.registerEventsForActions();
-		var container = this.getContentHolder();
-		this.advanceFilterInstance = Vtiger_AdvanceFilter_Js.getInstance(jQuery('.filterContainer',container));
+        var container = this.getContentHolder();
+        this.advanceFilterInstance = Vtiger_AdvanceFilter_Js.getInstance(jQuery('.filterContainer',container));
         this.generateReportCount(parseInt(jQuery("#countValue").text()));
-		this.registerConditionBlockChangeEvent();
-		this.registerEventForModifyCondition();
+        this.registerConditionBlockChangeEvent();
+        this.registerEventForModifyCondition();
                 this.registerOnlyAllUsersInSharedList();
-	}
-});
+    }
+};

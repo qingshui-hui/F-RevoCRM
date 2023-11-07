@@ -7,6 +7,4 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Inventory_List_Js("Quotes_List_Js",{},{
-    
-});
+class Quotes_List_Js extends Inventory_List_Js {};

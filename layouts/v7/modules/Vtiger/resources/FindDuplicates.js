@@ -7,23 +7,19 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
-    
-    massDeleteRecords : function(url) {
-		var listInstance = app.controller();
+class Vtiger_FindDuplicates_Js extends Vtiger_List_Js {
+    static massDeleteRecords(url) {
+        var listInstance = app.controller();
         var fields = jQuery('#duplicateSearchFields').val();
         var ignoreEmpty = jQuery('#ignoreEmpty').val();
         url += '&mode=FindDuplicates&fields=' + fields + '&ignoreEmpty=' + ignoreEmpty;
-		listInstance.performMassDeleteRecords(url);
-	}
-    
-},{
-   
-   
+        listInstance.performMassDeleteRecords(url);
+    }
+
     /**
      * Function to update selected checkboxes after pagination
      */
-    updateSelectedCheckboxes : function() {
+    updateSelectedCheckboxes() {
         var thisInstance = this;
         var selectedIds = thisInstance.readMergeSelectedIds();
         if(typeof selectedIds != 'undefined') {
@@ -34,9 +30,9 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
                 }
             });
         }
-    },
-    
-    loadListViewRecords : function(params) {        
+    }
+
+    loadListViewRecords(params) {        
         var self = this;
         var aDeferred = jQuery.Deferred();
         var container = this.getListViewContainer();
@@ -47,10 +43,10 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
             params.page = jQuery('#pageNumber').val();
         }
             
-		var fields = jQuery('#duplicateSearchFields').val();
-		var moduleName = app.module();
-		var ignoreEmpty = jQuery('#ignoreEmpty').val();
-		var url = 'index.php?module='+moduleName+'&view=FindDuplicates&fields='+fields+'&ignoreEmpty='+ignoreEmpty+'&page='+params.page;
+        var fields = jQuery('#duplicateSearchFields').val();
+        var moduleName = app.module();
+        var ignoreEmpty = jQuery('#ignoreEmpty').val();
+        var url = 'index.php?module='+moduleName+'&view=FindDuplicates&fields='+fields+'&ignoreEmpty='+ignoreEmpty+'&page='+params.page;
         app.helper.showProgress();
         app.request.pjax({'url':url}).then(function(error,data) {
             app.helper.hideProgress();
@@ -62,32 +58,32 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
             aDeferred.resolve();
         });
         return aDeferred.promise();
-    },
-    
-    loadFilter : function(cvid) {
-		window.location.href = 'index.php?module='+this.getModuleName()+'&view=List&viewname='+cvid;
-		return;
-    },
+    }
 
-	/**
-	 * Function registers event for merge button
-	 */
-	registerMergeRecordEvent : function(cb) {
-		var thisInstance = this;
+    loadFilter(cvid) {
+        window.location.href = 'index.php?module='+this.getModuleName()+'&view=List&viewname='+cvid;
+        return;
+    }
+
+    /**
+     * Function registers event for merge button
+     */
+    registerMergeRecordEvent(cb) {
+        var thisInstance = this;
         var container = this.getListViewContainer();
-		container.on('click','input[name="merge"]', function(e) {
-			var element = jQuery(e.currentTarget);
-			var groupName = element.data('group');
-			var mergeRecordsCheckBoxes = jQuery('input[name="mergeRecord"]:checked');
+        container.on('click','input[name="merge"]', function(e) {
+            var element = jQuery(e.currentTarget);
+            var groupName = element.data('group');
+            var mergeRecordsCheckBoxes = jQuery('input[name="mergeRecord"]:checked');
             var mergeSelectedIds = thisInstance.readMergeSelectedIds();
             var mergeSelectedIdsLength = Object.keys(mergeSelectedIds).length;
-			if(mergeRecordsCheckBoxes.length < 2 && mergeSelectedIdsLength < 2) {
-				app.helper.showErrorNotification({message : app.vtranslate('JS_SELECT_ATLEAST_TWO_RECORD_FOR_MERGING')});
-				return false;
-			} else {
-				var count = 0;
-				var records = [];
-				var stop = false;
+            if(mergeRecordsCheckBoxes.length < 2 && mergeSelectedIdsLength < 2) {
+                app.helper.showErrorNotification({message : app.vtranslate('JS_SELECT_ATLEAST_TWO_RECORD_FOR_MERGING')});
+                return false;
+            } else {
+                var count = 0;
+                var records = [];
+                var stop = false;
                 
                 mergeRecordsCheckBoxes.each(function(key, obj) {
                     var ele = jQuery(obj);
@@ -111,23 +107,23 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
                         }
                     }
                 }
-				if(stop) return false;
-				if(count > 3) {
-					app.helper.showErrorNotification({message: app.vtranslate('JS_ALLOWED_TO_SELECT_MAX_OF_THREE_RECORDS')});
-					return false;
-				}
+                if(stop) return false;
+                if(count > 3) {
+                    app.helper.showErrorNotification({message: app.vtranslate('JS_ALLOWED_TO_SELECT_MAX_OF_THREE_RECORDS')});
+                    return false;
+                }
                 app.event.trigger('Request.MergeRecords.show',{'records':records});
                 
-			}
-		});
-	},
-    
+            }
+        });
+    }
+
     /** 
     * Function to check if all the values in array are same 
     * @param <array> array 
     * @retrun <boolean> true or false 
-    */ 
-    checkArrayValue : function(array) { 
+    */
+    checkArrayValue(array) { 
         var first; 
         for(first in array) {  
             first = array[first]; 
@@ -138,53 +134,53 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
                 return false; 
         } 
         return true; 
-    },
-    
+    }
+
     /**
      * Function to read the selected merge ids
      */
-    readMergeSelectedIds : function(decode){
-		var cvId = this.getCurrentCvId();
-		var selectedIdsElement = jQuery('#mergeSelectedIds');
-		var selectedIdsDataAttr = cvId+'Selectedids';
-		var selectedIdsElementDataAttributes = selectedIdsElement.data();
-		if (!(selectedIdsDataAttr in selectedIdsElementDataAttributes) ) {
-			var selectedIds = new Array();
-			this.writeMergeSelectedIds(selectedIds);
-		} else {
-			selectedIds = selectedIdsElementDataAttributes[selectedIdsDataAttr];
-		}
-		if(decode == true){
-			if(typeof selectedIds == 'object'){
-				return JSON.stringify(selectedIds);
-			}
-		}
-		return selectedIds;
-	},
-    
-    writeMergeSelectedIds : function(selectedIds){
-		var cvId = this.getCurrentCvId();
-		jQuery('#mergeSelectedIds').data(cvId+'Selectedids',selectedIds);
-	},
-    
-    removeMergeSelectedIds : function() {
+    readMergeSelectedIds(decode) {
         var cvId = this.getCurrentCvId();
-		jQuery('#mergeSelectedIds').removeData(cvId+'Selectedids');
-    },
-    
-     /**
-	 * Function  to register click event for merge check check box.
-	 */
-	registerMergeCheckBoxClickEvent : function(){
-		var listViewPageDiv = this.getListViewContainer();
-		var thisInstance = this;
-		listViewPageDiv.on('click','[name=mergeRecord]',function(e){
-			var selectedIds = thisInstance.readMergeSelectedIds();
+        var selectedIdsElement = jQuery('#mergeSelectedIds');
+        var selectedIdsDataAttr = cvId+'Selectedids';
+        var selectedIdsElementDataAttributes = selectedIdsElement.data();
+        if (!(selectedIdsDataAttr in selectedIdsElementDataAttributes) ) {
+            var selectedIds = new Array();
+            this.writeMergeSelectedIds(selectedIds);
+        } else {
+            selectedIds = selectedIdsElementDataAttributes[selectedIdsDataAttr];
+        }
+        if(decode == true){
+            if(typeof selectedIds == 'object'){
+                return JSON.stringify(selectedIds);
+            }
+        }
+        return selectedIds;
+    }
+
+    writeMergeSelectedIds(selectedIds) {
+        var cvId = this.getCurrentCvId();
+        jQuery('#mergeSelectedIds').data(cvId+'Selectedids',selectedIds);
+    }
+
+    removeMergeSelectedIds() {
+        var cvId = this.getCurrentCvId();
+        jQuery('#mergeSelectedIds').removeData(cvId+'Selectedids');
+    }
+
+    /**
+    * Function  to register click event for merge check check box.
+    */
+    registerMergeCheckBoxClickEvent() {
+        var listViewPageDiv = this.getListViewContainer();
+        var thisInstance = this;
+        listViewPageDiv.on('click','[name=mergeRecord]',function(e){
+            var selectedIds = thisInstance.readMergeSelectedIds();
             if(typeof selectedIds  == 'undefined') {
                 var selectedIds = [];
             }
-			var elem = jQuery(e.currentTarget);
-			if(elem.is(':checked')){
+            var elem = jQuery(e.currentTarget);
+            if(elem.is(':checked')){
                 var id = elem.data('id');
                 if(typeof selectedIds["id"+id] == 'undefined') {
                     var searchFields = JSON.parse(jQuery('#duplicateSearchFields').val());
@@ -198,55 +194,55 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
                             value.push(dataValue);
                         }
                     }
-					selectedIds["id"+id] = JSON.stringify(value); // added id to avoid extra undefined values
-				}
-			} else {
+                    selectedIds["id"+id] = JSON.stringify(value); // added id to avoid extra undefined values
+                }
+            } else {
                 var id = elem.data('id')
                 delete selectedIds["id"+id];
-			}
-			thisInstance.writeMergeSelectedIds(selectedIds);
-		});
-	},
-    
-    registerPostMergeListerEvent : function () {
+            }
+            thisInstance.writeMergeSelectedIds(selectedIds);
+        });
+    }
+
+    registerPostMergeListerEvent() {
         var self = this;
         app.event.on('post.MergeRecords',function(e,data){
             self.removeMergeSelectedIds();
             self.loadListViewRecords();
         });
-    },
+    }
 
-	/**
-	 * Function registers various events for duplicate search
-	 */
-	registerEvents : function() {
-		this.registerMergeRecordEvent();
-		this.registerListViewMainCheckBoxClickEvent();
+    /**
+     * Function registers various events for duplicate search
+     */
+    registerEvents() {
+        this.registerMergeRecordEvent();
+        this.registerListViewMainCheckBoxClickEvent();
         var recordSelectTrackerObj = this.getRecordSelectTrackerInstance();
         recordSelectTrackerObj.registerEvents();
-		this.registerCheckBoxClickEvent();
+        this.registerCheckBoxClickEvent();
         
-		this.registerSelectAllClickEvent();
-		this.registerDeSelectAllClickEvent();
+        this.registerSelectAllClickEvent();
+        this.registerDeSelectAllClickEvent();
         this.registerPostMergeListerEvent();
         this.registerMergeCheckBoxClickEvent();
-		
-		//To Register Pagination Events
-		this.initializePaginationEvents();
-	},
+        
+        //To Register Pagination Events
+        this.initializePaginationEvents();
+    }
 
-	/**
-	 * Function returns current view name for the module
-	 */
-	getCurrentCvId : function(){
-		return jQuery('#viewName').val();
-	},
+    /**
+     * Function returns current view name for the module
+     */
+    getCurrentCvId() {
+        return jQuery('#viewName').val();
+    }
 
-	/**
-	 * Function gets the record count
-	 */
-	getRecordsCount : function(){
-		var aDeferred = jQuery.Deferred();
+    /**
+     * Function gets the record count
+     */
+    getRecordsCount() {
+        var aDeferred = jQuery.Deferred();
         var module = app.getModuleName();
         var parent = app.getParentModuleName();
         var fields = jQuery('#duplicateSearchFields').val();
@@ -261,6 +257,6 @@ Vtiger_List_Js("Vtiger_FindDuplicates_Js",{
                 aDeferred.resolve(data);
             }
         );
-		return aDeferred.promise();
-	}
-});
+        return aDeferred.promise();
+    }
+};

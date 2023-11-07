@@ -7,26 +7,31 @@
  * All Rights Reserved.
  *************************************************************************************/
 
-Vtiger.Class("Settings_Vtiger_TermsAndConditionsEdit_Js", {}, {
+class Settings_Vtiger_TermsAndConditionsEdit_Js extends Vtiger_Class_Js {
     //Contains Terms and Conditions container
-    container: false,
+    container = false;
+
     //return the container of Terms and Conditions
-    getContainer: function () {
+    getContainer() {
         if (this.container === false) {
             this.container = jQuery('#TermsAndConditionsContainer');
         }
         return this.container;
-    },
-    init: function () {
+    }
+
+    constructor() {
+        super();
         this.addComponents();
-    },
-    addComponents: function () {
+    }
+
+    addComponents() {
         this.addComponent('Vtiger_Index_Js');
-    },
+    }
+
     /*
      * Function to save the Terms & Conditions content
      */
-    saveTermsAndConditions: function (textAreaElement) {
+    saveTermsAndConditions(textAreaElement) {
         var aDeferred = jQuery.Deferred();
         var tandcContent = textAreaElement.val();
         var selectedModule = jQuery('#TermsAndConditionsContainer select.selectModule').val();
@@ -47,18 +52,20 @@ Vtiger.Class("Settings_Vtiger_TermsAndConditionsEdit_Js", {}, {
                     }
                 });
         return aDeferred.promise();
-    },
+    }
+
     /*
      * Function to register keyUp event for text area to show save button
      */
-    registerKeyUpEvent: function () {
+    registerKeyUpEvent() {
         var thisInstance = this;
         var container = thisInstance.getContainer();
         container.find('.TCContent').keyup(function (e) {
             jQuery('.saveTC', container).removeClass('hide');
         });
-    },
-    registerEventForTextAreaFields: function (parentElement) {
+    }
+
+    registerEventForTextAreaFields(parentElement) {
         if (typeof parentElement === 'undefined') {
             parentElement = jQuery('body');
         }
@@ -72,8 +79,9 @@ Vtiger.Class("Settings_Vtiger_TermsAndConditionsEdit_Js", {}, {
             return;
         }
 
-    },
-    registerSelectModuleEvent: function () {
+    }
+
+    registerSelectModuleEvent() {
         var container = this.getContainer();
         var textAreaElement = jQuery('.TCContent', container);
         container.find('.selectModule').on('change', function (e) {
@@ -97,8 +105,9 @@ Vtiger.Class("Settings_Vtiger_TermsAndConditionsEdit_Js", {}, {
                 }
             });
         });
-    },
-    registerEvents: function () {
+    }
+
+    registerEvents() {
         var thisInstance = this;
         var container = thisInstance.getContainer();
         var textAreaElement = jQuery('.TCContent', container);
@@ -109,21 +118,20 @@ Vtiger.Class("Settings_Vtiger_TermsAndConditionsEdit_Js", {}, {
         thisInstance.registerKeyUpEvent();
         thisInstance.registerSelectModuleEvent();
 
-		//Register click event for save button
-		saveButton.click(function(e) {
-			saveButton.addClass('hide');
-			
-			//save the new T&C content
-			thisInstance.saveTermsAndConditions(textAreaElement).then(
-				function(data) {
-					thisInstance.registerKeyUpEvent();
-					var message = app.vtranslate('JS_TERMS_AND_CONDITIONS_SAVED')
-					 app.helper.showSuccessNotification({'message':message});
-				});
-		});
-		
-		var instance = new Settings_Vtiger_Index_Js();
-		instance.registerBasicSettingsEvents();
-	}
-
-});
+        //Register click event for save button
+        saveButton.click(function(e) {
+            saveButton.addClass('hide');
+            
+            //save the new T&C content
+            thisInstance.saveTermsAndConditions(textAreaElement).then(
+                function(data) {
+                    thisInstance.registerKeyUpEvent();
+                    var message = app.vtranslate('JS_TERMS_AND_CONDITIONS_SAVED')
+                     app.helper.showSuccessNotification({'message':message});
+                });
+        });
+        
+        var instance = new Settings_Vtiger_Index_Js();
+        instance.registerBasicSettingsEvents();
+    }
+};
